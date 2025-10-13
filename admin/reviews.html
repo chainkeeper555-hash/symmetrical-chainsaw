@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reviews | S4R Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-top: #07121a;
+            --bg-bottom: #001017;
+            --card-bg: #031016;
+            --accent-cyan: #00E0FF;
+            --accent-cyan-2: #72F4FF;
+            --muted-white: #c7dfe6;
+            --thumbnail-yellow: #ffd700;
+            --thumbnail-green: #00ff66;
+            --text-white: #ffffff;
+            --neon-green: #00ff99;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--card-bg);
+            color: var(--muted-white);
+            min-height: 100vh;
+            font-size: clamp(12px, 3vw, 14px);
+            padding: 2rem;
+        }
+
+        .cta-button {
+            background: rgba(167, 236, 255, 1);
+            color: #021d22;
+            border-radius: 15px;
+            border: 1px solid var(--accent-cyan);
+            padding: 12px 24px;
+            font-weight: 900;
+            font-size: clamp(10px, 2.5vw, 12px);
+            transition: all 0.18s cubic-bezier(.2,.9,.3,1);
+        }
+
+        .cta-button:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0,224,255,0.48);
+        }
+
+        .modal {
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--card-bg);
+            border: 1px solid var(--accent-cyan);
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--accent-cyan);
+        }
+
+        th {
+            background: rgba(0, 224, 255, 0.1);
+            font-weight: 600;
+        }
+
+        .review-image {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+
+        .action-button {
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .edit-button {
+            background: rgba(0, 224, 255, 0.2);
+            color: var(--accent-cyan);
+        }
+
+        .delete-button {
+            background: rgba(255, 0, 0, 0.2);
+            color: #ff0000;
+        }
+    </style>
+</head>
+<body>
+    <div class="max-w-7xl mx-auto">
+        <h1 class="text-2xl font-bold text-[var(--text-white)] mb-6">Manage Reviews</h1>
+        <div class="mb-4">
+            <button id="create-review-button" class="cta-button">Create New Review</button>
+        </div>
+        <div id="review-error" class="hidden text-sm text-red-600 mb-4"></div>
+        <table id="reviews-table">
+            <thead>
+                <tr>
+                    <th>Type</th>
+                    <th>Title</th>
+                    <th>Image</th>
+                    <th>Rating</th>
+                    <th>Description</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <!-- Review Form Modal -->
+    <div id="review-modal" class="fixed inset-0 modal hidden flex items-center justify-center z-50">
+        <div class="bg-[var(--card-bg)] p-6 rounded-lg border border-[var(--accent-cyan)] w-full max-w-md">
+            <h2 id="review-modal-title" class="text-lg font-medium text-[var(--text-white)] mb-4">Create Review</h2>
+            <div id="review-form-error" class="hidden text-sm text-red-600 mb-4"></div>
+            <div class="space-y-4">
+                <select id="review-type" class="w-full px-3 py-2 bg-[var(--card-bg)] border border-[var(--accent-cyan)] rounded-md text-[var(--text-white)]">
+                    <option value="slot">Slot</option>
+                    <option value="casino">Casino</option>
+                </select>
+                <input id="review-title" type="text" placeholder="Title" class="w-full px-3 py-2 bg-[var(--card-bg)] border border-[var(--accent-cyan)] rounded-md text-[var(--text-white)]">
+                <input id="review-image" type="file" accept="image/*" class="w-full px-3 py-2 bg-[var(--card-bg)] border border-[var(--accent-cyan)] rounded-md text-[var(--text-white)]">
+                <input id="review-rating" type="number" placeholder="Rating (1-5)" min="1" max="5" class="w-full px-3 py-2 bg-[var(--card-bg)] border border-[var(--accent-cyan)] rounded-md text-[var(--text-white)]">
+                <textarea id="review-description" placeholder="Description" class="w-full px-3 py-2 bg-[var(--card-bg)] border border-[var(--accent-cyan)] rounded-md text-[var(--text-white)]" rows="4"></textarea>
+                <input id="review-id" type="hidden">
+                <div class="flex justify-end space-x-2">
+                    <button id="review-cancel" class="px-4 py-2 text-[var(--muted-white)] hover:text-[var(--accent-cyan)]">Cancel</button>
+                    <button id="review-submit" class="cta-button">Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        feather.replace();
+
+        // Fetch and display reviews
+        async function fetchReviews() {
+            try {
+                const [slotResponse, casinoResponse] = await Promise.all([
+                    fetch('https://sh4nerewards.com/api/reviews?type=slot').then(res => res.ok ? res.json() : { reviews: [] }),
+                    fetch('https://sh4nerewards.com/api/reviews?type=casino').then(res => res.ok ? res.json() : { reviews: [] })
+                ]);
+                const reviews = [...slotResponse.reviews, ...casinoResponse.reviews];
+                const tbody = document.querySelector('#reviews-table tbody');
+                tbody.innerHTML = '';
+
+                if (reviews.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" class="text-center">No reviews found</td></tr>';
+                    return;
+                }
+
+                reviews.forEach(review => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${review.type.charAt(0).toUpperCase() + review.type.slice(1)}</td>
+                        <td>${review.title}</td>
+                        <td><img src="${review.image}" alt="${review.title}" class="review-image"></td>
+                        <td>${review.rating}</td>
+                        <td>${review.description.substring(0, 50)}${review.description.length > 50 ? '...' : ''}</td>
+                        <td>
+                            <button class="action-button edit-button" data-id="${review._id}" data-type="${review.type}" data-title="${review.title}" data-image="${review.image}" data-rating="${review.rating}" data-description="${review.description}">Edit</button>
+                            <button class="action-button delete-button" data-id="${review._id}">Delete</button>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+
+                // Add event listeners for edit and delete buttons
+                document.querySelectorAll('.edit-button').forEach(button => {
+                    button.addEventListener('click', () => {
+                        const modal = document.getElementById('review-modal');
+                        const modalTitle = document.getElementById('review-modal-title');
+                        const reviewId = document.getElementById('review-id');
+                        const reviewType = document.getElementById('review-type');
+                        const reviewTitle = document.getElementById('review-title');
+                        const reviewRating = document.getElementById('review-rating');
+                        const reviewDescription = document.getElementById('review-description');
+
+                        modalTitle.textContent = 'Edit Review';
+                        reviewId.value = button.dataset.id;
+                        reviewType.value = button.dataset.type;
+                        reviewTitle.value = button.dataset.title;
+                        reviewRating.value = button.dataset.rating;
+                        reviewDescription.value = button.dataset.description;
+                        modal.classList.remove('hidden');
+                    });
+                });
+
+                document.querySelectorAll('.delete-button').forEach(button => {
+                    button.addEventListener('click', async () => {
+                        if (!confirm('Are you sure you want to delete this review?')) return;
+                        try {
+                            const response = await fetch(`https://sh4nerewards.com/api/reviews/${button.dataset.id}`, {
+                                method: 'DELETE',
+                                headers: { 'Content-Type': 'application/json' }
+                            });
+                            const result = await response.json();
+                            if (!response.ok) {
+                                throw new Error(result.message || 'Failed to delete review');
+                            }
+                            alert('Review deleted successfully!');
+                            fetchReviews();
+                            updateReviewCount();
+                        } catch (err) {
+                            console.error('Error deleting review:', err);
+                            document.getElementById('review-error').textContent = err.message || 'Failed to delete review';
+                            document.getElementById('review-error').classList.remove('hidden');
+                        }
+                    });
+                });
+            } catch (err) {
+                console.error('Error fetching reviews:', err);
+                document.getElementById('review-error').textContent = 'Failed to load reviews';
+                document.getElementById('review-error').classList.remove('hidden');
+            }
+        }
+
+        // Update review count in parent dashboard
+        async function updateReviewCount() {
+            try {
+                const [slotResponse, casinoResponse] = await Promise.all([
+                    fetch('https://sh4nerewards.com/api/reviews?type=slot').then(res => res.ok ? res.json() : { reviews: [] }),
+                    fetch('https://sh4nerewards.com/api/reviews?type=casino').then(res => res.ok ? res.json() : { reviews: [] })
+                ]);
+                const totalReviews = slotResponse.reviews.length + casinoResponse.reviews.length;
+                const parentWindow = window.parent;
+                if (parentWindow) {
+                    const reviewCount = parentWindow.document.getElementById('review-count');
+                    if (reviewCount) {
+                        reviewCount.textContent = totalReviews || '0';
+                        reviewCount.classList.toggle('hidden', !totalReviews);
+                    }
+                }
+            } catch (err) {
+                console.error('Error updating review count:', err);
+            }
+        }
+
+        // Handle review form submission
+        document.getElementById('review-submit').addEventListener('click', async () => {
+            const reviewId = document.getElementById('review-id').value;
+            const type = document.getElementById('review-type').value;
+            const title = document.getElementById('review-title').value.trim();
+            const rating = parseInt(document.getElementById('review-rating').value);
+            const description = document.getElementById('review-description').value.trim();
+            const imageInput = document.getElementById('review-image');
+            const errorDiv = document.getElementById('review-form-error');
+
+            if (!title || !type || !rating || rating < 1 || rating > 5 || !description) {
+                errorDiv.textContent = 'Please provide title, type, rating (1-5), and description';
+                errorDiv.classList.remove('hidden');
+                return;
+            }
+
+            let image = imageInput.dataset.currentImage || '';
+            if (imageInput.files && imageInput.files[0]) {
+                const file = imageInput.files[0];
+                const reader = new FileReader();
+                reader.onload = async (e) => {
+                    try {
+                        const response = await fetch('https://sh4nerewards.com/api/upload-image', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ image: e.target.result })
+                        });
+                        const result = await response.json();
+                        if (!response.ok) {
+                            throw new Error(result.message || 'Failed to upload image');
+                        }
+                        image = result.url;
+
+                        // Proceed with review submission
+                        await submitReview(reviewId, type, title, rating, description, image);
+                    } catch (err) {
+                        console.error('Error uploading image:', err);
+                        errorDiv.textContent = err.message || 'Failed to upload image';
+                        errorDiv.classList.remove('hidden');
+                    }
+                };
+                reader.readAsDataURL(file);
+            } else {
+                // Proceed without new image
+                await submitReview(reviewId, type, title, rating, description, image);
+            }
+        });
+
+        async function submitReview(reviewId, type, title, rating, description, image) {
+            const errorDiv = document.getElementById('review-form-error');
+            try {
+                const method = reviewId ? 'PUT' : 'POST';
+                const url = reviewId ? `https://sh4nerewards.com/api/reviews/${reviewId}` : 'https://sh4nerewards.com/api/reviews';
+                const response = await fetch(url, {
+                    method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ type, title, rating, description, image: image || 'https://res.cloudinary.com/placeholder.jpg' })
+                });
+                const result = await response.json();
+                if (!response.ok) {
+                    throw new Error(result.message || `Failed to ${reviewId ? 'update' : 'create'} review`);
+                }
+                alert(`Review ${reviewId ? 'updated' : 'created'} successfully!`);
+                document.getElementById('review-modal').classList.add('hidden');
+                document.getElementById('review-id').value = '';
+                document.getElementById('review-type').value = 'slot';
+                document.getElementById('review-title').value = '';
+                document.getElementById('review-image').value = '';
+                document.getElementById('review-rating').value = '';
+                document.getElementById('review-description').value = '';
+                document.getElementById('review-form-error').classList.add('hidden');
+                fetchReviews();
+                updateReviewCount();
+            } catch (err) {
+                console.error(`Error ${reviewId ? 'updating' : 'creating'} review:`, err);
+                errorDiv.textContent = err.message || `Failed to ${reviewId ? 'update' : 'create'} review`;
+                errorDiv.classList.remove('hidden');
+            }
+        }
+
+        // Open create review modal
+        document.getElementById('create-review-button').addEventListener('click', () => {
+            const modal = document.getElementById('review-modal');
+            const modalTitle = document.getElementById('review-modal-title');
+            modalTitle.textContent = 'Create Review';
+            document.getElementById('review-id').value = '';
+            document.getElementById('review-type').value = 'slot';
+            document.getElementById('review-title').value = '';
+            document.getElementById('review-image').value = '';
+            document.getElementById('review-rating').value = '';
+            document.getElementById('review-description').value = '';
+            document.getElementById('review-form-error').classList.add('hidden');
+            modal.classList.remove('hidden');
+        });
+
+        // Cancel review form
+        document.getElementById('review-cancel').addEventListener('click', () => {
+            document.getElementById('review-modal').classList.add('hidden');
+            document.getElementById('review-form-error').classList.add('hidden');
+            document.getElementById('review-id').value = '';
+            document.getElementById('review-type').value = 'slot';
+            document.getElementById('review-title').value = '';
+            document.getElementById('review-image').value = '';
+            document.getElementById('review-rating').value = '';
+            document.getElementById('review-description').value = '';
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchReviews();
+        });
+    </script>
+</body>
+</html>
