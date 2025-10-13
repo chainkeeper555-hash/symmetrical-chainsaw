@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Content</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-top: #07121a;
+            --bg-bottom: #001017;
+            --card-bg: #031016;
+            --accent-cyan: #00E0FF;
+            --accent-cyan-2: #72F4FF;
+            --muted-white: #c7dfe6;
+            --thumbnail-yellow: #ffd700;
+            --thumbnail-green: #00ff66;
+            --text-white: #ffffff;
+            --neon-green: #00ff99;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--card-bg);
+            color: var(--muted-white);
+            min-height: 100vh;
+            font-size: clamp(12px, 3vw, 14px);
+            overflow-x: hidden;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border: 1px solid var(--accent-cyan);
+            backdrop-filter: blur(6px);
+            transition: all 0.25s cubic-bezier(.2,.9,.3,1);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0,224,255,0.28);
+        }
+
+        .cta-button {
+            background: rgba(167, 236, 255, 1);
+            color: #021d22;
+            border-radius: 15px;
+            border: 1px solid var(--accent-cyan);
+            padding: 12px 24px;
+            font-weight: 900;
+            font-size: clamp(10px, 2.5vw, 12px);
+            transition: all 0.18s cubic-bezier(.2,.9,.3,1);
+        }
+
+        .cta-button:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0,224,255,0.48);
+        }
+
+        .chart-container {
+            background: rgba(10, 30, 40, 0.5);
+            border: 1px solid var(--accent-cyan);
+            backdrop-filter: blur(6px);
+        }
+    </style>
+</head>
+<body>
+    <main class="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
+        <!-- Stats Grid -->
+        <div id="dashboard" class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-8">
+            <div class="stat-card rounded-lg">
+                <div class="px-4 py-5 sm:p-6 flex items-center">
+                    <div class="flex-shrink-0 bg-[var(--accent-cyan)] rounded-md p-3">
+                        <i data-feather="message-square" class="h-6 w-6 text-[var(--text-white)]"></i>
+                    </div>
+                    <div class="ml-5">
+                        <dt class="text-sm font-medium text-[var(--muted-white)]">Total Contacts</dt>
+                        <dd class="flex items-baseline">
+                            <div id="total-contacts" class="text-2xl font-semibold text-[var(--text-white)]">0</div>
+                        </dd>
+                    </div>
+                </div>
+            </div>
+            <div class="stat-card rounded-lg">
+                <div class="px-4 py-5 sm:p-6 flex items-center">
+                    <div class="flex-shrink-0 bg-[var(--thumbnail-green)] rounded-md p-3">
+                        <i data-feather="award" class="h-6 w-6 text-[var(--text-white)]"></i>
+                    </div>
+                    <div class="ml-5">
+                        <dt class="text-sm font-medium text-[var(--muted-white)]">Giveaway Entries</dt>
+                        <dd class="flex items-baseline">
+                            <div id="total-entries" class="text-2xl font-semibold text-[var(--text-white)]">0</div>
+                        </dd>
+                    </div>
+                </div>
+            </div>
+            <div class="stat-card rounded-lg">
+                <div class="px-4 py-5 sm:p-6 flex items-center">
+                    <div class="flex-shrink-0 bg-[var(--thumbnail-yellow)] rounded-md p-3">
+                        <i data-feather="users" class="h-6 w-6 text-[var(--text-white)]"></i>
+                    </div>
+                    <div class="ml-5">
+                        <dt class="text-sm font-medium text-[var(--muted-white)]">Total Visitors</dt>
+                        <dd class="flex items-baseline">
+                            <div id="total-visitors" class="text-2xl font-semibold text-[var(--text-white)]">0</div>
+                        </dd>
+                    </div>
+                </div>
+            </div>
+            <div class="stat-card rounded-lg">
+                <div class="px-4 py-5 sm:p-6 flex items-center">
+                    <div class="flex-shrink-0 bg-[var(--accent-cyan-2)] rounded-md p-3">
+                        <i data-feather="link" class="h-6 w-6 text-[var(--text-white)]"></i>
+                    </div>
+                    <div class="ml-5">
+                        <dt class="text-sm font-medium text-[var(--muted-white)]">Total Link Clicks</dt>
+                        <dd class="flex items-baseline">
+                            <div id="total-link-clicks" class="text-2xl font-semibold text-[var(--text-white)]">0</div>
+                        </dd>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+            <div class="chart-container p-6 rounded-lg lg:col-span-2">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-lg font-medium text-[var(--text-white)]">Visitor Activity (Last 14 Days)</h2>
+                    <div class="flex space-x-2">
+                        <button id="chart-all" class="px-3 py-1 text-sm rounded-md bg-[rgba(0,224,255,0.2)] text-[var(--accent-cyan)]">All</button>
+                        <button id="chart-unique" class="px-3 py-1 text-sm rounded-md text-[var(--muted-white)] hover:bg-[rgba(0,224,255,0.1)]">Unique</button>
+                    </div>
+                </div>
+                <div class="h-80">
+                    <canvas id="mainChart"></canvas>
+                </div>
+            </div>
+            <div class="chart-container p-6 rounded-lg">
+                <h2 class="text-lg font-medium text-[var(--text-white)] mb-4">Giveaway Entries</h2>
+                <div class="h-80">
+                    <canvas id="subscribersChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="bg-[var(--card-bg)] p-6 rounded-lg border border-[var(--accent-cyan)] lg:col-span-2">
+                <h2 class="text-lg font-medium text-[var(--text-white)] mb-4">Recent Activity</h2>
+                <div id="recent-activity" class="space-y-4">
+                    <p class="text-sm text-[var(--muted-white)]">No recent activity</p>
+                </div>
+                <div class="mt-4">
+                    <button id="view-all-activity" class="w-full cta-button">View All Activity</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
+            <button id="open-contact-form" class="flex flex-col items-center p-4 bg-[var(--card-bg)] rounded-lg border border-[var(--accent-cyan)] hover:bg-[rgba(0,224,255,0.1)]">
+                <div class="p-3 rounded-full bg-[rgba(0,224,255,0.2)] text-[var(--accent-cyan)]">
+                    <i data-feather="message-square" class="h-6 w-6"></i>
+                </div>
+                <span class="mt-2 text-sm font-medium text-[var(--text-white)]">Submit Contact</span>
+            </button>
+            <button id="open-giveaway-form" class="flex flex-col items-center p-4 bg-[var(--card-bg)] rounded-lg border border-[var(--accent-cyan)] hover:bg-[rgba(0,224,255,0.1)]">
+                <div class="p-3 rounded-full bg-[rgba(0,255,102,0.2)] text-[var(--thumbnail-green)]">
+                    <i data-feather="award" class="h-6 w-6"></i>
+                </div>
+                <span class="mt-2 text-sm font-medium text-[var(--text-white)]">Enter Giveaway</span>
+            </button>
+        </div>
+    </main>
+
+    <script>
+        feather.replace();
+
+        // Track visitor on page load
+        async function trackVisitor() {
+            try {
+                const sessionId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+                const response = await fetch('https://symmetrical-chainsaw-otqn.onrender.com/api/tracking/trackVisitor', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ sessionId })
+                });
+                if (!response.ok) throw new Error(`Visitor API failed: ${response.status}`);
+                const data = await response.json();
+                console.log('Visitor tracked:', data);
+            } catch (err) {
+                console.error('Error tracking visitor:', err);
+            }
+        }
+
+        // Fetch and display stats
+        async function fetchStats() {
+            try {
+                const [contactsResponse, entriesResponse, visitorsResponse, linkClicksResponse] = await Promise.all([
+                    fetch('https://symmetrical-chainsaw-otqn.onrender.com/api/contact').catch(() => ({ ok: false, status: 500 })),
+                    fetch('https://symmetrical-chainsaw-otqn.onrender.com/api/giveaway/entries').catch(() => ({ ok: false, status: 500 })),
+                    fetch('https://symmetrical-chainsaw-otqn.onrender.com/api/tracking/visitors').catch(() => ({ ok: false, status: 500 })),
+                    fetch('https://symmetrical-chainsaw-otqn.onrender.com/api/tracking/link-clicks').catch(() => ({ ok: false, status: 500 }))
+                ]);
+
+                const contacts = contactsResponse.ok ? await contactsResponse.json().catch(() => []) : [];
+                const entries = entriesResponse.ok ? await entriesResponse.json().catch(() => []) : [];
+                const visitors = visitorsResponse.ok ? await visitorsResponse.json().catch(() => []) : [];
+                const linkClicks = linkClicksResponse.ok ? await linkClicksResponse.json().catch(() => []) : [];
+
+                document.getElementById('total-contacts').textContent = contacts.length || '0';
+                document.getElementById('total-entries').textContent = entries.length || '0';
+                document.getElementById('total-visitors').textContent = visitors.length || '0';
+                document.getElementById('total-link-clicks').textContent = linkClicks.length || '0';
+
+                // Notify parent to update sidebar counters
+                if (window.parent && window.parent.document) {
+                    ['contact-count', 'entry-count', 'visitor-count', 'link-click-count'].forEach(id => {
+                        if (window.parent.document.getElementById(id)) {
+                            window.parent.document.getElementById(id).textContent = 
+                                id === 'contact-count' ? contacts.length || '0' :
+                                id === 'entry-count' ? entries.length || '0' :
+                                id === 'visitor-count' ? visitors.length || '0' :
+                                linkClicks.length || '0';
+                            if (id === 'entry-count') {
+                                window.parent.document.getElementById(id).classList.toggle('hidden', !entries.length);
+                            }
+                        }
+                    });
+                }
+            } catch (err) {
+                console.error('Error fetching stats:', err);
+                document.getElementById('total-contacts').textContent = 'Error';
+                document.getElementById('total-entries').textContent = 'Error';
+                document.getElementById('total-visitors').textContent = 'Error';
+                document.getElementById('total-link-clicks').textContent = 'Error';
+            }
+        }
+
+        // Fetch and display charts
+        async function fetchChartData() {
+            try {
+                // Track visitor before fetching data
+                await trackVisitor();
+
+                const [visitorsResponse, entriesResponse] = await Promise.all([
+                    fetch('https://symmetrical-chainsaw-otqn.onrender.com/api/tracking/visitors').catch(() => ({ ok: false, status: 500 })),
+                    fetch('https://symmetrical-chainsaw-otqn.onrender.com/api/giveaway/entries').catch(() => ({ ok: false, status: 500 }))
+                ]);
+
+                const visitors = visitorsResponse.ok ? await visitorsResponse.json().catch(() => []) : [];
+                let entries = entriesResponse.ok ? await entriesResponse.json().catch(() => []) : [];
+                
+                // Ensure entries is an array
+                if (!Array.isArray(entries)) {
+                    console.warn('Entries response is not an array:', entries);
+                    entries = entries.entries && Array.isArray(entries.entries) ? entries.entries : [];
+                }
+
+                // Process visitor activity (last 14 days)
+                const today = new Date();
+                const labels = Array.from({ length: 14 }, (_, i) => {
+                    const date = new Date(today);
+                    date.setDate(today.getDate() - (13 - i));
+                    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                });
+                const visitorCounts = Array(14).fill(0);
+                const uniqueVisitors = new Set();
+                const uniqueCounts = Array(14).fill(0);
+
+                visitors.forEach(visitor => {
+                    if (!visitor.createdAt) return;
+                    try {
+                        const visitedAt = new Date(visitor.createdAt);
+                        const diffDays = Math.floor((today - visitedAt) / (1000 * 60 * 60 * 24));
+                        if (diffDays >= 0 && diffDays < 14) {
+                            visitorCounts[13 - diffDays]++;
+                            if (!uniqueVisitors.has(visitor.sessionId)) {
+                                uniqueVisitors.add(visitor.sessionId);
+                                uniqueCounts[13 - diffDays]++;
+                            }
+                        }
+                    } catch {
+                        console.warn('Invalid visitor date:', visitor.createdAt);
+                    }
+                });
+
+                const mainChartConfig = {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [
+                            {
+                                label: 'Visitors',
+                                data: visitorCounts,
+                                borderColor: '#00b7eb',
+                                backgroundColor: 'rgba(0,183,235,0.2)',
+                                borderWidth: 4,
+                                tension: 0.3,
+                                fill: true
+                            },
+                            {
+                                label: 'Unique Visitors',
+                                data: uniqueCounts,
+                                borderColor: '#ffd700',
+                                backgroundColor: 'rgba(255,215,0,0.2)',
+                                borderWidth: 4,
+                                tension: 0.3,
+                                fill: true,
+                                hidden: true
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                                labels: {
+                                    color: '#ffffff',
+                                    font: { size: 18, weight: 'bold' }
+                                }
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(0,0,0,0.8)',
+                                titleColor: '#ffffff',
+                                bodyColor: '#ffffff',
+                                borderColor: '#00E0FF',
+                                borderWidth: 1
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: { color: 'rgba(199,223,230,0.2)' },
+                                ticks: {
+                                    color: '#ffffff',
+                                    font: { size: 16, weight: 'bold' }
+                                }
+                            },
+                            x: {
+                                grid: { display: false },
+                                ticks: {
+                                    color: '#ffffff',
+                                    font: { size: 16, weight: 'bold' }
+                                }
+                            }
+                        }
+                    }
+                };
+
+                const mainChart = new Chart(document.getElementById('mainChart').getContext('2d'), mainChartConfig);
+
+                // Toggle between All and Unique Visitors
+                document.getElementById('chart-all').addEventListener('click', () => {
+                    mainChart.data.datasets[0].hidden = false;
+                    mainChart.data.datasets[1].hidden = true;
+                    mainChart.update();
+                    document.getElementById('chart-all').classList.add('bg-[rgba(0,224,255,0.2)]', 'text-[var(--accent-cyan)]');
+                    document.getElementById('chart-unique').classList.remove('bg-[rgba(0,224,255,0.2)]', 'text-[var(--accent-cyan)]');
+                    document.getElementById('chart-unique').classList.add('text-[var(--muted-white)]');
+                });
+                document.getElementById('chart-unique').addEventListener('click', () => {
+                    mainChart.data.datasets[0].hidden = true;
+                    mainChart.data.datasets[1].hidden = false;
+                    mainChart.update();
+                    document.getElementById('chart-unique').classList.add('bg-[rgba(0,224,255,0.2)]', 'text-[var(--accent-cyan)]');
+                    document.getElementById('chart-all').classList.remove('bg-[rgba(0,224,255,0.2)]', 'text-[var(--accent-cyan)]');
+                    document.getElementById('chart-all').classList.add('text-[var(--muted-white)]');
+                });
+
+                // Process giveaway entries (monthly)
+                const entryCounts = Array(12).fill(0);
+                const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                entries.forEach(entry => {
+                    if (!entry.createdAt) return;
+                    try {
+                        const enteredAt = new Date(entry.createdAt);
+                        const month = enteredAt.getMonth();
+                        entryCounts[month]++;
+                    } catch {
+                        console.warn('Invalid entry date:', entry.createdAt);
+                    }
+                });
+
+                const subscribersChartConfig = {
+                    type: 'bar',
+                    data: {
+                        labels: months,
+                        datasets: [
+                            {
+                                label: 'Giveaway Entries',
+                                data: entryCounts,
+                                backgroundColor: 'rgba(0,183,235,0.9)',
+                                borderColor: '#00b7eb',
+                                borderWidth: 1
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                                labels: {
+                                    color: '#ffffff',
+                                    font: { size: 18, weight: 'bold' }
+                                }
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(0,0,0,0.8)',
+                                titleColor: '#ffffff',
+                                bodyColor: '#ffffff',
+                                borderColor: '#00E0FF',
+                                borderWidth: 1
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: { color: 'rgba(199,223,230,0.2)' },
+                                ticks: {
+                                    color: '#ffffff',
+                                    font: { size: 16, weight: 'bold' }
+                                }
+                            },
+                            x: {
+                                grid: { display: false },
+                                ticks: {
+                                    color: '#ffffff',
+                                    font: { size: 16, weight: 'bold' }
+                                }
+                            }
+                        }
+                    }
+                };
+
+                const subscribersChart = new Chart(document.getElementById('subscribersChart').getContext('2d'), subscribersChartConfig);
+            } catch (err) {
+                console.error('Error fetching chart data:', err);
+                document.getElementById('mainChart').parentElement.innerHTML = '<p class="text-sm text-[var(--muted-white)]">Error loading chart</p>';
+                document.getElementById('subscribersChart').parentElement.innerHTML = '<p class="text-sm text-[var(--muted-white)]">Error loading chart</p>';
+            }
+        }
+
+        // Fetch and display recent activity
+        async function fetchRecentActivity() {
+            try {
+                const [entriesResponse, newsResponse, shortsResponse, videosResponse, scheduleResponse] = await Promise.all([
+                    fetch('https://symmetrical-chainsaw-otqn.onrender.com/api/giveaway/entries').catch(() => ({ ok: false, status: 500 })),
+                    fetch('https://symmetrical-chainsaw-otqn.onrender.com/api/news').catch(() => ({ ok: false, status: 500 })),
+                    fetch('https://symmetrical-chainsaw-otqn.onrender.com/api/shorts').catch(() => ({ ok: false, status: 500 })),
+                    fetch('https://symmetrical-chainsaw-otqn.onrender.com/api/videos').catch(() => ({ ok: false, status: 500 })),
+                    fetch('https://symmetrical-chainsaw-otqn.onrender.com/api/schedule').catch(() => ({ ok: false, status: 500 }))
+                ]);
+
+                let entries = entriesResponse.ok ? await entriesResponse.json().catch(() => []) : [];
+                const newsData = newsResponse.ok ? await newsResponse.json().catch(() => ({ news: [] })) : { news: [] };
+                const shortsData = shortsResponse.ok ? await shortsResponse.json().catch(() => ({ shorts: [] })) : { shorts: [] };
+                const videosData = videosResponse.ok ? await videosResponse.json().catch(() => ({ videos: [] })) : { videos: [] };
+                const schedule = scheduleResponse.ok ? await scheduleResponse.json().catch(() => []) : [];
+
+                // Ensure entries is an array
+                if (!Array.isArray(entries)) {
+                    console.warn('Entries response is not an array:', entries);
+                    entries = entries.entries && Array.isArray(entries.entries) ? entries.entries : [];
+                }
+
+                const activities = [
+                    ...entries.map(entry => ({
+                        type: 'Giveaway Entry',
+                        icon: 'award',
+                        title: entry.email || 'Unknown Email',
+                        description: `Prize: ${entry.prize || 'Unknown'}`,
+                        timestamp: entry.createdAt ? new Date(entry.createdAt) : null
+                    })),
+                    ...newsData.news.map(item => ({
+                        type: 'News',
+                        icon: 'file-text',
+                        title: item.title || 'Untitled News',
+                        description: item.content || 'No content',
+                        timestamp: item.createdAt ? new Date(item.createdAt) : null
+                    })),
+                    ...shortsData.shorts.map(item => ({
+                        type: 'Short',
+                        icon: 'video',
+                        title: item.title || 'Untitled Short',
+                        description: item.description || 'No description',
+                        timestamp: item.createdAt ? new Date(item.createdAt) : null
+                    })),
+                    ...videosData.videos.map(item => ({
+                        type: 'Video',
+                        icon: 'film',
+                        title: item.title || 'Untitled Video',
+                        description: item.description || 'No description',
+                        timestamp: item.createdAt ? new Date(item.createdAt) : null
+                    })),
+                    ...schedule.map(item => ({
+                        type: 'Schedule',
+                        icon: 'calendar',
+                        title: item.title || 'Untitled Event',
+                        description: item.description || 'No description',
+                        timestamp: item.date ? new Date(item.date) : null
+                    }))
+                ].filter(item => item.timestamp).sort((a, b) => b.timestamp - a.timestamp);
+
+                const activityContainer = document.getElementById('recent-activity');
+                activityContainer.innerHTML = activities.length === 0 ? 
+                    '<p class="text-sm text-[var(--muted-white)]">No recent activity</p>' :
+                    activities.slice(0, 3).map(activity => `
+                        <div class="flex items-start">
+                            <div class="flex-1">
+                                <div class="flex items-center justify-between">
+                                    <p class="text-sm font-medium text-[var(--text-white)]">${activity.title}</p>
+                                    <span class="text-xs text-[var(--muted-white)]">${
+                                        activity.timestamp ? activity.timestamp.toLocaleString() : 'Unknown'
+                                    }</span>
+                                </div>
+                                <p class="text-sm text-[var(--muted-white)]">${activity.description}</p>
+                                <div class="mt-1 flex items-center text-xs text-[var(--muted-white)]">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-[rgba(0,224,255,0.2)] text-[var(--accent-cyan)]">
+                                        <i data-feather="${activity.icon}" class="h-3 w-3 mr-1"></i> ${activity.type}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('') + '<div class="mt-4"><button id="view-all-activity" class="w-full cta-button">View All Activity</button></div>';
+                feather.replace();
+            } catch (err) {
+                console.error('Error fetching recent activity:', err);
+                document.getElementById('recent-activity').innerHTML = '<p class="text-sm text-[var(--muted-white)]">Error loading activity</p>';
+            }
+        }
+
+        // Initialize data
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchStats();
+            fetchChartData();
+            fetchRecentActivity();
+            // Trigger modal buttons in parent
+            document.getElementById('open-contact-form').addEventListener('click', () => {
+                if (window.parent && window.parent.document.getElementById('contact-modal')) {
+                    window.parent.document.getElementById('contact-modal').classList.remove('hidden');
+                }
+            });
+            document.getElementById('open-giveaway-form').addEventListener('click', () => {
+                if (window.parent && window.parent.document.getElementById('giveaway-modal')) {
+                    window.parent.document.getElementById('giveaway-modal').classList.remove('hidden');
+                }
+            });
+            // Navigate to giveaways.html for View All Activity
+            document.getElementById('view-all-activity').addEventListener('click', () => {
+                if (window.parent && window.parent.document.getElementById('content-frame')) {
+                    window.parent.document.getElementById('content-frame').src = 'giveaways.html';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
