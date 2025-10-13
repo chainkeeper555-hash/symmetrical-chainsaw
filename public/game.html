@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <meta http-equiv="Content-Security-Policy" content="
+        default-src 'self';
+        script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://unpkg.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com;
+        style-src 'self' 'unsafe-inline' https://unpkg.com https://fonts.googleapis.com https://fonts.gstatic.com;
+        font-src 'self' https://fonts.gstatic.com;
+        img-src 'self' data: http://localhost:3000 https://res.cloudinary.com;
+        connect-src 'self' http://localhost:3000 https://cdn.jsdelivr.net https://kick.com https://bcgame.st https://api.cloudinary.com https://t.me https://youtube.com https://www.instagram.com;
+        frame-src 'self' https://www.youtube.com https://youtube.com https://youtu.be https://www.youtube-nocookie.com https://player.vimeo.com https://www.kick.com;
+        media-src 'self' sound/;
+    ">
+    <title>SH4NER | S4R - Live Stream</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&display=block" rel="stylesheet">
+    <link rel="stylesheet" href="/game.css">
+    <style>
+        /* Body Padding to Prevent Footer Overlap */
+        @media (max-width: 640px) {
+            body {
+                padding-bottom: 3.5rem; /* Height of bottom-nav (3rem) + buffer */
+            }
+        }
+
+        /* Bottom Navigation (Mobile Only) */
+        .bottom-nav {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            max-width: 100%;
+            margin: 0 auto;
+            background: rgba(0, 14, 15, 0.407);
+            backdrop-filter: blur(10px);
+            z-index: 900;
+            padding: 0.5rem 0;
+        }
+
+        @media (max-width: 640px) {
+            .bottom-nav {
+                display: flex;
+                justify-content: space-around;
+                align-items: center;
+            }
+            .bottom-nav a {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                color: #dfefff;
+                font-size: 0.625rem;
+                font-weight: 600;
+                text-transform: uppercase;
+                padding: 0.125rem 0.5rem;
+                transition: color 0.2s, background 0.2s;
+                width: 20%;
+                min-width: 60px;
+            }
+            .bottom-nav a:hover {
+                color: #ffffff;
+            }
+            .bottom-nav a.nav-active {
+                color: #ffffff;
+                background: #72F4FF;
+            }
+            .bottom-nav a.nav-active i {
+                color: #ffffff;
+            }
+            .bottom-nav a i {
+                width: 1.5rem;
+                height: 1.5rem;
+                margin-bottom: 0.25rem;
+                color: #dfefff;
+                transition: color 0.2s;
+            }
+        }
+
+        /* Floating Kick Button (Mobile Only) */
+        .floating-kick-button {
+            display: none;
+            position: fixed;
+            bottom: 4.5rem;
+            right: 1rem;
+            background: #6addc24d;
+            color: #ffffff;
+            font-size: 0.75rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 0.5rem 1rem;
+            border-radius: 0.75rem;
+            z-index: 950;
+            transition: transform 0.2s, opacity 0.3s, visibility 0.3s;
+        }
+
+        .floating-kick-button.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .floating-kick-button:hover {
+            transform: scale(1.05);
+        }
+
+        @media (max-width: 640px) {
+            .floating-kick-button {
+                display: block;
+                font-size: 0.6rem; /* Smaller on mobile */
+                padding: 0.25rem 0.5rem;
+            }
+        }
+
+        /* Mobile Responsiveness for Sections */
+        @media (max-width: 640px) {
+            .livestream-banner {
+                width: 100%;
+                max-width: 95vw;
+                height: auto;
+            }
+            .schedule-container {
+                padding: 0.5rem;
+            }
+            .schedule-container ul {
+                font-size: 0.8rem;
+                line-height: 1.2;
+            }
+            .review-card {
+                padding: 0.5rem;
+            }
+            .review-card img {
+                max-width: 100%;
+                height: auto;
+            }
+            .review-heading {
+                font-size: 1.2rem !important;
+            }
+            .winner-grid {
+                grid-template-columns: 1fr;
+                gap: 0.25rem; /* Very small gap */
+            }
+            .winner-card {
+                padding: 0.25rem; /* Very small padding */
+                font-size: 0.65rem; /* Very small font */
+            }
+            .winner-card img.winner-avatar {
+                width: 25px; /* Very small avatar */
+                height: 25px;
+            }
+            .winner-card h4 {
+                font-size: 0.7rem;
+                margin: 0.125rem 0;
+            }
+            .winner-card p {
+                font-size: 0.6rem;
+                margin: 0.1rem 0;
+            }
+            .trophy-icon {
+                width: 15px !important;
+                height: 15px !important;
+            }
+            .winning-amount {
+                font-size: 0.65rem !important;
+            }
+            .countdown, .use-code-btn {
+                font-size: 0.55rem;
+                margin: 0.1rem 0;
+                padding: 0.1rem 0.3rem;
+            }
+            .leaderboard-table {
+                font-size: 0.6rem; /* Very small table font */
+            }
+            .leaderboard-table th, .leaderboard-table td {
+                padding: 0.1rem 0.05rem; /* Very tight padding */
+            }
+            .leaderboard-table .avatar {
+                width: 20px;
+                height: 20px;
+            }
+            .pagination {
+                display: flex;
+                justify-content: center;
+                gap: 0.25rem;
+            }
+            .pagination button {
+                padding: 0.2rem 0.4rem;
+                font-size: 0.6rem;
+            }
+            .mobile-warning {
+                display: none; /* Hide mobile warning on mobile devices */
+            }
+        }
+
+        /* Star Rating Styling */
+        .star-rating {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+        }
+        .star-rating i {
+            color: rgba(0, 186, 236, 1);
+            width: 20px;
+            height: 20px;
+        }
+        @media (max-width: 640px) {
+            .star-rating i {
+                width: 15px;
+                height: 15px;
+            }
+        }
+
+        /* Leaderboard Heading Styling */
+        .leaderboard-heading {
+            font-size: 2.8rem; /* 30% smaller than original 4rem */
+        }
+
+        @media (max-width: 640px) {
+            .leaderboard-heading {
+                font-size: 1rem; /* Very small on mobile */
+            }
+            .leaderboard-section {
+                padding: 0.25rem; /* Very small section padding */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-pattern"></div>
+
+    <!-- Header -->
+    <header class="header fixed z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-center justify-between">
+            <div class="flex items-center w-1/3 left-icons">
+                <nav class="flex space-x-4 sm:space-x-6">
+                    <a href="index.html" class="text-[#dfefff]/95 uppercase font-semibold text-xs sm:text-sm tracking-wide">Home</a>
+                    <a href="game.html" class="text-[#dfefff]/95 uppercase font-semibold text-xs sm:text-sm tracking-wide nav-active">Gameplay</a>
+                    <a href="givaway.html" class="text-[#dfefff]/95 uppercase font-semibold text-xs sm:text-sm tracking-wide">Giveaway</a>
+                    <a href="#" class="text-[#dfefff]/95 uppercase font-semibold text-xs sm:text-sm tracking-wide">Help</a>
+                </nav>
+            </div>
+            <div class="flex justify-center w-1/3 logo-container">
+                <img src="/img/Sh4ner_White 1.png" alt="Logo" class="h-8 sm:h-10 rounded-full object-cover">
+            </div>
+            <div class="flex items-center space-x-1 sm:space-x-2 w-1/3 justify-end right-icons">
+                <a href="https://x.com/sh4ner" target="_blank" aria-label="X" class="feather-icon">
+                    <svg class="text-white w-4 h-4 sm:w-5 sm:h-5" viewBox="0 0 48 48" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M 5.9199219 6 L 20.582031 27.375 L 6.2304688 44 L 9.4101562 44 L 21.986328 29.421875 L 31.986328 44 L 44 44 L 28.681641 21.669922 L 42.199219 6 L 39.029297 6 L 27.275391 19.617188 L 17.933594 6 L 5.9199219 6 z M 9.7167969 8 L 16.880859 8 L 40.203125 42 L 33.039062 42 L 9.7167969 8 z"></path>
+                    </svg>
+                </a>
+                <span class="icon-fallback">X</span>
+                <a href="https://youtube.com/@sh4neryt?si=mW-9I4vw14vgCbC_" target="_blank" aria-label="YouTube" class="feather-icon"><i data-feather="youtube" class="text-white w-4 h-4 sm:w-5 sm:h-5"></i></a>
+                <span class="icon-fallback">YT</span>
+                <a href="https://www.instagram.com/s4r.clips?igsh=Z3pyM3hua21qNmI5" target="_blank" aria-label="Instagram" class="feather-icon"><i data-feather="instagram" class="text-white w-4 h-4 sm:w-5 sm:h-5"></i></a>
+                <span class="icon-fallback">IG</span>
+                <a href="https://t.me/SH4NERLOBBY" target="_blank" aria-label="Telegram" class="feather-icon"><i data-feather="send" class="text-white w-4 h-4 sm:w-5 sm:h-5"></i></a>
+                <span class="icon-fallback">TG</span>
+                <a href="https://kick.com/sh4ne_r" target="_blank" class="cta-button flex items-center uppercase font-bold tracking-wider">Follow on Kick!</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 sm:pt-32 pb-12 sm:pb-16 relative">
+        <section class="livestream-section" aria-labelledby="livestream-heading">
+            <div class="flex flex-col items-center mb-8 sm:mb-12">
+                <h2 id="livestream-heading" class="social-heading">S4R | Live Stream</h2>
+                <img src="/img/stream.png" alt="S4R Live Stream Banner" class="livestream-banner" data-aos="fade-up">
+            </div>
+        </section>
+        <h2 id="schedule-heading" class="social-heading">S4R | Stream Schedule</h2>
+        <section class="schedule-section" aria-labelledby="schedule-heading">
+            <div class="max-w-3xl mx-auto">
+                <span class="loader" id="schedule-loader"></span>
+                <div id="schedule-container" class="schedule-container"></div>
+            </div>
+        </section>
+        <section class="action-section" aria-labelledby="action-heading">
+            <div class="flex flex-col items-center mb-8 sm:mb-12">
+                <img src="/img/giveaway.jpg" alt="Join the Action Banner" class="livestream-banner" data-aos="fade-up">
+            </div>
+        </section>
+        <section class="review-section" aria-labelledby="review-heading">
+            <div class="flex flex-col items-center mb-8 sm:mb-12">
+                <h2 id="review-heading" class="social-heading">S4R | Review</h2>
+                <h3 class="review-heading">Slot Review</h3>
+                <span class="loader" id="slot-review-loader"></span>
+                <div id="slot-review-container" class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-8 w-full"></div>
+                <div class="flex justify-end w-full">
+                    <a href="#" class="cta-button flex items-center uppercase font-bold tracking-wider">View More</a>
+                </div>
+            </div>
+        </section>
+        <section class="banner-section" aria-labelledby="banner-heading">
+            <h2 id="banner-heading" class="sr-only">Promotional Banner</h2>
+            <div class="h-divider">
+                <div class="shadow"></div>
+            </div>
+            <div class="flex flex-col items-center mb-8 sm:mb-12">
+                <img src="/img/39d0fbc18d39cd2bd9acd7e6f1ebffbfcc2a9d26.jpg" alt="Promotional Banner" class="livestream-banner" data-aos="fade-up">
+            </div>
+            <div class="h-divider">
+                <div class="shadow"></div>
+            </div>
+        </section>
+        <section class="promo-section" aria-labelledby="promo-heading">
+            <div class="flex flex-col items-center mb-8 sm:mb-12">
+                <h3 class="review-heading text-right self-end">Casino Review</h3>
+                <span class="loader" id="casino-review-loader"></span>
+                <div id="casino-review-container" class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-8 w-full"></div>
+                <div class="flex justify-end w-full">
+                    <a href="#" class="cta-button flex items-center uppercase font-bold tracking-wider">View More</a>
+                </div>
+            </div>
+        </section>
+        <section class="banner-section" aria-labelledby="banner-heading">
+            <h2 id="banner-heading" class="sr-only">Promotional Banner</h2>
+            <div class="h-divider">
+                <div class="shadow"></div>
+            </div>
+            <div class="flex flex-col items-center mb-8 sm:mb-12">
+                <img src="/img/d9f29429e30aa62c64802f7c45ac336191c1343c.jpg" alt="Promotional Banner" class="livestream-banner" data-aos="fade-up">
+            </div>
+            <div class="h-divider">
+                <div class="shadow"></div>
+            </div>
+        </section>
+        <section class="leaderboard-section" aria-labelledby="leaderboard-heading">
+            <h2 id="leaderboard-heading" class="social-heading">S4R | Leaderboard</h2>
+            <div class="container mx-auto px-4 py-8">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="leaderboard-heading font-bold text-white">Leaderboard Wage Race</h3>
+                    <div class="flex gap-4">
+                        <button class="tab-button active" data-tab="daily">Daily</button>
+                        <button class="tab-button inactive" data-tab="monthly">Monthly</button>
+                    </div>
+                </div>
+                <span class="loader" id="leaderboard-loader"></span>
+                <div class="winner-grid grid grid-cols-3 gap-6 mb-8" data-aos="fade-up"></div>
+                <div class="leaderboard-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>User name</th>
+                                <th>Wager</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <div class="pagination"></div>
+            </div>
+        </section>
+        <div class="mobile-warning">
+            <p>Please use a desktop or laptop computer to view this website. Mobile access is not supported at this time.</p>
+        </div>
+    </main>
+    <section class="contact-section" aria-labelledby="contact-heading">
+        <div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+            <div class="h-divider">
+                <div class="shadow"></div>
+            </div>
+            <h2 id="contact-heading" class="social-heading">Contact S4R Team</h2>
+            <form id="contactForm" class="max-w-3xl mx-auto">
+                <p class="text-center text-[16px] sm:text-[18px] text-white font-['Poppins'] mb-8">Reach out to the S4R team for collaboration!</p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <input type="text" id="firstName" name="firstName" placeholder="First Name" class="w-full p-3 rounded-lg bg-[rgba(3,16,22,0.8)] border border-gray-500 text-white placeholder-white placeholder-opacity-70 focus:outline-none focus:ring-2 focus:ring-gray-500" required>
+                    </div>
+                    <div>
+                        <input type="text" id="lastName" name="lastName" placeholder="Last Name" class="w-full p-3 rounded-lg bg-[rgba(3,16,22,0.8)] border border-gray-500 text-white placeholder-white placeholder-opacity-70 focus:outline-none focus:ring-2 focus:ring-gray-500" required>
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <input type="email" id="email" name="email" placeholder="Email" class="w-full p-3 rounded-lg bg-[rgba(3,16,22,0.8)] border border-gray-500 text-white placeholder-white placeholder-opacity-70 focus:outline-none focus:ring-2 focus:ring-gray-500" required>
+                </div>
+                <div class="mb-4">
+                    <input type="tel" id="phone" name="phone" placeholder="Phone Number" class="w-full p-3 rounded-lg bg-[rgba(3,16,22,0.8)] border border-gray-500 text-white placeholder-white placeholder-opacity-70 focus:outline-none focus:ring-2 focus:ring-gray-500">
+                </div>
+                <div class="mb-4">
+                    <textarea id="message" name="message" rows="5" placeholder="Message" class="w-full p-3 rounded-lg bg-[rgba(3,16,22,0.8)] border border-gray-500 text-white placeholder-white placeholder-opacity-70 focus:outline-none focus:ring-2 focus:ring-gray-500" required></textarea>
+                </div>
+                <div class="text-center">
+                    <button type="submit" class="w-full primary-cta rounded-xl uppercase font-bold text-sm sm:text-base">Send Message</button>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <!-- Bottom Navigation (Mobile Only) -->
+    <nav class="bottom-nav">
+        <a href="index.html"><i data-feather="home"></i>Home</a>
+        <a href="game.html" class="nav-active"><i data-feather="play-circle"></i>Gameplay</a>
+        <a href="givaway.html"><i data-feather="gift"></i>Giveaway</a>
+        <a href="#"><i data-feather="help-circle"></i>Help</a>
+    </nav>
+
+    <!-- Floating Kick Button (Mobile Only) -->
+    <a href="https://kick.com/sh4ne_r" target="_blank" class="floating-kick-button">Follow on Kick!</a>
+
+    <!-- Footer Section -->
+    <footer class="footer">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+            <div class="h-divider">
+                <div class="shadow"></div>
+            </div>
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="section-divider w-full mb-8"></div>
+                <h2 class="text-[#FFFF00] font-bold text-[48px] text-center font-['Poppins']">Disclaimer</h2>
+                <p class="text-[16px] text-center font-['Poppins'] font-normal mt-4 max-w-2xl mx-auto disclaimer-text">
+                    sh4ner.com is an independent igaming news site and casino comparison service. Every effort is made to ensure that the bonus offers listed here are accurate and up-to-date. However, we accept no responsibility for inaccuracies or errors. Please check terms and conditions before deciding to take a bonus.
+                </p>
+                <h1 class="text-[#FF0000] font-bold text-[48px] text-center font-['Poppins'] mt-8">Gamble Responsibly</h1>
+                <p class="text-[16px] text-center font-['Poppins'] font-normal mt-4 max-w-2xl mx-auto gamble-text">
+                    Please gamble responsibly. Gambling can have a serious impact on your life. Only gamble with money you can afford to lose.
+                </p>
+                <div class="footer-logo-container">
+                    <img src="/img/75a66996c8988a839e73f363914e85fba6db1e10.png" alt="Logo 1" class="footer-logo">
+                    <img src="/img/1be4be065fedecbf48f67c6f6b5dc6ffa0b85cfb.png" alt="Logo 2" class="footer-logo">
+                    <img src="/img/b787bdceb376f6ca4007ae8c5de2c7bcea17b7ef.png" alt="Logo 3" class="footer-logo">
+                    <img src="/img/164ae989bb0b639138196e2074669754ca16ba85.png" alt="Logo 4" class="footer-logo">
+                </div>
+                <p class="text-[12px] text-center font-['Poppins'] font-normal mt-4">
+                    © 2025 SH4NE_R. All rights reserved. 
+                    <a href="#" class="underline">Privacy Policy</a> | 
+                    <a href="#" class="underline">Terms of Service</a>
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            try {
+                feather.replace();
+            } catch (e) {
+                console.error('Feather Icons failed to load:', e);
+                document.querySelectorAll('.feather-icon').forEach(function(el) {
+                    el.classList.add('empty');
+                });
+            }
+            AOS.init();
+
+            // Scroll Handling for Floating Kick Button
+            let lastScrollTop = 0;
+            let scrollTimeout = null;
+            const kickButton = document.querySelector('.floating-kick-button');
+
+            function throttle(func, wait) {
+                let timeout = null;
+                return function() {
+                    if (!timeout) {
+                        timeout = setTimeout(() => {
+                            func.apply(this, arguments);
+                            timeout = null;
+                        }, wait);
+                    }
+                };
+            }
+
+            const handleScroll = throttle(() => {
+                let currentScrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                if (currentScrollTop > lastScrollTop) {
+                    // Scrolling down
+                    kickButton.classList.add('hidden');
+                } else {
+                    // Scrolling up
+                    kickButton.classList.remove('hidden');
+                }
+                lastScrollTop = currentScrollTop <= 0 ? 0 : currentScrollTop;
+
+                // Show button when scrolling stops
+                clearTimeout(scrollTimeout);
+                scrollTimeout = setTimeout(() => {
+                    kickButton.classList.remove('hidden');
+                }, 150);
+            }, 100);
+
+            window.addEventListener('scroll', handleScroll);
+
+            // Detect mobile devices
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 640;
+            if (isMobile) {
+                document.body.classList.add('mobile-detected');
+            }
+
+            // Helper function to show loader
+            function showLoader(id) {
+                const loader = document.getElementById(id);
+                if (loader) loader.style.display = 'block';
+            }
+
+            // Helper function to hide loader
+            function hideLoader(id) {
+                const loader = document.getElementById(id);
+                if (loader) loader.style.display = 'none';
+            }
+
+            // Render Stream Schedule
+            function renderSchedule() {
+                showLoader('schedule-loader');
+                const scheduleContainer = document.getElementById('schedule-container');
+                if (!scheduleContainer) {
+                    console.error('Schedule container not found');
+                    hideLoader('schedule-loader');
+                    return;
+                }
+                hideLoader('schedule-loader');
+                scheduleContainer.innerHTML = '<p class="text-[var(--muted-white)] text-center text-xl font-bold">Coming soon</p>';
+            }
+
+            // Fetch Reviews (Slot and Casino)
+            async function fetchReviews(type, containerId, loaderId) {
+                showLoader(loaderId);
+                const container = document.getElementById(containerId);
+                if (!container) {
+                    console.error(`${type} review container not found`);
+                    hideLoader(loaderId);
+                    return;
+                }
+                try {
+                    const response = await fetch(`http://localhost:3000/api/reviews?type=${type}`);
+                    const data = await response.json();
+                    hideLoader(loaderId);
+                    if (response.ok && Array.isArray(data.reviews)) {
+                        if (data.reviews.length === 0) {
+                            container.innerHTML = `<p class="text-[var(--muted-white)] text-center">No ${type} reviews available at this time.</p>`;
+                            return;
+                        }
+                        container.innerHTML = '';
+                        data.reviews.forEach((review, index) => {
+                            // Validate and sanitize rating
+                            const rating = parseInt(review.rating, 10);
+                            const validRating = isNaN(rating) || rating < 1 || rating > 5 ? 0 : rating;
+                            const starIcons = Array(validRating).fill().map(() => '<i data-feather="star" class="star-rating"></i>').join('');
+                            const reviewCard = document.createElement('div');
+                            reviewCard.className = 'review-card';
+                            reviewCard.setAttribute('data-aos', 'fade-up');
+                            reviewCard.setAttribute('data-aos-delay', index * 100);
+                            reviewCard.innerHTML = `
+                                <img src="${review.image || 'https://res.cloudinary.com/placeholder.jpg'}" alt="${review.title || 'Untitled'}" class="review-image mb-4">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h4 class="text-white font-bold text-xl sm:text-2xl">${review.title || 'Untitled'}</h4>
+                                    <div class="star-rating">${validRating > 0 ? starIcons : '<span>No rating</span>'}</div>
+                                </div>
+                                <p class="text-white leading-relaxed" style="font-size: 12px;">${review.description || 'No description'}</p>
+                            `;
+                            container.appendChild(reviewCard);
+                        });
+                        // Call feather.replace() once after all cards are added
+                        try {
+                            feather.replace();
+                        } catch (e) {
+                            console.error('Feather Icons failed to render stars:', e);
+                            // Fallback: replace <i> tags with text if Feather fails
+                            container.querySelectorAll('.star-rating i[data-feather="star"]').forEach(star => {
+                                star.outerHTML = '<span style="color: rgba(0, 186, 236, 1); font-size: 20px;">★</span>';
+                            });
+                        }
+                    } else {
+                        console.error(`Error fetching ${type} reviews:`, data.message || 'Invalid response');
+                        container.innerHTML = `<p class="text-[var(--muted-white)] text-center">Error loading ${type} reviews. Please try again later.</p>`;
+                    }
+                } catch (error) {
+                    console.error(`Error fetching ${type} reviews:`, error);
+                    hideLoader(loaderId);
+                    container.innerHTML = `<p class="text-[var(--muted-white)] text-center">Error loading ${type} reviews. Please try again later.</p>`;
+                }
+            }
+
+            // Contact Form Submission
+            const contactForm = document.getElementById('contactForm');
+            if (contactForm) {
+                contactForm.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    const formData = {
+                        firstName: document.getElementById('firstName').value,
+                        lastName: document.getElementById('lastName').value,
+                        email: document.getElementById('email').value,
+                        phone: document.getElementById('phone').value,
+                        message: document.getElementById('message').value
+                    };
+                    try {
+                        const response = await fetch('http://localhost:3000/api/contact', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify(formData)
+                        });
+                        const result = await response.json();
+                        if (response.ok) {
+                            alert('Message sent successfully!');
+                            contactForm.reset();
+                        } else {
+                            alert('Error: ' + result.message);
+                        }
+                    } catch (error) {
+                        console.error('Error submitting form:', error);
+                        alert('An error occurred. Please try again later.');
+                    }
+                });
+            }
+
+            // Leaderboard Functionality
+            const winnerGrid = document.querySelector('.winner-grid');
+            const leaderboardTableBody = document.querySelector('.leaderboard-table tbody');
+            const paginationContainer = document.querySelector('.pagination');
+            let currentPage = 1;
+            const itemsPerPage = 7;
+            let currentTab = 'daily';
+            let lastLeaderboardData = null;
+            let leaderboardInterval = null;
+
+            function formatNumber(num) {
+                return num ? num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') : '0';
+            }
+
+            // Static fallback data with updated top three
+            const fallbackLeaderboardData = [
+                { rank: 1, username: "ЖЕ*****ЧУ", userHandle: "ЖЕ*****ЧУ", betAmount: 4000, avatar: "/img/68bc13f12b9955da45ff08fbac97d84ece42bc86.png" },
+                { rank: 2, username: "El********cc", userHandle: "El********cc", betAmount: 2000, avatar: "/img/68bc13f12b9955da45ff08fbac97d84ece42bc86.png" },
+                { rank: 3, username: "Ma***ts", userHandle: "Ma***ts", betAmount: 1000, avatar: "/img/68bc13f12b9955da45ff08fbac97d84ece42bc86.png" },
+                { rank: 4, username: "Lb*******yb", userHandle: "Lb*******yb", betAmount: 69878.16, avatar: "/img/68bc13f12b9955da45ff08fbac97d84ece42bc86.png" },
+                { rank: 5, username: "St********ac", userHandle: "St********ac", betAmount: 68815.00, avatar: "/img/68bc13f12b9955da45ff08fbac97d84ece42bc86.png" },
+                { rank: 6, username: "Ki**_K", userHandle: "Ki**_K", betAmount: 13919.21, avatar: "/img/68bc13f12b9955da45ff08fbac97d84ece42bc86.png" },
+                { rank: 7, username: "Ma*****f5", userHandle: "Ma*****f5", betAmount: 12877.67, avatar: "/img/68bc13f12b9955da45ff08fbac97d84ece42bc86.png" },
+                { rank: 8, username: "Re**im", userHandle: "Re**im", betAmount: 8819.57, avatar: "/img/68bc13f12b9955da45ff08fbac97d84ece42bc86.png" },
+                { rank: 9, username: "Ng******ri", userHandle: "Ng******ri", betAmount: 8775.00, avatar: "/img/68bc13f12b9955da45ff08fbac97d84ece42bc86.png" },
+                { rank: 10, username: "اب***کل", userHandle: "اب***کل", betAmount: 6843.48, avatar: "/img/68bc13f12b9955da45ff08fbac97d84ece42bc86.png" },
+                { rank: 11, username: "tr******aa", userHandle: "tr******aa", betAmount: 6046.06, avatar: "/img/68bc13f12b9955da45ff08fbac97d84ece42bc86.png" },
+                { rank: 12, username: "Ma*****ay", userHandle: "Ma*****ay", betAmount: 5998.72, avatar: "/img/68bc13f12b9955da45ff08fbac97d84ece42bc86.png" },
+                { rank: 13, username: "Az******🚬", userHandle: "Az******🚬", betAmount: 5912.03, avatar: "/img/68bc13f12b9955da45ff08fbac97d84ece42bc86.png" },
+                { rank: 14, username: "Sa**********te", userHandle: "Sa**********te", betAmount: 5811.83, avatar: "/img/68bc13f12b9955da45ff08fbac97d84ece42bc86.png" },
+                { rank: 15, username: "Bu**********ze", userHandle: "Bu**********ze", betAmount: 5240.29, avatar: "/img/68bc13f12b9955da45ff08fbac97d84ece42bc86.png" },
+                { rank: 16, username: "Br***um", userHandle: "Br***um", betAmount: 4680.00, avatar: "/img/68bc13f12b9955da45ff08fbac97d84ece42bc86.png" },
+                { rank: 17, username: "सा************🚩", userHandle: "सा************🚩", betAmount: 4324.07, avatar: "/img/68bc13f12b9955da45ff08fbac97d84ece42bc86.png" },
+                { rank: 18, username: "ih*****fe", userHandle: "ih*****fe", betAmount: 4240.00, avatar: "/img/68bc13f12b9955da45ff08fbac97d84ece42bc86.png" },
+                { rank: 19, username: "ᘻᓍ******🎭", userHandle: "ᘻᓍ******🎭", betAmount: 4071.90, avatar: "/img/68bc13f12b9955da45ff08fbac97d84ece42bc86.png" },
+                { rank: 20, username: "Ba*******da", userHandle: "Ba*******da", betAmount: 3470.18, avatar: "/img/68bc13f12b9955da45ff08fbac97d84ece42bc86.png" }
+            ];
+
+            async function fetchLeaderboardData(type) {
+                showLoader('leaderboard-loader');
+                try {
+                    console.log('Attempting to fetch from /api/bcgame');
+                    const response = await fetch('http://localhost:3000/api/bcgame', {
+                        method: 'GET',
+                        headers: { 'Content-Type': 'application/json' }
+                    });
+                    const data = await response.json();
+                    console.log('Leaderboard response from /api/bcgame:', JSON.stringify(data, null, 2));
+
+                    if (response.ok && Array.isArray(data.leaderboard) && data.leaderboard.length > 0) {
+                        return data.leaderboard.map((item, index) => ({
+                            username: item.username || 'Anonymous',
+                            userHandle: item.username || 'anonymous',
+                            betAmount: item.wagered || 0,
+                            avatar: item.img || '/img/68bc13f12b9955da45ff08fbac97d84ece42bc86.png',
+                            rank: item.rank || index + 1
+                        }));
+                    } else {
+                        console.log('Falling back to /api/leaderboard/proxy/bcgame with 1-year time range');
+                        const beginTimestamp = Date.now() - 365 * 24 * 60 * 60 * 1000;
+                        const endTimestamp = Date.now();
+                        console.log('Fetching leaderboard with:', { type, beginTimestamp, endTimestamp, invitationCode: '2cv50ogdp', accessKey: 'iigYk9dcgO2XJZeo' });
+                        const fallbackResponse = await fetch('http://localhost:3000/api/leaderboard/proxy/bcgame', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                invitationCode: '2cv50ogdp',
+                                accessKey: 'iigYk9dcgO2XJZeo',
+                                beginTimestamp: beginTimestamp,
+                                endTimestamp: endTimestamp
+                            })
+                        });
+                        const fallbackData = await fallbackResponse.json();
+                        console.log('Fallback leaderboard response:', JSON.stringify(fallbackData, null, 2));
+                        if (fallbackResponse.ok && Array.isArray(fallbackData.data) && fallbackData.data.length > 0) {
+                            return fallbackData.data.map(item => ({
+                                username: item.username || 'Anonymous',
+                                userHandle: item.userHandle || item.username || 'anonymous',
+                                betAmount: item.betAmount || 0,
+                                avatar: item.avatar || '/img/68bc13f12b9955da45ff08fbac97d84ece42bc86.png',
+                                rank: item.rank || 0
+                            }));
+                        } else {
+                            console.log('Both API calls failed or returned no data, using static fallback data');
+                            return fallbackLeaderboardData;
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error fetching leaderboard data:', error.message);
+                    console.log('Using static fallback data due to error');
+                    hideLoader('leaderboard-loader');
+                    return fallbackLeaderboardData;
+                }
+            }
+
+            function arraysEqual(arr1, arr2) {
+                if (!arr1 || !arr2 || arr1.length !== arr2.length) return false;
+                return arr1.every((item, index) => 
+                    item.username === arr2[index].username &&
+                    item.userHandle === arr2[index].userHandle &&
+                    item.betAmount === arr2[index].betAmount &&
+                    item.avatar === arr2[index].avatar
+                );
+            }
+
+            async function renderLeaderboard(type = 'daily', page = 1) {
+                const data = await fetchLeaderboardData(type);
+                
+                if (arraysEqual(data, lastLeaderboardData)) {
+                    return; // Skip rendering if data hasn't changed
+                }
+                lastLeaderboardData = data;
+                hideLoader('leaderboard-loader');
+
+                if (!data || data.length === 0) {
+                    winnerGrid.innerHTML = '<p class="text-[var(--muted-white)] text-center">No leaderboard data available.</p>';
+                    leaderboardTableBody.innerHTML = '';
+                    paginationContainer.innerHTML = '';
+                    return;
+                }
+
+                // Sort data by betAmount in descending order and take top 3
+                const sortedData = [...data].sort((a, b) => b.betAmount - a.betAmount);
+                const topWinners = sortedData.slice(0, 3);
+                
+                // Reorder top winners: [2nd, 1st, 3rd] for left-center-right layout
+                const orderedWinners = [
+                    topWinners[1] || topWinners[0], // 2nd place (left)
+                    topWinners[0],                  // 1st place (center)
+                    topWinners[2] || topWinners[1]  // 3rd place (right)
+                ].filter(winner => winner); // Remove undefined entries
+
+                const startIndex = (page - 1) * itemsPerPage;
+                const paginatedData = data.slice(startIndex, startIndex + itemsPerPage);
+                const leaderboard = paginatedData.slice(3);
+                const totalPages = Math.ceil(data.length / itemsPerPage);
+                
+                winnerGrid.innerHTML = '';
+                leaderboardTableBody.innerHTML = '';
+                paginationContainer.innerHTML = '';
+
+                orderedWinners.forEach((winner, index) => {
+                    const isMiddle = index === 1;
+                    const winnerCard = document.createElement('div');
+                    winnerCard.className = `winner-card ${isMiddle ? 'middle-card' : ''}`;
+                    winnerCard.innerHTML = `
+                        <img src="${winner.avatar}" alt="${winner.username}" class="winner-avatar">
+                        <h4 class="text-xl font-bold text-white">${winner.username}</h4>
+                        <img src="/img/Trophy.gif" alt="Trophy" class="trophy-icon">
+                        <p class="text-gray-400 text-sm">@${winner.userHandle}</p>
+                        <p class="winning-amount">${formatNumber(winner.betAmount)} <img src="/img/download.png" alt="Ethereum" class="eth-icon"></p>
+                        ${isMiddle ? '<div class="countdown" id="countdown"></div><a href="https://bcgame.st/i-sh4ner-n" target="_blank" class="use-code-btn">Use Code SHARE</a>' : ''}
+                    `;
+                    winnerGrid.appendChild(winnerCard);
+                });
+
+                leaderboard.forEach((entry, index) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${startIndex + index + 4}<br><span class="rank-win">Win</span></td>
+                        <td><img src="${entry.avatar}" alt="Avatar" class="avatar">${entry.username}<br><span class="text-gray-400 text-sm">@${entry.userHandle}</span></td>
+                        <td>${formatNumber(entry.betAmount)}</td>
+                    `;
+                    leaderboardTableBody.appendChild(row);
+                });
+
+                if (totalPages > 1) {
+                    const prevButton = document.createElement('button');
+                    prevButton.textContent = '←';
+                    prevButton.disabled = page === 1;
+                    prevButton.addEventListener('click', () => {
+                        if (page > 1) {
+                            currentPage = page - 1;
+                            clearInterval(leaderboardInterval);
+                            renderLeaderboard(currentTab, currentPage);
+                            startLeaderboardUpdates();
+                        }
+                    });
+                    paginationContainer.appendChild(prevButton);
+
+                    for (let i = 1; i <= totalPages; i++) {
+                        const pageButton = document.createElement('button');
+                        pageButton.textContent = i;
+                        pageButton.className = i === page ? 'active' : '';
+                        pageButton.addEventListener('click', () => {
+                            currentPage = i;
+                            clearInterval(leaderboardInterval);
+                            renderLeaderboard(currentTab, currentPage);
+                            startLeaderboardUpdates();
+                        });
+                        paginationContainer.appendChild(pageButton);
+                    }
+
+                    const nextButton = document.createElement('button');
+                    nextButton.textContent = '→';
+                    nextButton.disabled = page === totalPages;
+                    nextButton.addEventListener('click', () => {
+                        if (page < totalPages) {
+                            currentPage = page + 1;
+                            clearInterval(leaderboardInterval);
+                            renderLeaderboard(currentTab, currentPage);
+                            startLeaderboardUpdates();
+                        }
+                    });
+                    paginationContainer.appendChild(nextButton);
+                }
+
+                // Initialize countdown with provided time remaining
+                const countdownElement = document.getElementById('countdown');
+                if (countdownElement) {
+                    const countDownDate = new Date().getTime() + (19 * 24 * 60 * 60 * 1000) + (7 * 60 * 60 * 1000) + (28 * 60 * 1000) + (2 * 1000);
+                    const countdown = setInterval(() => {
+                        const now = new Date().getTime();
+                        const distance = countDownDate - now;
+                        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                        countdownElement.textContent = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+                        if (distance < 0) {
+                            clearInterval(countdown);
+                            countdownElement.textContent = "EXPIRED";
+                        }
+                    }, 1000);
+                }
+            }
+
+            function startLeaderboardUpdates() {
+                if (leaderboardInterval) {
+                    clearInterval(leaderboardInterval);
+                }
+                leaderboardInterval = setInterval(() => {
+                    renderLeaderboard(currentTab, currentPage);
+                }, 30000);
+            }
+
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.addEventListener('click', () => {
+                    document.querySelectorAll('.tab-button').forEach(btn => {
+                        btn.classList.remove('active', 'text-black', 'shadow-lg');
+                        btn.classList.add('inactive');
+                    });
+                    button.classList.remove('inactive');
+                    button.classList.add('active', 'text-black', 'shadow-lg');
+                    currentTab = button.dataset.tab;
+                    currentPage = 1;
+                    clearInterval(leaderboardInterval);
+                    renderLeaderboard(currentTab, currentPage);
+                    startLeaderboardUpdates();
+                });
+            });
+
+            // Initial fetches and start real-time updates
+            renderSchedule();
+            fetchReviews('slot', 'slot-review-container', 'slot-review-loader');
+            fetchReviews('casino', 'casino-review-container', 'casino-review-loader');
+            renderLeaderboard(currentTab, currentPage);
+            startLeaderboardUpdates();
+        });
+    </script>
+</body>
+</html>
