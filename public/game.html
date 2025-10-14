@@ -684,30 +684,30 @@
                 return num ? num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') : '0';
             }
 
-            // Static fallback data with updated prizes
+            // Static fallback data, pre-sorted by betAmount in descending order
             const fallbackLeaderboardData = [
                 { rank: 1, username: "ЖЕ*****ЧУ", betAmount: 238096.25, prizeAmount: 3000, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
                 { rank: 2, username: "Ma***ts", betAmount: 192516.39, prizeAmount: 2000, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
                 { rank: 3, username: "El********cc", betAmount: 94690.22, prizeAmount: 1000, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
-                 { rank: 4, username: "St********ac", betAmount: 68815.00, prizeAmount: 500, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
-                { rank: 5, username: "Lb*******yb", betAmount: 82664.93, prizeAmount: 250, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
+                { rank: 4, username: "Lb*******yb", betAmount: 82664.93, prizeAmount: 250, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
                 { rank: 5, username: "St********ac", betAmount: 68815.00, prizeAmount: 500, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
-                { rank: 6, username: "Ki**_K", betAmount: 13919.21, prizeAmount: 250, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
-                { rank: 7, username: "Ma*****f5", betAmount: 12877.41, prizeAmount: 250, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
-                { rank: 8, username: "Ng******ri", betAmount: 10468.95, prizeAmount: 250, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
-                { rank: 9, username: "Re**im", betAmount: 9354.71, prizeAmount: 250, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
-                { rank: 10, username: "اب***کل", betAmount: 6905.94, prizeAmount: 250, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
-                { rank: 11, username: "Az******🚬", betAmount: 7788.27, prizeAmount: 250, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
-                { rank: 12, username: "Ma*****ay", betAmount: 6781.63, prizeAmount: 250, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
-                { rank: 13, username: "Ar******a_", betAmount: 6055.49, prizeAmount: 250, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
-                { rank: 14, username: "Sa**********te", betAmount: 5830.20, prizeAmount: 250, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
-                { rank: 15, username: "Bu**********ze", betAmount: 5244.91, prizeAmount: 0, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
-                { rank: 16, username: "ᘻᓍ******🎭", betAmount: 4710.64, prizeAmount: 0, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
-                { rank: 17, username: "Br***um", betAmount: 4680.00, prizeAmount: 0, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
-                { rank: 18, username: "सा************🚩", betAmount: 4324.93, prizeAmount: 0, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
-                { rank: 19, username: "ih*****fe", betAmount: 4240.00, prizeAmount: 0, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
-                { rank: 20, username: "Ba*******da", betAmount: 3482.96, prizeAmount: 0, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" }
-            ];
+                { rank: 6, username: "Az******🚬", betAmount: 7788.27, prizeAmount: 250, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
+                { rank: 7, username: "اب***کل", betAmount: 6905.94, prizeAmount: 250, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
+                { rank: 8, username: "Ma*****ay", betAmount: 6781.63, prizeAmount: 250, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
+                { rank: 9, username: "Ar******a_", betAmount: 6055.49, prizeAmount: 250, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
+                { rank: 10, username: "Sa**********te", betAmount: 5830.20, prizeAmount: 250, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
+                { rank: 11, username: "Bu**********ze", betAmount: 5244.91, prizeAmount: 0, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
+                { rank: 12, username: "ᘻᓍ******🎭", betAmount: 4710.64, prizeAmount: 0, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
+                { rank: 13, username: "Br***um", betAmount: 4680.00, prizeAmount: 0, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
+                { rank: 14, username: "सा************🚩", betAmount: 4324.93, prizeAmount: 0, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
+                { rank: 15, username: "ih*****fe", betAmount: 4240.00, prizeAmount: 0, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
+                { rank: 16, username: "Ba*******da", betAmount: 3482.96, prizeAmount: 0, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
+                { rank: 17, username: "Ki**_K", betAmount: 13919.21, prizeAmount: 250, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
+                { rank: 18, username: "Ma*****f5", betAmount: 12877.41, prizeAmount: 250, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
+                { rank: 19, username: "Ng******ri", betAmount: 10468.95, prizeAmount: 250, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
+                { rank: 20, username: "Re**im", betAmount: 9354.71, prizeAmount: 250, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" }
+            ].sort((a, b) => b.betAmount - a.betAmount) // Sort by betAmount descending
+            .map((item, index) => ({ ...item, rank: index + 1 })); // Reassign ranks starting from 1
 
             async function fetchLeaderboardData(type) {
                 showLoader('leaderboard-loader');
@@ -721,13 +721,16 @@
                     console.log('Leaderboard response from /api/bcgame:', JSON.stringify(data, null, 2));
 
                     if (response.ok && Array.isArray(data.leaderboard) && data.leaderboard.length > 0) {
-                        return data.leaderboard.map((item, index) => ({
-                            username: item.username || 'Anonymous',
-                            betAmount: item.wagered || 0,
-                            prizeAmount: item.prize || 0,
-                            avatar: '/img/bc-game-esports-logo-png_seeklogo-619973.png',
-                            rank: item.rank || index + 1
-                        }));
+                        return data.leaderboard
+                            .map((item, index) => ({
+                                username: item.username || 'Anonymous',
+                                betAmount: item.wagered || 0,
+                                prizeAmount: item.prize || 0,
+                                avatar: '/img/bc-game-esports-logo-png_seeklogo-619973.png',
+                                rank: item.rank || index + 1
+                            }))
+                            .sort((a, b) => b.betAmount - a.betAmount) // Sort by betAmount descending
+                            .map((item, index) => ({ ...item, rank: index + 1 })); // Reassign ranks
                     } else {
                         console.log('Falling back to /api/leaderboard/proxy/bcgame with 1-year time range');
                         const beginTimestamp = Date.now() - 365 * 24 * 60 * 60 * 1000;
@@ -746,13 +749,16 @@
                         const fallbackData = await fallbackResponse.json();
                         console.log('Fallback leaderboard response:', JSON.stringify(fallbackData, null, 2));
                         if (fallbackResponse.ok && Array.isArray(fallbackData.data) && fallbackData.data.length > 0) {
-                            return fallbackData.data.map(item => ({
-                                username: item.username || 'Anonymous',
-                                betAmount: item.betAmount || 0,
-                                prizeAmount: item.prizeAmount || 0,
-                                avatar: '/img/bc-game-esports-logo-png_seeklogo-619973.png',
-                                rank: item.rank || 0
-                            }));
+                            return fallbackData.data
+                                .map(item => ({
+                                    username: item.username || 'Anonymous',
+                                    betAmount: item.betAmount || 0,
+                                    prizeAmount: item.prizeAmount || 0,
+                                    avatar: '/img/bc-game-esports-logo-png_seeklogo-619973.png',
+                                    rank: item.rank || 0
+                                }))
+                                .sort((a, b) => b.betAmount - a.betAmount) // Sort by betAmount descending
+                                .map((item, index) => ({ ...item, rank: index + 1 })); // Reassign ranks
                         } else {
                             console.log('Both API calls failed or returned no data, using static fallback data');
                             return fallbackLeaderboardData;
@@ -791,7 +797,7 @@
                     return;
                 }
 
-                // Sort data by betAmount in descending order
+                // Data is already sorted in fetchLeaderboardData, but re-sort to ensure consistency
                 const sortedData = [...data].sort((a, b) => b.betAmount - a.betAmount);
                 const topWinners = sortedData.slice(0, 3);
                 
@@ -898,5 +904,3 @@
     </script>
 </body>
 </html>
-
-
