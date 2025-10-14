@@ -8,7 +8,7 @@
         script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://unpkg.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com;
         style-src 'self' 'unsafe-inline' https://unpkg.com https://fonts.googleapis.com https://fonts.gstatic.com;
         font-src 'self' https://fonts.gstatic.com;
-        img-src 'self' data: https://sh4nerewards.com https://res.cloudinary.com;
+        img-src 'self' data: https://sh4nerewards.com https://res.cloudinary.com https://images.seeklogo.com;
         connect-src 'self' https://sh4nerewards.com https://cdn.jsdelivr.net https://kick.com https://bcgame.st https://api.cloudinary.com https://t.me https://youtube.com https://www.instagram.com;
         frame-src 'self' https://www.youtube.com https://youtube.com https://youtu.be https://www.youtube-nocookie.com https://player.vimeo.com https://www.kick.com;
         media-src 'self' sound/;
@@ -626,28 +626,28 @@
                 return num ? num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') : '0';
             }
 
-            // Static fallback data with updated top three
+            // Static fallback data with updated avatar
             const fallbackLeaderboardData = [
-                { rank: 1, username: "ЖЕ*****ЧУ", userHandle: "ЖЕ*****ЧУ", betAmount: 4000, avatar: "/img/bc-logo.png" },
-                { rank: 2, username: "El********cc", userHandle: "El********cc", betAmount: 2000, avatar: "/img/bc-logo.png" },
-                { rank: 3, username: "Ma***ts", userHandle: "Ma***ts", betAmount: 1000, avatar: "/img/bc-logo.png" },
-                { rank: 4, username: "Lb*******yb", userHandle: "Lb*******yb", betAmount: 69878.16, avatar: "/img/bc-logo.png" },
-                { rank: 5, username: "St********ac", userHandle: "St********ac", betAmount: 68815.00, avatar: "/img/bc-logo.png" },
-                { rank: 6, username: "Ki**_K", userHandle: "Ki**_K", betAmount: 13919.21, avatar: "/img/bc-logo.png" },
-                { rank: 7, username: "Ma*****f5", userHandle: "Ma*****f5", betAmount: 12877.67, avatar: "/img/bc-logo.png" },
-                { rank: 8, username: "Re**im", userHandle: "Re**im", betAmount: 8819.57, avatar: "/img/bc-logo.png" },
-                { rank: 9, username: "Ng******ri", userHandle: "Ng******ri", betAmount: 8775.00, avatar: "/img/bc-logo.png" },
-                { rank: 10, username: "اب***کل", userHandle: "اب***کل", betAmount: 6843.48, avatar: "/img/bc-logo.png" },
-                { rank: 11, username: "tr******aa", userHandle: "tr******aa", betAmount: 6046.06, avatar: "/img/bc-logo.png" },
-                { rank: 12, username: "Ma*****ay", userHandle: "Ma*****ay", betAmount: 5998.72, avatar: "/img/bc-logo.png" },
-                { rank: 13, username: "Az******🚬", userHandle: "Az******🚬", betAmount: 5912.03, avatar: "/img/bc-logo.png" },
-                { rank: 14, username: "Sa**********te", userHandle: "Sa**********te", betAmount: 5811.83, avatar: "/img/bc-logo.png" },
-                { rank: 15, username: "Bu**********ze", userHandle: "Bu**********ze", betAmount: 5240.29, avatar: "/img/bc-logo.png" },
-                { rank: 16, username: "Br***um", userHandle: "Br***um", betAmount: 4680.00, avatar: "/img/bc-logo.png" },
-                { rank: 17, username: "सा************🚩", userHandle: "सा************🚩", betAmount: 4324.07, avatar: "/img/bc-logo.png" },
-                { rank: 18, username: "ih*****fe", userHandle: "ih*****fe", betAmount: 4240.00, avatar: "/img/bc-logo.png" },
-                { rank: 19, username: "ᘻᓍ******🎭", userHandle: "ᘻᓍ******🎭", betAmount: 4071.90, avatar: "/img/bc-logo.png" },
-                { rank: 20, username: "Ba*******da", userHandle: "Ba*******da", betAmount: 3470.18, avatar: "/img/bc-logo.png" }
+                { rank: 1, username: "ЖЕ*****ЧУ", userHandle: "ЖЕ*****ЧУ", betAmount: 4000, avatar: "https://images.seeklogo.com/logo-png/61/2/bc-game-esports-logo-png_seeklogo-619973.png" },
+                { rank: 2, username: "El********cc", userHandle: "El********cc", betAmount: 2000, avatar: "https://images.seeklogo.com/logo-png/61/2/bc-game-esports-logo-png_seeklogo-619973.png" },
+                { rank: 3, username: "Ma***ts", userHandle: "Ma***ts", betAmount: 1000, avatar: "https://images.seeklogo.com/logo-png/61/2/bc-game-esports-logo-png_seeklogo-619973.png" },
+                { rank: 4, username: "Lb*******yb", userHandle: "Lb*******yb", betAmount: 69878.16, avatar: "https://images.seeklogo.com/logo-png/61/2/bc-game-esports-logo-png_seeklogo-619973.png" },
+                { rank: 5, username: "St********ac", userHandle: "St********ac", betAmount: 68815.00, avatar: "https://images.seeklogo.com/logo-png/61/2/bc-game-esports-logo-png_seeklogo-619973.png" },
+                { rank: 6, username: "Ki**_K", userHandle: "Ki**_K", betAmount: 13919.21, avatar: "https://images.seeklogo.com/logo-png/61/2/bc-game-esports-logo-png_seeklogo-619973.png" },
+                { rank: 7, username: "Ma*****f5", userHandle: "Ma*****f5", betAmount: 12877.67, avatar: "https://images.seeklogo.com/logo-png/61/2/bc-game-esports-logo-png_seeklogo-619973.png" },
+                { rank: 8, username: "Re**im", userHandle: "Re**im", betAmount: 8819.57, avatar: "https://images.seeklogo.com/logo-png/61/2/bc-game-esports-logo-png_seeklogo-619973.png" },
+                { rank: 9, username: "Ng******ri", userHandle: "Ng******ri", betAmount: 8775.00, avatar: "https://images.seeklogo.com/logo-png/61/2/bc-game-esports-logo-png_seeklogo-619973.png" },
+                { rank: 10, username: "اب***کل", userHandle: "اب***کل", betAmount: 6843.48, avatar: "https://images.seeklogo.com/logo-png/61/2/bc-game-esports-logo-png_seeklogo-619973.png" },
+                { rank: 11, username: "tr******aa", userHandle: "tr******aa", betAmount: 6046.06, avatar: "https://images.seeklogo.com/logo-png/61/2/bc-game-esports-logo-png_seeklogo-619973.png" },
+                { rank: 12, username: "Ma*****ay", userHandle: "Ma*****ay", betAmount: 5998.72, avatar: "https://images.seeklogo.com/logo-png/61/2/bc-game-esports-logo-png_seeklogo-619973.png" },
+                { rank: 13, username: "Az******🚬", userHandle: "Az******🚬", betAmount: 5912.03, avatar: "https://images.seeklogo.com/logo-png/61/2/bc-game-esports-logo-png_seeklogo-619973.png" },
+                { rank: 14, username: "Sa**********te", userHandle: "Sa**********te", betAmount: 5811.83, avatar: "https://images.seeklogo.com/logo-png/61/2/bc-game-esports-logo-png_seeklogo-619973.png" },
+                { rank: 15, username: "Bu**********ze", userHandle: "Bu**********ze", betAmount: 5240.29, avatar: "https://images.seeklogo.com/logo-png/61/2/bc-game-esports-logo-png_seeklogo-619973.png" },
+                { rank: 16, username: "Br***um", userHandle: "Br***um", betAmount: 4680.00, avatar: "https://images.seeklogo.com/logo-png/61/2/bc-game-esports-logo-png_seeklogo-619973.png" },
+                { rank: 17, username: "सा************🚩", userHandle: "सा************🚩", betAmount: 4324.07, avatar: "https://images.seeklogo.com/logo-png/61/2/bc-game-esports-logo-png_seeklogo-619973.png" },
+                { rank: 18, username: "ih*****fe", userHandle: "ih*****fe", betAmount: 4240.00, avatar: "https://images.seeklogo.com/logo-png/61/2/bc-game-esports-logo-png_seeklogo-619973.png" },
+                { rank: 19, username: "ᘻᓍ******🎭", userHandle: "ᘻᓍ******🎭", betAmount: 4071.90, avatar: "https://images.seeklogo.com/logo-png/61/2/bc-game-esports-logo-png_seeklogo-619973.png" },
+                { rank: 20, username: "Ba*******da", userHandle: "Ba*******da", betAmount: 3470.18, avatar: "https://images.seeklogo.com/logo-png/61/2/bc-game-esports-logo-png_seeklogo-619973.png" }
             ];
 
             async function fetchLeaderboardData(type) {
@@ -666,7 +666,7 @@
                             username: item.username || 'Anonymous',
                             userHandle: item.username || 'anonymous',
                             betAmount: item.wagered || 0,
-                            avatar: '/img/bc-logo.png',
+                            avatar: 'https://images.seeklogo.com/logo-png/61/2/bc-game-esports-logo-png_seeklogo-619973.png',
                             rank: item.rank || index + 1
                         }));
                     } else {
@@ -691,7 +691,7 @@
                                 username: item.username || 'Anonymous',
                                 userHandle: item.userHandle || item.username || 'anonymous',
                                 betAmount: item.betAmount || 0,
-                                avatar: '/img/bc-logo.png',
+                                avatar: 'https://images.seeklogo.com/logo-png/61/2/bc-game-esports-logo-png_seeklogo-619973.png',
                                 rank: item.rank || 0
                             }));
                         } else {
@@ -732,7 +732,7 @@
                     return;
                 }
 
-                // Sort data by betAmount in descending order and take top 3
+                // Sort data by betAmount in descending order
                 const sortedData = [...data].sort((a, b) => b.betAmount - a.betAmount);
                 const topWinners = sortedData.slice(0, 3);
                 
@@ -743,8 +743,8 @@
                     topWinners[2] || topWinners[1]  // 3rd place (right)
                 ].filter(winner => winner); // Remove undefined entries
 
-                const leaderboard = sortedData.slice(3); // All entries beyond top 3
-                
+                const leaderboard = sortedData; // All entries
+
                 winnerGrid.innerHTML = '';
                 leaderboardTableBody.innerHTML = '';
 
@@ -754,12 +754,12 @@
                     const winnerCard = document.createElement('div');
                     winnerCard.className = `winner-card ${isMiddle ? 'middle-card' : ''}`;
                     winnerCard.innerHTML = `
+                        <div class="rank-overlay">${rankNumber}</div>
                         <img src="${winner.avatar}" alt="${winner.username}" class="winner-avatar">
-                        <span class="rank-overlay">${rankNumber}</span>
                         <h4 class="text-xl font-bold text-white">${winner.username}</h4>
                         <img src="/img/Trophy.gif" alt="Trophy" class="trophy-icon">
                         <p class="text-gray-400 text-sm">@${winner.userHandle}</p>
-                        <p class="winning-amount">${formatNumber(winner.betAmount)}#$</p>
+                        <p class="winning-amount">$${formatNumber(winner.betAmount)}#$</p>
                         ${isMiddle ? '<div class="countdown" id="countdown"></div><a href="https://bcgame.st/i-sh4ner-n" target="_blank" class="use-code-btn">Use Code SHARE</a>' : ''}
                     `;
                     winnerGrid.appendChild(winnerCard);
@@ -770,7 +770,7 @@
                     row.innerHTML = `
                         <td>${entry.rank}</td>
                         <td><img src="${entry.avatar}" alt="Avatar" class="avatar">${entry.username}<br><span class="text-gray-400 text-sm">@${entry.userHandle}</span></td>
-                        <td>${formatNumber(entry.betAmount)}#$</td>
+                        <td>$${formatNumber(entry.betAmount)}#$</td>
                     `;
                     leaderboardTableBody.appendChild(row);
                 });
