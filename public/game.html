@@ -626,11 +626,11 @@
                 return num ? num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') : '0';
             }
 
-            // Static fallback data with updated entries for ranks 4-20
+            // Static fallback data with updated second-place entry
             const fallbackLeaderboardData = [
-                { rank: 1, username: "ЖЕ*****ЧУ", userHandle: "ЖЕ*****ЧУ", betAmount: 238096.25, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
-                { rank: 2, username: "Ma***ts", userHandle: "Ma***ts", betAmount: 192516.39, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
-                { rank: 3, username: "El********cc", userHandle: "El********cc", betAmount: 94690.22, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
+                { rank: 1, username: "ЖЕ*****ЧУ", userHandle: "ЖЕ*****ЧУ", betAmount: 238096.25, prizeAmount: 4000, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
+                { rank: 2, username: "Ma***ts", userHandle: "Ma***ts", betAmount: 192516.39, prizeAmount: 2000, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
+                { rank: 3, username: "El********cc", userHandle: "El********cc", betAmount: 94690.22, prizeAmount: 1000, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
                 { rank: 4, username: "Lb*******yb", userHandle: "Lb*******yb", betAmount: 82664.93, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
                 { rank: 5, username: "St********ac", userHandle: "St********ac", betAmount: 68815.00, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
                 { rank: 6, username: "Ki**_K", userHandle: "Ki**_K", betAmount: 13919.21, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
@@ -666,6 +666,7 @@
                             username: item.username || 'Anonymous',
                             userHandle: item.username || 'anonymous',
                             betAmount: item.wagered || 0,
+                            prizeAmount: item.prize || 0,
                             avatar: '/img/bc-game-esports-logo-png_seeklogo-619973.png',
                             rank: item.rank || index + 1
                         }));
@@ -691,6 +692,7 @@
                                 username: item.username || 'Anonymous',
                                 userHandle: item.userHandle || item.username || 'anonymous',
                                 betAmount: item.betAmount || 0,
+                                prizeAmount: item.prizeAmount || 0,
                                 avatar: '/img/bc-game-esports-logo-png_seeklogo-619973.png',
                                 rank: item.rank || 0
                             }));
@@ -713,6 +715,7 @@
                     item.username === arr2[index].username &&
                     item.userHandle === arr2[index].userHandle &&
                     item.betAmount === arr2[index].betAmount &&
+                    item.prizeAmount === arr2[index].prizeAmount &&
                     item.avatar === arr2[index].avatar
                 );
             }
@@ -759,7 +762,7 @@
                         <h4 class="text-xl font-bold text-white">${winner.username}</h4>
                         <img src="/img/Trophy.gif" alt="Trophy" class="trophy-icon">
                         <p class="text-gray-400 text-sm">@${winner.userHandle}</p>
-                        <p class="winning-amount">$${formatNumber(winner.betAmount)}</p>
+                        <p class="winning-amount">$${formatNumber(winner.prizeAmount)}</p>
                         ${isMiddle ? '<div class="countdown" id="countdown"></div><a href="https://bcgame.st/i-sh4ner-n" target="_blank" class="use-code-btn">Use Code SHARE</a>' : ''}
                     `;
                     winnerGrid.appendChild(winnerCard);
