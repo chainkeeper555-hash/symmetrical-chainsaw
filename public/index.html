@@ -197,6 +197,10 @@
                 bottom: 13%;
             }
         }
+        /* Smooth Scroll Offset for Fixed Header */
+        #contact-heading {
+            scroll-margin-top: 80px;
+        }
     </style>
 </head>
 <body>
@@ -210,7 +214,7 @@
                     <a href="index.html" class="text-[#dfefff]/95 uppercase font-semibold text-xs sm:text-sm tracking-wide nav-active">Home</a>
                     <a href="game.html" class="text-[#dfefff]/95 uppercase font-semibold text-xs sm:text-sm tracking-wide">Gameplay</a>
                     <a href="givaway.html" class="text-[#dfefff]/95 uppercase font-semibold text-xs sm:text-sm tracking-wide">Giveaway</a>
-                    <a href="#" class="text-[#dfefff]/95 uppercase font-semibold text-xs sm:text-sm tracking-wide">Help</a>
+                    <a href="#contact-heading" class="text-[#dfefff]/95 uppercase font-semibold text-xs sm:text-sm tracking-wide">Help</a>
                 </nav>
             </div>
             <div class="flex justify-center w-1/3 logo-container">
@@ -265,7 +269,7 @@
                     </svg>
                 </div>
                 <div style="display: flex; flex-direction: row; align-items: center;">
-                    <p style="margin: 0; font-size: 11px; text-align: left; flex-grow: 1;">We use cookies and other technologies to help personalize content, tailor and measure ads, and provide a better experience. By clicking "OK" or turning on a cookie preference, you agree to this as outlined in our <a href="/cookie-policy" style="color: #A7ECFF; text-decoration: underline;">Cookie Policy</a>. To change preferences or withdraw consent, please update your <a href="/cookie-preferences" style="color: #A7ECFF; text-decoration: underline;">cookie preferences</a>.</p>
+                    <p style="margin: 0; font-size: 11px; text-align: left; flex-grow: 1;">We use cookies and other technologies.</p>
                     <div style="display: flex; gap: 2px; margin-left: auto; margin-left: 6px;">
                         <button id="cookie-preferences" style="padding: 5px 10px; font-size: 10px; border: 1px solid #A7ECFF; border-radius: 8px; background: #66666600; color: white; cursor: pointer; width: 78px;">Preferences</button>
                         <button id="cookie-accept" style="padding: 5px 10px; font-size: 10px; border: none; border-radius: 5px; background: #A7ECFF; color: rgb(8, 7, 7); cursor: pointer; width: 78px;">OK</button>
@@ -354,7 +358,7 @@
         <a href="index.html" class="nav-active"><i data-feather="home"></i>Home</a>
         <a href="game.html"><i data-feather="play-circle"></i>Gameplay</a>
         <a href="givaway.html"><i data-feather="gift"></i>Giveaway</a>
-        <a href="#"><i data-feather="help-circle"></i>Help</a>
+        <a href="#contact-heading"><i data-feather="help-circle"></i>Help</a>
     </nav>
 
     <!-- Floating Kick Button (Mobile Only) -->
@@ -457,6 +461,17 @@
                     }
                 });
             }
+
+            // Smooth scroll to contact section when Help link is clicked
+            document.querySelectorAll('a[href="#contact-heading"]').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault(); // Prevent default anchor behavior
+                    const contactSection = document.getElementById('contact-heading');
+                    if (contactSection) {
+                        contactSection.scrollIntoView({ behavior: 'smooth' });
+                    }
+                });
+            });
 
             // Scroll Handling for Floating Kick Button
             let lastScrollTop = 0;
