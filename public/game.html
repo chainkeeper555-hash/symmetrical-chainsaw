@@ -236,6 +236,34 @@
             border-radius: 4px;
             font-size: 0.8rem;
         }
+
+        /* Countdown Timer Styling */
+        .countdown {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            font-size: 0.9rem;
+            color: #ffffff;
+            margin-top: 10px;
+        }
+        .countdown span {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .countdown span::after {
+            content: attr(data-label);
+            font-size: 0.7rem;
+            color: #dfefff;
+        }
+        @media (max-width: 640px) {
+            .countdown {
+                font-size: 0.5rem;
+            }
+            .countdown span::after {
+                font-size: 0.4rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -357,6 +385,7 @@
                                 <th>Rank</th>
                                 <th>Username</th>
                                 <th>Wager</th>
+                                <th>Prize</th>
                             </tr>
                         </thead>
                         <tbody></tbody>
@@ -626,28 +655,28 @@
                 return num ? num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') : '0';
             }
 
-            // Static fallback data with top 3 retained and ranks starting from 4 after
+            // Static fallback data with updated prizes
             const fallbackLeaderboardData = [
                 { rank: 1, username: "ЖЕ*****ЧУ", betAmount: 238096.25, prizeAmount: 4000, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
                 { rank: 2, username: "Ma***ts", betAmount: 192516.39, prizeAmount: 2000, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
                 { rank: 3, username: "El********cc", betAmount: 94690.22, prizeAmount: 1000, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
-                { rank: 4, username: "Lb*******yb", betAmount: 82664.93, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
-                { rank: 5, username: "St********ac", betAmount: 68815.00, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
-                { rank: 6, username: "Ki**_K", betAmount: 13919.21, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
-                { rank: 7, username: "Ma*****f5", betAmount: 12877.41, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
-                { rank: 8, username: "Ng******ri", betAmount: 10468.95, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
-                { rank: 9, username: "Re**im", betAmount: 9354.71, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
-                { rank: 10, username: "اب***کل", betAmount: 6905.94, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
-                { rank: 11, username: "Az******🚬", betAmount: 7788.27, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
-                { rank: 12, username: "Ma*****ay", betAmount: 6781.63, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
-                { rank: 13, username: "Ar******a_", betAmount: 6055.49, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
-                { rank: 14, username: "Sa**********te", betAmount: 5830.20, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
-                { rank: 15, username: "Bu**********ze", betAmount: 5244.91, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
-                { rank: 16, username: "ᘻᓍ******🎭", betAmount: 4710.64, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
-                { rank: 17, username: "Br***um", betAmount: 4680.00, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
-                { rank: 18, username: "सा************🚩", betAmount: 4324.93, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
-                { rank: 19, username: "ih*****fe", betAmount: 4240.00, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
-                { rank: 20, username: "Ba*******da", betAmount: 3482.96, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" }
+                { rank: 4, username: "Lb*******yb", betAmount: 82664.93, prizeAmount: 250, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
+                { rank: 5, username: "St********ac", betAmount: 68815.00, prizeAmount: 250, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
+                { rank: 6, username: "Ki**_K", betAmount: 13919.21, prizeAmount: 250, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
+                { rank: 7, username: "Ma*****f5", betAmount: 12877.41, prizeAmount: 250, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
+                { rank: 8, username: "Ng******ri", betAmount: 10468.95, prizeAmount: 250, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
+                { rank: 9, username: "Re**im", betAmount: 9354.71, prizeAmount: 250, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
+                { rank: 10, username: "اب***کل", betAmount: 6905.94, prizeAmount: 250, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
+                { rank: 11, username: "Az******🚬", betAmount: 7788.27, prizeAmount: 250, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
+                { rank: 12, username: "Ma*****ay", betAmount: 6781.63, prizeAmount: 250, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
+                { rank: 13, username: "Ar******a_", betAmount: 6055.49, prizeAmount: 250, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
+                { rank: 14, username: "Sa**********te", betAmount: 5830.20, prizeAmount: 250, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
+                { rank: 15, username: "Bu**********ze", betAmount: 5244.91, prizeAmount: 0, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
+                { rank: 16, username: "ᘻᓍ******🎭", betAmount: 4710.64, prizeAmount: 0, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
+                { rank: 17, username: "Br***um", betAmount: 4680.00, prizeAmount: 0, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
+                { rank: 18, username: "सा************🚩", betAmount: 4324.93, prizeAmount: 0, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
+                { rank: 19, username: "ih*****fe", betAmount: 4240.00, prizeAmount: 0, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
+                { rank: 20, username: "Ba*******da", betAmount: 3482.96, prizeAmount: 0, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" }
             ];
 
             async function fetchLeaderboardData(type) {
@@ -770,24 +799,32 @@
                         <td>${entry.rank}</td>
                         <td><img src="${entry.avatar}" alt="Avatar" class="avatar">${entry.username}</td>
                         <td>$${formatNumber(entry.betAmount)}</td>
+                        <td>${entry.prizeAmount > 0 ? '$' + formatNumber(entry.prizeAmount) : '-'}</td>
                     `;
                     leaderboardTableBody.appendChild(row);
                 });
 
-                // Initialize countdown to show days left in the current month
+                // Initialize countdown to show days, hours, minutes, seconds
                 const countdownElement = document.getElementById('countdown');
                 if (countdownElement) {
-                    // Get the current date and set the end of the month
+                    // Set end date based on provided time (17 days, 22 hours, 10 minutes, 58 seconds from now)
                     const now = new Date();
-                    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
-                    const countDownDate = endOfMonth.getTime();
+                    const countDownDate = new Date(now.getTime() + (17 * 24 * 60 * 60 * 1000) + (22 * 60 * 60 * 1000) + (10 * 60 * 1000) + (58 * 1000));
                     
                     const countdown = setInterval(() => {
                         const currentTime = new Date().getTime();
                         const distance = countDownDate - currentTime;
                         const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
                         
-                        countdownElement.textContent = `${days} days`;
+                        countdownElement.innerHTML = `
+                            <span data-label="Days">${days}</span>
+                            <span data-label="Hours">${hours}</span>
+                            <span data-label="Minutes">${minutes}</span>
+                            <span data-label="Seconds">${seconds}</span>
+                        `;
                         if (distance <= 0) {
                             clearInterval(countdown);
                             countdownElement.textContent = "EXPIRED";
