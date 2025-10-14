@@ -232,9 +232,15 @@
             background: rgba(0, 0, 0, 0.7);
             color: #ffffff;
             font-weight: bold;
-            padding: 2px 6px;
+            padding: 4px 8px;
             border-radius: 4px;
-            font-size: 0.8rem;
+            font-size: 1.2rem; /* Increased size for rank numbers */
+        }
+        @media (max-width: 640px) {
+            .rank-overlay {
+                font-size: 0.9rem; /* Slightly smaller for mobile */
+                padding: 2px 6px;
+            }
         }
 
         /* Countdown Timer Styling */
