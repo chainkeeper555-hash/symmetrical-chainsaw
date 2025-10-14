@@ -169,6 +169,9 @@
             .winning-amount {
                 font-size: 0.65rem !important;
             }
+            .wager-amount {
+                font-size: 0.5rem !important;
+            }
             .countdown, .use-code-btn {
                 font-size: 0.55rem;
                 margin: 0.1rem 0;
@@ -240,6 +243,26 @@
             .rank-overlay {
                 font-size: 0.9rem; /* Slightly smaller for mobile */
                 padding: 2px 6px;
+            }
+        }
+
+        /* Wager and Prize Amount Styling */
+        .wager-amount {
+            font-size: 0.9rem;
+            color: #dfefff;
+            margin: 0.1rem 0;
+        }
+        .winning-amount {
+            font-size: 1rem;
+            color: #ffffff;
+            margin: 0.1rem 0;
+        }
+        @media (max-width: 640px) {
+            .wager-amount {
+                font-size: 0.5rem;
+            }
+            .winning-amount {
+                font-size: 0.65rem;
             }
         }
 
@@ -792,8 +815,9 @@
                         <div class="rank-overlay">${rankNumber}</div>
                         <img src="${winner.avatar}" alt="${winner.username}" class="winner-avatar">
                         <h4 class="text-xl font-bold text-white">${winner.username}</h4>
+                        <p class="wager-amount">Wager: $${formatNumber(winner.betAmount)}</p>
                         <img src="/img/Trophy.gif" alt="Trophy" class="trophy-icon">
-                        <p class="winning-amount">$${formatNumber(winner.prizeAmount)}</p>
+                        <p class="winning-amount">Prize: $${formatNumber(winner.prizeAmount)}</p>
                         ${isMiddle ? '<div class="countdown" id="countdown"></div><a href="https://bcgame.st/i-sh4ner-n" target="_blank" class="use-code-btn">Use Code SHARE</a>' : ''}
                     `;
                     winnerGrid.appendChild(winnerCard);
