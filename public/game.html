@@ -817,7 +817,7 @@
                         <h4 class="text-xl font-bold text-white">${winner.username}</h4>
                         <p class="wager-amount">$${formatNumber(winner.betAmount)}</p>
                         <img src="/img/Trophy.gif" alt="Trophy" class="trophy-icon">
-                        <p class="winning-amount">Prize: $${formatNumber(winner.prizeAmount)}</p>
+                        <p class="winning-amount">$${formatNumber(winner.prizeAmount)}</p>
                         ${isMiddle ? '<div class="countdown" id="countdown"></div><a href="https://bcgame.st/i-sh4ner-n" target="_blank" class="use-code-btn">Use Code SHARE</a>' : ''}
                     `;
                     winnerGrid.appendChild(winnerCard);
