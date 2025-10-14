@@ -684,13 +684,13 @@
                 return num ? num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') : '0';
             }
 
-            // Static fallback data, pre-sorted by betAmount in descending order
+            // Static fallback data, pre-sorted by prizeAmount descending, then betAmount descending
             const fallbackLeaderboardData = [
                 { rank: 1, username: "ЖЕ*****ЧУ", betAmount: 238096.25, prizeAmount: 3000, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
                 { rank: 2, username: "Ma***ts", betAmount: 192516.39, prizeAmount: 2000, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
                 { rank: 3, username: "El********cc", betAmount: 94690.22, prizeAmount: 1000, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
-                { rank: 5, username: "Lb*******yb", betAmount: 82664.93, prizeAmount: 250, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
                 { rank: 4, username: "St********ac", betAmount: 68815.00, prizeAmount: 500, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
+                { rank: 5, username: "Lb*******yb", betAmount: 82664.93, prizeAmount: 250, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
                 { rank: 6, username: "Ki**_K", betAmount: 13919.21, prizeAmount: 250, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
                 { rank: 7, username: "Ma*****f5", betAmount: 12877.41, prizeAmount: 250, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
                 { rank: 8, username: "Ng******ri", betAmount: 10468.95, prizeAmount: 250, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
@@ -706,7 +706,7 @@
                 { rank: 18, username: "सा************🚩", betAmount: 4324.93, prizeAmount: 0, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
                 { rank: 19, username: "ih*****fe", betAmount: 4240.00, prizeAmount: 0, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
                 { rank: 20, username: "Ba*******da", betAmount: 3482.96, prizeAmount: 0, avatar: "/img/bc-game-esports-logo-png_seeklogo-619973.png" }
-            ].sort((a, b) => b.betAmount - a.betAmount) // Sort by betAmount descending
+            ].sort((a, b) => b.prizeAmount - a.prizeAmount || b.betAmount - a.betAmount) // Sort by prizeAmount descending, then betAmount descending
             .map((item, index) => ({ ...item, rank: index + 1 })); // Reassign ranks starting from 1
 
             async function fetchLeaderboardData(type) {
@@ -729,7 +729,7 @@
                                 avatar: '/img/bc-game-esports-logo-png_seeklogo-619973.png',
                                 rank: item.rank || index + 1
                             }))
-                            .sort((a, b) => b.betAmount - a.betAmount) // Sort by betAmount descending
+                            .sort((a, b) => b.prizeAmount - a.prizeAmount || b.betAmount - a.betAmount) // Sort by prizeAmount descending, then betAmount descending
                             .map((item, index) => ({ ...item, rank: index + 1 })); // Reassign ranks
                     } else {
                         console.log('Falling back to /api/leaderboard/proxy/bcgame with 1-year time range');
@@ -757,7 +757,7 @@
                                     avatar: '/img/bc-game-esports-logo-png_seeklogo-619973.png',
                                     rank: item.rank || 0
                                 }))
-                                .sort((a, b) => b.betAmount - a.betAmount) // Sort by betAmount descending
+                                .sort((a, b) => b.prizeAmount - a.prizeAmount || b.betAmount - a.betAmount) // Sort by prizeAmount descending, then betAmount descending
                                 .map((item, index) => ({ ...item, rank: index + 1 })); // Reassign ranks
                         } else {
                             console.log('Both API calls failed or returned no data, using static fallback data');
@@ -798,7 +798,7 @@
                 }
 
                 // Data is already sorted in fetchLeaderboardData, but re-sort to ensure consistency
-                const sortedData = [...data].sort((a, b) => b.betAmount - a.betAmount);
+                const sortedData = [...data].sort((a, b) => b.prizeAmount - a.prizeAmount || b.betAmount - a.betAmount);
                 const topWinners = sortedData.slice(0, 3);
                 
                 // Reorder top winners: [2nd, 1st, 3rd] for left-center-right layout
@@ -904,4 +904,3 @@
     </script>
 </body>
 </html>
-
