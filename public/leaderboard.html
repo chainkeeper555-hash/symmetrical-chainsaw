@@ -8,8 +8,8 @@
         script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://unpkg.com https://cdn.jsdelivr.net;
         style-src 'self' 'unsafe-inline' https://unpkg.com https://fonts.googleapis.com https://fonts.gstatic.com;
         font-src 'self' https://fonts.gstatic.com;
-        img-src 'self' data: https://sh4nerewards.com https://res.cloudinary.com;
-        connect-src 'self' https://sh4nerewards.com https://cdn.jsdelivr.net https://kick.com https://bc.game https://t.me https://youtube.com https://www.instagram.com;
+        img-src 'self' data: http://localhost:3000 https://res.cloudinary.com;
+        connect-src 'self' http://localhost:3000 https://cdn.jsdelivr.net https://kick.com https://bc.game https://t.me https://youtube.com https://www.instagram.com;
         frame-src 'self' https://www.youtube.com https://youtube.com https://youtu.be https://www.youtube-nocookie.com https://player.vimeo.com https://www.kick.com;
         media-src 'self' sound/;
     ">
@@ -252,26 +252,26 @@
 
             // Embedded leaderboard data as fallback
             const fallbackLeaderboardData = [
-                { rank: 1, username: "ЖЕ*****ЧУ", totalWager: 243747.58, reward: 4000, img: "img/bc-game-esports-logo-png_seeklogo-619973.png" },
-                { rank: 2, username: "Ma***ts", totalWager: 205427.81, reward: 2000, img: "img/bc-game-esports-logo-png_seeklogo-619973.png" },
-                { rank: 3, username: "Lb*******yb", totalWager: 97128.16, reward: 1000, img: "img/bc-game-esports-logo-png_seeklogo-619973.png" },
-                { rank: 4, username: "El********cc", totalWager: 94694.31, reward: 250, img: "img/bc-game-esports-logo-png_seeklogo-619973.png" },
-                { rank: 5, username: "St********ac", totalWager: 68815, reward: 250, img: "img/bc-game-esports-logo-png_seeklogo-619973.png" },
-                { rank: 6, username: "Ma*****f5", totalWager: 35404.04, reward: 250, img: "img/bc-game-esports-logo-png_seeklogo-619973.png" },
-                { rank: 7, username: "Ki**_K", totalWager: 13919.21, reward: 250, img: "img/bc-game-esports-logo-png_seeklogo-619973.png" },
-                { rank: 8, username: "Ma*****ay", totalWager: 13235.44, reward: 250, img: "img/bc-game-esports-logo-png_seeklogo-619973.png" },
-                { rank: 9, username: "Re**im", totalWager: 11396.51, reward: 250, img: "img/bc-game-esports-logo-png_seeklogo-619973.png" },
-                { rank: 10, username: "Ng******ri", totalWager: 10468.95, reward: 250, img: "img/bc-game-esports-logo-png_seeklogo-619973.png" },
-                { rank: 11, username: "اب***کل", totalWager: 9752.73, reward: 250, img: "img/bc-game-esports-logo-png_seeklogo-619973.png" },
-                { rank: 12, username: "Az******🚬", totalWager: 7833.94, reward: 250, img: "img/bc-game-esports-logo-png_seeklogo-619973.png" },
-                { rank: 13, username: "ᘻᓍ******🎭", totalWager: 6474.33, reward: 250, img: "img/bc-game-esports-logo-png_seeklogo-619973.png" },
-                { rank: 14, username: "Tr******oa", totalWager: 6094.99, reward: 250, img: "img/bc-game-esports-logo-png_seeklogo-619973.png" },
-                { rank: 15, username: "Sa**********te", totalWager: 5830.2, reward: 250, img: "img/bc-game-esports-logo-png_seeklogo-619973.png" },
-                { rank: 16, username: "Bu**********ze", totalWager: 5253.2, reward: 0, img: "img/bc-game-esports-logo-png_seeklogo-619973.png" },
-                { rank: 17, username: "Br***um", totalWager: 4680, reward: 0, img: "img/bc-game-esports-logo-png_seeklogo-619973.png" },
-                { rank: 18, username: "सा************🚩", totalWager: 4331.13, reward: 0, img: "img/bc-game-esports-logo-png_seeklogo-619973.png" },
-                { rank: 19, username: "ih*****fe", totalWager: 4240, reward: 0, img: "img/bc-game-esports-logo-png_seeklogo-619973.png" },
-                { rank: 20, username: "La*****25", totalWager: 3588.75, reward: 0, img: "img/bc-game-esports-logo-png_seeklogo-619973.png" }
+                { rank: 1, username: "ЖЕ*****ЧУ", totalWager: 243747.58, reward: 3000, img: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
+                { rank: 2, username: "Ma***ts", totalWager: 205427.81, reward: 2000, img: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
+                { rank: 3, username: "Lb*******yb", totalWager: 97128.16, reward: 1000, img: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
+                { rank: 4, username: "El********cc", totalWager: 94694.31, reward: 500, img: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
+                { rank: 5, username: "St********ac", totalWager: 68815, reward: 250, img: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
+                { rank: 6, username: "Ma*****f5", totalWager: 35404.04, reward: 250, img: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
+                { rank: 7, username: "Ki**_K", totalWager: 13919.21, reward: 0, img: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
+                { rank: 8, username: "Ma*****ay", totalWager: 13235.44, reward: 0, img: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
+                { rank: 9, username: "Re**im", totalWager: 11396.51, reward: 0, img: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
+                { rank: 10, username: "Ng******ri", totalWager: 10468.95, reward: 0, img: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
+                { rank: 11, username: "اب***کل", totalWager: 9752.73, reward: 0, img: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
+                { rank: 12, username: "Az******🚬", totalWager: 7833.94, reward: 0, img: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
+                { rank: 13, username: "ᘻᓍ******🎭", totalWager: 6474.33, reward: 0, img: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
+                { rank: 14, username: "Tr******oa", totalWager: 6094.99, reward: 0, img: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
+                { rank: 15, username: "Sa**********te", totalWager: 5830.2, reward: 0, img: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
+                { rank: 16, username: "Bu**********ze", totalWager: 5253.2, reward: 0, img: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
+                { rank: 17, username: "Br***um", totalWager: 4680, reward: 0, img: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
+                { rank: 18, username: "सा************🚩", totalWager: 4331.13, reward: 0, img: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
+                { rank: 19, username: "ih*****fe", totalWager: 4240, reward: 0, img: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
+                { rank: 20, username: "La*****25", totalWager: 3588.75, reward: 0, img: "/img/bc-game-esports-logo-png_seeklogo-619973.png" }
             ];
 
             async function loadLeaderboard() {
@@ -310,11 +310,11 @@
                         winnerCard.className = `winner-card ${isMiddle ? 'middle-card' : ''}`;
                         winnerCard.innerHTML = `
                             <p class="winner-rank">${rankText}</p>
-                            <img src="${winner.img || 'img/bc-game-esports-logo-png_seeklogo-619973.png'}" alt="${winner.username || 'Unknown'}" class="winner-avatar">
+                            <img src="${winner.img || '/img/bc-game-esports-logo-png_seeklogo-619973.png'}" alt="${winner.username || 'Unknown'}" class="winner-avatar">
                             <h4>${winner.username || 'Unknown'}</h4>
                             <img src="/img/Trophy.gif" alt="Trophy" class="trophy-icon">
                             <p class="winning-amount">$${Number(winner.totalWager || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
-                            <p class="winner-prize">${winner.reward ? '$' + Number(winner.reward).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '-'}</p>
+                            <p class="winner-prize">${winner.reward ? '$' + Number(winner.reward).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : ''}</p>
                         `;
                         winnerGrid.appendChild(winnerCard);
                     });
@@ -326,11 +326,11 @@
                         tr.innerHTML = `
                             <td>${p.rank || index + 4}</td>
                             <td class="flex items-center gap-2">
-                                ${p.img ? `<img src="${p.img || 'img/bc-game-esports-logo-png_seeklogo-619973.png'}" class="avatar" alt="Avatar" />` : ''}
+                                ${p.img ? `<img src="${p.img || '/img/bc-game-esports-logo-png_seeklogo-619973.png'}" class="avatar" alt="Avatar" />` : ''}
                                 ${p.username || "Unknown"}
                             </td>
                             <td>$${Number(p.totalWager || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-                            <td>${p.reward ? '$' + Number(p.reward).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '-'}</td>
+                            <td>${p.reward ? '$' + Number(p.reward).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : ''}</td>
                         `;
                         tbody.appendChild(tr);
                     });
@@ -388,11 +388,11 @@
                         winnerCard.className = `winner-card ${isMiddle ? 'middle-card' : ''}`;
                         winnerCard.innerHTML = `
                             <p class="winner-rank">${rankText}</p>
-                            <img src="${winner.img || 'img/bc-game-esports-logo-png_seeklogo-619973.png'}" alt="${winner.username || 'Unknown'}" class="winner-avatar">
+                            <img src="${winner.img || '/img/bc-game-esports-logo-png_seeklogo-619973.png'}" alt="${winner.username || 'Unknown'}" class="winner-avatar">
                             <h4>${winner.username || 'Unknown'}</h4>
                             <img src="/img/Trophy.gif" alt="Trophy" class="trophy-icon">
                             <p class="winning-amount">$${Number(winner.totalWager || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
-                            <p class="winner-prize">${winner.reward ? '$' + Number(winner.reward).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '-'}</p>
+                            <p class="winner-prize">${winner.reward ? '$' + Number(winner.reward).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : ''}</p>
                         `;
                         winnerGrid.appendChild(winnerCard);
                     });
@@ -403,11 +403,11 @@
                         tr.innerHTML = `
                             <td>${p.rank || index + 4}</td>
                             <td class="flex items-center gap-2">
-                                ${p.img ? `<img src="${p.img || 'img/bc-game-esports-logo-png_seeklogo-619973.png'}" class="avatar" alt="Avatar" />` : ''}
+                                ${p.img ? `<img src="${p.img || '/img/bc-game-esports-logo-png_seeklogo-619973.png'}" class="avatar" alt="Avatar" />` : ''}
                                 ${p.username || "Unknown"}
                             </td>
                             <td>$${Number(p.totalWager || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-                            <td>${p.reward ? '$' + Number(p.reward).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '-'}</td>
+                            <td>${p.reward ? '$' + Number(p.reward).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : ''}</td>
                         `;
                         tbody.appendChild(tr);
                     });
@@ -465,5 +465,4 @@
         });
     </script>
 </body>
-
 </html>
