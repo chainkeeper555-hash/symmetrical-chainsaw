@@ -54,20 +54,20 @@ const EMBEDDED_DATA = {
     { rank: 4, username: "El********cc", wagered: 94694.31, prize: 500, img: BC_LOGO },
     { rank: 5, username: "St********ac", wagered: 68815, prize: 250, img: BC_LOGO },
     { rank: 6, username: "Ma*****f5", wagered: 35404.04, prize: 250, img: BC_LOGO },
-    { rank: 7, username: "Ki**_K", wagered: 13919.21, prize: 250, img: BC_LOGO },
-    { rank: 8, username: "Ma*****ay", wagered: 13235.44, prize: 250, img: BC_LOGO },
-    { rank: 9, username: "Re**im", wagered: 11396.51, prize: 250, img: BC_LOGO },
-    { rank: 10, username: "Ng******ri", wagered: 10468.95, prize: 250, img: BC_LOGO },
-    { rank: 11, username: "اب***کل", wagered: 9752.73, prize: 250, img: BC_LOGO },
-    { rank: 12, username: "Az******🚬", wagered: 7833.94, prize: 250, img: BC_LOGO },
-    { rank: 13, username: "ᘻᓍ******🎭", wagered: 6474.33, prize: 250, img: BC_LOGO },
-    { rank: 14, username: "Tr******oa", wagered: 6094.99, prize: 250, img: BC_LOGO },
-    { rank: 15, username: "Sa**********te", wagered: 5830.2, prize: 250, img: BC_LOGO },
-    { rank: 16, username: "Bu**********ze", wagered: 5253.2, prize: 250, img: BC_LOGO },
-    { rank: 17, username: "Br***um", wagered: 4680, prize: 250, img: BC_LOGO },
-    { rank: 18, username: "सा************🚩", wagered: 4331.13, prize: 250, img: BC_LOGO },
-    { rank: 19, username: "ih*****fe", wagered: 4240, prize: 250, img: BC_LOGO },
-    { rank: 20, username: "La*****25", wagered: 3588.75, prize: 250, img: BC_LOGO },
+    { rank: 7, username: "Ki**_K", wagered: 13919.21, prize: 0, img: BC_LOGO },
+    { rank: 8, username: "Ma*****ay", wagered: 13235.44, prize: 0, img: BC_LOGO },
+    { rank: 9, username: "Re**im", wagered: 11396.51, prize: 0, img: BC_LOGO },
+    { rank: 10, username: "Ng******ri", wagered: 10468.95, prize: 0, img: BC_LOGO },
+    { rank: 11, username: "اب***کل", wagered: 9752.73, prize: 0, img: BC_LOGO },
+    { rank: 12, username: "Az******🚬", wagered: 7833.94, prize: 0, img: BC_LOGO },
+    { rank: 13, username: "ᘻᓍ******🎭", wagered: 6474.33, prize: 0, img: BC_LOGO },
+    { rank: 14, username: "Tr******oa", wagered: 6094.99, prize: 0, img: BC_LOGO },
+    { rank: 15, username: "Sa**********te", wagered: 5830.2, prize: 0, img: BC_LOGO },
+    { rank: 16, username: "Bu**********ze", wagered: 5253.2, prize: 0, img: BC_LOGO },
+    { rank: 17, username: "Br***um", wagered: 4680, prize: 0, img: BC_LOGO },
+    { rank: 18, username: "सा************🚩", wagered: 4331.13, prize: 0, img: BC_LOGO },
+    { rank: 19, username: "ih*****fe", wagered: 4240, prize: 0, img: BC_LOGO },
+    { rank: 20, username: "La*****25", wagered: 3588.75, prize: 0, img: BC_LOGO },
   ],
   lastupdated: "15.10.2025 03:30:00 UTC",
 };
@@ -480,7 +480,7 @@ async function fetchAndMerge() {
                                    index === 3 ? 500 :  // 4th place
                                    index === 4 ? 250 :  // 5th place
                                    index === 5 ? 250 :  // 6th place
-                                   250;                 // Others
+                                   0;                   // 7th place and below
                 return {
                     ...entry,
                     rank: index + 1,
