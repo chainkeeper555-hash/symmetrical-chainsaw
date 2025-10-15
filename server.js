@@ -124,7 +124,8 @@ app.use(helmet({
                 "'unsafe-inline'",
                 'https://cdn.tailwindcss.com',
                 'https://unpkg.com',
-                'https://cdn.jsdelivr.net'
+                'https://cdn.jsdelivr.net',
+                'https://cdnjs.cloudflare.com' // Added to allow Chart.js and datalabels plugin
             ],
             styleSrc: [
                 "'self'",
