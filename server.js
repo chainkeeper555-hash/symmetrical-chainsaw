@@ -45,13 +45,13 @@ const END_DATE = new Date(Date.UTC(START_DATE.getUTCFullYear(), START_DATE.getUT
 const BEGIN_UTC = Math.floor(START_DATE.getTime() / 1000);
 const END_UTC = Math.floor(END_DATE.getTime() / 1000);
 
-// Embedded leaderboard data as fallback
+// Embedded leaderboard data as fallback with custom prizes
 const EMBEDDED_DATA = {
   leaderboard: [
-    { rank: 1, username: "ЖЕ*****ЧУ", wagered: 243747.58, prize: 4000, img: BC_LOGO },
+    { rank: 1, username: "ЖЕ*****ЧУ", wagered: 243747.58, prize: 3000, img: BC_LOGO },
     { rank: 2, username: "Ma***ts", wagered: 205427.81, prize: 2000, img: BC_LOGO },
     { rank: 3, username: "Lb*******yb", wagered: 97128.16, prize: 1000, img: BC_LOGO },
-    { rank: 4, username: "El********cc", wagered: 94694.31, prize: 250, img: BC_LOGO },
+    { rank: 4, username: "El********cc", wagered: 94694.31, prize: 500, img: BC_LOGO },
     { rank: 5, username: "St********ac", wagered: 68815, prize: 250, img: BC_LOGO },
     { rank: 6, username: "Ma*****f5", wagered: 35404.04, prize: 250, img: BC_LOGO },
     { rank: 7, username: "Ki**_K", wagered: 13919.21, prize: 250, img: BC_LOGO },
@@ -63,20 +63,20 @@ const EMBEDDED_DATA = {
     { rank: 13, username: "ᘻᓍ******🎭", wagered: 6474.33, prize: 250, img: BC_LOGO },
     { rank: 14, username: "Tr******oa", wagered: 6094.99, prize: 250, img: BC_LOGO },
     { rank: 15, username: "Sa**********te", wagered: 5830.2, prize: 250, img: BC_LOGO },
-    { rank: 16, username: "Bu**********ze", wagered: 5253.2, img: BC_LOGO },
-    { rank: 17, username: "Br***um", wagered: 4680, img: BC_LOGO },
-    { rank: 18, username: "सा************🚩", wagered: 4331.13, img: BC_LOGO },
-    { rank: 19, username: "ih*****fe", wagered: 4240, img: BC_LOGO },
-    { rank: 20, username: "La*****25", wagered: 3588.75, img: BC_LOGO },
+    { rank: 16, username: "Bu**********ze", wagered: 5253.2, prize: 250, img: BC_LOGO },
+    { rank: 17, username: "Br***um", wagered: 4680, prize: 250, img: BC_LOGO },
+    { rank: 18, username: "सा************🚩", wagered: 4331.13, prize: 250, img: BC_LOGO },
+    { rank: 19, username: "ih*****fe", wagered: 4240, prize: 250, img: BC_LOGO },
+    { rank: 20, username: "La*****25", wagered: 3588.75, prize: 250, img: BC_LOGO },
   ],
   lastupdated: "15.10.2025 03:30:00 UTC",
 };
 
-// Mock data as fallback
+// Mock data as fallback with custom prizes
 const MOCK_DATA = [
-    { rank: 1, username: 'Player1', totalWager: 10000.50, reward: 100.00, img: BC_LOGO },
-    { rank: 2, username: 'Player2', totalWager: 5000.25, reward: 50.00, img: BC_LOGO },
-    { rank: 3, username: 'Ma***ts', totalWager: 204547.88, reward: 2000.00, img: BC_LOGO },
+    { rank: 1, username: 'Player1', totalWager: 10000.50, reward: 3000, img: BC_LOGO },
+    { rank: 2, username: 'Player2', totalWager: 5000.25, reward: 2000, img: BC_LOGO },
+    { rank: 3, username: 'Ma***ts', totalWager: 204547.88, reward: 1000, img: BC_LOGO },
 ];
 
 console.log('UTC Period:', START_DATE.toISOString(), '-', END_DATE.toISOString());
@@ -125,7 +125,7 @@ app.use(helmet({
                 'https://cdn.tailwindcss.com',
                 'https://unpkg.com',
                 'https://cdn.jsdelivr.net',
-                'https://cdnjs.cloudflare.com' // Added to allow Chart.js and datalabels plugin
+                'https://cdnjs.cloudflare.com'
             ],
             styleSrc: [
                 "'self'",
@@ -364,7 +364,7 @@ async function fetchWithRetry(url, options, retries = 3, delay = 1000) {
     }
 }
 
-// Fetch BC.Game data
+// Fetch BC.Game data, ignoring reward
 async function fetchBCGame(account) {
     try {
         const payload = {
@@ -409,7 +409,7 @@ function getEmbeddedData() {
     }
 }
 
-// Merge and cache data
+// Merge and cache data with custom prize logic
 async function fetchAndMerge() {
     // Check cache
     try {
@@ -426,13 +426,12 @@ async function fetchAndMerge() {
 
     const allResults = [];
 
-    // Fetch BC.Game accounts
+    // Fetch BC.Game accounts, excluding reward
     for (const acc of ACCOUNTS) {
         const data = await fetchBCGame(acc);
         allResults.push(...data.map(p => ({
             username: p.username || 'Unknown',
             totalWager: p.totalWager || 0,
-            reward: p.reward || 0,
             img: BC_LOGO,
         })));
     }
@@ -456,12 +455,12 @@ async function fetchAndMerge() {
                 rank: p.rank || null,
                 username: name,
                 totalWager: 0,
-                reward: 0,
+                reward: p.reward || 0,
                 img: BC_LOGO,
             };
         }
         merged[name].totalWager += p.totalWager || 0;
-        merged[name].reward += p.reward || 0;
+        // Do not sum rewards from API, as we want custom prizes
     }
 
     // Convert to array and sort
@@ -470,13 +469,24 @@ async function fetchAndMerge() {
         // Use embedded data ranks if available
         mergedArray = mergedArray.sort((a, b) => (a.rank || Infinity) - (b.rank || Infinity));
     } else {
-        // Sort by totalWager descending and assign ranks
+        // Sort by totalWager descending and assign ranks with custom prizes
         mergedArray = mergedArray
             .sort((a, b) => b.totalWager - a.totalWager)
-            .map((entry, index) => ({
-                ...entry,
-                rank: index + 1,
-            }));
+            .map((entry, index) => {
+                // Assign custom prizes based on rank
+                const customPrize = index === 0 ? 3000 : // 1st place
+                                   index === 1 ? 2000 : // 2nd place
+                                   index === 2 ? 1000 : // 3rd place
+                                   index === 3 ? 500 :  // 4th place
+                                   index === 4 ? 250 :  // 5th place
+                                   index === 5 ? 250 :  // 6th place
+                                   250;                 // Others
+                return {
+                    ...entry,
+                    rank: index + 1,
+                    reward: customPrize, // Override any existing reward
+                };
+            });
     }
 
     // Cache to file
