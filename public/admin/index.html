@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Welcome King 👑 | Admin Portal</title>
+
+  <style>
+    :root {
+      --bg-top: #0b0f16;
+      --bg-bottom: #010409;
+      --accent-cyan: #00e0ff;
+      --text-white: #e6f1ff;
+      --muted-white: #a9b4c3;
+    }
+
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      background: linear-gradient(180deg, var(--bg-top), var(--bg-bottom));
+      color: var(--text-white);
+      font-family: 'Poppins', sans-serif;
+      overflow: hidden;
+      animation: fadeInBody 1.2s ease forwards;
+    }
+
+    .welcome-container {
+      text-align: center;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(0,224,255,0.2);
+      padding: 3rem 2.5rem;
+      border-radius: 20px;
+      box-shadow: 0 0 40px rgba(0,224,255,0.15);
+      backdrop-filter: blur(10px);
+      animation: fadeIn 1.2s ease forwards;
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+
+    h1 {
+      font-size: clamp(2rem, 6vw, 4rem);
+      color: var(--accent-cyan);
+      text-shadow: 0 0 15px rgba(0,224,255,0.5);
+      font-weight: 800;
+      margin-bottom: 1rem;
+    }
+
+    p {
+      color: var(--muted-white);
+      font-size: 1.05rem;
+      margin-bottom: 0;
+      line-height: 1.6;
+    }
+
+    footer {
+      position: absolute;
+      bottom: 15px;
+      font-size: 0.85rem;
+      color: rgba(255,255,255,0.45);
+      letter-spacing: 0.4px;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeInBody {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes fadeOutBody {
+      from { opacity: 1; }
+      to { opacity: 0; }
+    }
+
+    @media (max-width: 640px) {
+      .welcome-container {
+        width: 90%;
+        padding: 2rem 1.5rem;
+      }
+      h1 {
+        font-size: 1.8rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="welcome-container" id="welcomeBox">
+    <h1>Welcome King 👑</h1>
+    <p>Preparing your royal dashboard...</p>
+  </div>
+
+  <footer>© <span id="year"></span> S4R | Powered by SH4NER</footer>
+
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+
+    // After 3 seconds, fade out and redirect
+    setTimeout(() => {
+      const box = document.getElementById('welcomeBox');
+      box.style.opacity = '0';
+      box.style.transform = 'translateY(-10px)';
+      document.body.style.animation = 'fadeOutBody 0.8s ease forwards';
+      setTimeout(() => {
+        window.location.href = "dashboard.html";
+      }, 800);
+    }, 3000);
+  </script>
+</body>
+</html>
