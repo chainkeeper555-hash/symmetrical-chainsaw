@@ -31,38 +31,51 @@ const PORT = process.env.PORT || 3000;
 
 // Leaderboard-specific configurations
 const CACHE_FILE = path.join(__dirname, 'bcgame_cache.json');
-const CACHE_TTL = 30 * 1000; // 30 seconds for testing
+const CACHE_TTL = 1 * 60 * 1000; // 1 minute
 const BC_API_URL = 'https://bc.game/api/agent/open-api/kol/invitees/';
-const BC_LOGO = '/img/bc-game-esports-logo-png_seeklogo-619973.png'; // Local image path
+const BC_LOGO = '/img/bc-game-esports-logo-png_seeklogo-619973.png';
 const ACCOUNTS = [
     { invitationCode: '2cv50ogdp', accessKey: process.env.BC_ACCESS_KEY_1 || 'iigYk9dcgO2XJZeo' },
     { invitationCode: 'sh4ner', accessKey: process.env.BC_ACCESS_KEY_2 || 'ZyFuCnq66f3ODBCv' },
 ];
 
 // Fixed UTC period: October 1, 2025 - October 31, 2025
-const START_DATE = new Date(Date.UTC(2025, 9, 1, 0, 0, 0)); // Month 9 = October
+const START_DATE = new Date(Date.UTC(2025, 9, 1, 0, 0, 0));
 const END_DATE = new Date(Date.UTC(START_DATE.getUTCFullYear(), START_DATE.getUTCMonth() + 1, 0, 23, 59, 59));
 const BEGIN_UTC = Math.floor(START_DATE.getTime() / 1000);
 const END_UTC = Math.floor(END_DATE.getTime() / 1000);
 
-// Embedded leaderboard data as fallback with custom prizes
+// Flag to force API fetch on first call after server restart
+let forceFetchOnStartup = true;
+
+// Clear cache file on server startup
+try {
+    if (fs.existsSync(CACHE_FILE)) {
+        fs.unlinkSync(CACHE_FILE);
+        console.log('Cleared cache file on server startup');
+    }
+} catch (err) {
+    console.error('Error clearing cache file on startup:', err.message);
+}
+
+// Embedded leaderboard data as fallback
 const EMBEDDED_DATA = {
   leaderboard: [
-    { rank: 1, username: "ЖЕ*****ЧУ", wagered: 243747.58, prize: 3000, img: BC_LOGO },
+    { rank: 1, username: "ЖЕ*****ЧУ", wagered: 243747.58, prize: 4000, img: BC_LOGO },
     { rank: 2, username: "Ma***ts", wagered: 205427.81, prize: 2000, img: BC_LOGO },
     { rank: 3, username: "Lb*******yb", wagered: 97128.16, prize: 1000, img: BC_LOGO },
-    { rank: 4, username: "El********cc", wagered: 94694.31, prize: 500, img: BC_LOGO },
+    { rank: 4, username: "El********cc", wagered: 94694.31, prize: 250, img: BC_LOGO },
     { rank: 5, username: "St********ac", wagered: 68815, prize: 250, img: BC_LOGO },
     { rank: 6, username: "Ma*****f5", wagered: 35404.04, prize: 250, img: BC_LOGO },
-    { rank: 7, username: "Ki**_K", wagered: 13919.21, prize: 0, img: BC_LOGO },
-    { rank: 8, username: "Ma*****ay", wagered: 13235.44, prize: 0, img: BC_LOGO },
-    { rank: 9, username: "Re**im", wagered: 11396.51, prize: 0, img: BC_LOGO },
-    { rank: 10, username: "Ng******ri", wagered: 10468.95, prize: 0, img: BC_LOGO },
-    { rank: 11, username: "اب***کل", wagered: 9752.73, prize: 0, img: BC_LOGO },
-    { rank: 12, username: "Az******🚬", wagered: 7833.94, prize: 0, img: BC_LOGO },
-    { rank: 13, username: "ᘻᓍ******🎭", wagered: 6474.33, prize: 0, img: BC_LOGO },
-    { rank: 14, username: "Tr******oa", wagered: 6094.99, prize: 0, img: BC_LOGO },
-    { rank: 15, username: "Sa**********te", wagered: 5830.2, prize: 0, img: BC_LOGO },
+    { rank: 7, username: "Ki**_K", wagered: 13919.21, prize: 250, img: BC_LOGO },
+    { rank: 8, username: "Ma*****ay", wagered: 13235.44, prize: 250, img: BC_LOGO },
+    { rank: 9, username: "Re**im", wagered: 11396.51, prize: 250, img: BC_LOGO },
+    { rank: 10, username: "Ng******ri", wagered: 10468.95, prize: 250, img: BC_LOGO },
+    { rank: 11, username: "اب***کل", wagered: 9752.73, prize: 250, img: BC_LOGO },
+    { rank: 12, username: "Az******🚬", wagered: 7833.94, prize: 250, img: BC_LOGO },
+    { rank: 13, username: "ᘻᓍ******🎭", wagered: 6474.33, prize: 250, img: BC_LOGO },
+    { rank: 14, username: "Tr******oa", wagered: 6094.99, prize: 250, img: BC_LOGO },
+    { rank: 15, username: "Sa**********te", wagered: 5830.2, prize: 250, img: BC_LOGO },
     { rank: 16, username: "Bu**********ze", wagered: 5253.2, prize: 0, img: BC_LOGO },
     { rank: 17, username: "Br***um", wagered: 4680, prize: 0, img: BC_LOGO },
     { rank: 18, username: "सा************🚩", wagered: 4331.13, prize: 0, img: BC_LOGO },
@@ -72,11 +85,9 @@ const EMBEDDED_DATA = {
   lastupdated: "15.10.2025 03:30:00 UTC",
 };
 
-// Mock data as fallback with custom prizes
-const MOCK_DATA = [
-    { rank: 1, username: 'Player1', totalWager: 10000.50, reward: 3000, img: BC_LOGO },
-    { rank: 2, username: 'Player2', totalWager: 5000.25, reward: 2000, img: BC_LOGO },
-    { rank: 3, username: 'Ma***ts', totalWager: 204547.88, reward: 1000, img: BC_LOGO },
+// Minimal fallback data
+const FALLBACK_DATA = [
+    { rank: null, username: 'Un****wn', totalWager: 0, reward: 0, img: BC_LOGO }
 ];
 
 console.log('UTC Period:', START_DATE.toISOString(), '-', END_DATE.toISOString());
@@ -332,8 +343,8 @@ app.post('/api/upload-image', async (req, res) => {
 // 🏆 Leaderboard Endpoint
 app.get('/api/leaderboard', async (req, res) => {
     try {
-        const data = await fetchAndMerge();
-        res.json({ data });
+        const { data, timestamp } = await fetchAndMerge();
+        res.json({ timestamp, data });
     } catch (err) {
         console.error('Error in /api/leaderboard:', {
             message: err.message,
@@ -342,20 +353,78 @@ app.get('/api/leaderboard', async (req, res) => {
             userAgent: req.get('User-Agent'),
             timestamp: new Date().toISOString()
         });
-        res.status(500).json({ error: 'Failed to fetch leaderboard' });
+        res.status(500).json({
+            timestamp: Date.now(),
+            data: FALLBACK_DATA,
+            error: 'Failed to fetch leaderboard',
+            details: err.message
+        });
+    }
+});
+
+// 🧹 Clear Cache Endpoint
+app.post('/api/clear-cache', async (req, res) => {
+    try {
+        if (fs.existsSync(CACHE_FILE)) {
+            fs.unlinkSync(CACHE_FILE);
+            console.log('Cache cleared via /api/clear-cache');
+        }
+        forceFetchOnStartup = true;
+        res.status(200).json({ message: 'Cache cleared successfully, next leaderboard request will fetch fresh data' });
+    } catch (err) {
+        console.error('Error clearing cache:', {
+            message: err.message,
+            stack: err.stack,
+            ip: req.ip,
+            userAgent: req.get('User-Agent'),
+            timestamp: new Date().toISOString()
+        });
+        res.status(500).json({ message: 'Failed to clear cache', details: err.message });
+    }
+});
+
+// 🩺 BC.Game API Health Check Endpoint
+app.get('/api/bc-health', async (req, res) => {
+    try {
+        const payload = {
+            invitationCode: ACCOUNTS[0].invitationCode,
+            accessKey: ACCOUNTS[0].accessKey,
+            beginTimestamp: BEGIN_UTC,
+            endTimestamp: END_UTC
+        };
+        console.log('Testing BC.Game API with payload:', JSON.stringify(payload, null, 2));
+        const response = await fetch(BC_API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Origin': 'https://bc.game' },
+            body: JSON.stringify(payload)
+        });
+        const json = await response.json();
+        console.log('BC.Game API health response:', JSON.stringify(json, null, 2));
+        res.status(200).json({
+            status: response.ok ? 'API reachable' : `API error: ${response.status}`,
+            response: json,
+            timestamp: new Date().toISOString()
+        });
+    } catch (err) {
+        console.error('BC.Game API health check failed:', err.message);
+        res.status(500).json({
+            status: 'API unreachable',
+            details: err.message,
+            timestamp: new Date().toISOString()
+        });
     }
 });
 
 // Retry-enabled fetch
-async function fetchWithRetry(url, options, retries = 3, delay = 1000) {
+async function fetchWithRetry(url, options, retries = 5, delay = 2000) {
     for (let i = 0; i < retries; i++) {
         try {
             const res = await fetch(url, options);
             if (res.ok) return res;
             throw new Error(`HTTP error: ${res.status} - ${res.statusText}`);
         } catch (err) {
+            console.warn(`Retrying ${url} (${i + 1}/${retries})... Error: ${err.message}`);
             if (i < retries - 1) {
-                console.warn(`Retrying ${url} (${i + 1}/${retries})...`);
                 await new Promise(resolve => setTimeout(resolve, delay));
             } else {
                 throw new Error(`Failed to fetch ${url}: ${err.message}`);
@@ -364,7 +433,7 @@ async function fetchWithRetry(url, options, retries = 3, delay = 1000) {
     }
 }
 
-// Fetch BC.Game data, ignoring reward
+// Fetch BC.Game data
 async function fetchBCGame(account) {
     try {
         const payload = {
@@ -373,34 +442,49 @@ async function fetchBCGame(account) {
             beginTimestamp: BEGIN_UTC,
             endTimestamp: END_UTC,
         };
-
+        console.log(`Fetching BC.Game data for ${account.invitationCode} with payload:`, JSON.stringify(payload, null, 2));
         const res = await fetchWithRetry(BC_API_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Origin': 'https://bc.game' },
             body: JSON.stringify(payload),
         });
-
         const json = await res.json();
         console.log(`BC.Game response for ${account.invitationCode}:`, JSON.stringify(json, null, 2));
-        return json?.data || [];
+        if (!json.data) {
+            console.warn(`No data returned for ${account.invitationCode}, response:`, JSON.stringify(json, null, 2));
+            return [];
+        }
+        return json.data;
     } catch (err) {
         console.error(`Error fetching BC.Game data for ${account.invitationCode}:`, err.message);
         return [];
     }
 }
 
+// Format username to show first 2 and last 2 letters with stars in between
+function formatUsername(name) {
+    if (!name || typeof name !== 'string' || name === 'Unknown') {
+        return 'Un****wn';
+    }
+    if (name.length <= 4) {
+        return name; // If 4 or fewer characters, return as is
+    }
+    const firstTwo = name.slice(0, 2);
+    const lastTwo = name.slice(-2);
+    const stars = '*****';
+    return `${firstTwo}${stars}${lastTwo}`;
+}
+
 // Use embedded data and normalize
 function getEmbeddedData() {
     try {
         const rawData = EMBEDDED_DATA.leaderboard || [];
-        console.log('Using embedded data:', JSON.stringify(rawData, null, 2));
-
-        // Normalize embedded fields
+        console.log('Using embedded data as fallback:', JSON.stringify(rawData, null, 2));
         return rawData.map(p => ({
             rank: p.rank || null,
-            username: p.username || 'Unknown',
-            totalWager: p.wagered ? parseFloat(p.wagered) : 0,
-            reward: p.prize ? parseFloat(p.prize) : 0,
+            username: p.username || 'Un****wn', // Already formatted in EMBEDDED_DATA
+            totalWager: parseFloat(p.wagered) || 0,
+            reward: parseFloat(p.prize) || 0,
             img: BC_LOGO,
         }));
     } catch (err) {
@@ -409,94 +493,110 @@ function getEmbeddedData() {
     }
 }
 
-// Merge and cache data with custom prize logic
+// Merge and cache data
 async function fetchAndMerge() {
+    let timestamp = Date.now();
+
     // Check cache
-    try {
-        if (fs.existsSync(CACHE_FILE)) {
-            const cache = JSON.parse(fs.readFileSync(CACHE_FILE, 'utf8'));
-            if (Date.now() - cache.timestamp < CACHE_TTL) {
-                console.log('Returning cached data');
-                return cache.data;
+    if (!forceFetchOnStartup) {
+        try {
+            if (fs.existsSync(CACHE_FILE)) {
+                const cache = JSON.parse(fs.readFileSync(CACHE_FILE, 'utf8'));
+                if (Date.now() - cache.timestamp < CACHE_TTL) {
+                    console.log('Returning cached data:', JSON.stringify(cache.data, null, 2));
+                    return { data: cache.data, timestamp: cache.timestamp };
+                }
             }
+        } catch (err) {
+            console.error('Error reading cache:', err.message);
         }
-    } catch (err) {
-        console.error('Error reading cache:', err.message);
+    } else {
+        console.log('Server restarted or cache cleared, forcing new API fetch');
+        forceFetchOnStartup = false;
     }
 
-    const allResults = [];
+    let allResults = [];
 
-    // Fetch BC.Game accounts, excluding reward
+    // Fetch BC.Game accounts
     for (const acc of ACCOUNTS) {
         const data = await fetchBCGame(acc);
-        allResults.push(...data.map(p => ({
-            username: p.username || 'Unknown',
-            totalWager: p.totalWager || 0,
-            img: BC_LOGO,
-        })));
+        console.log(`Processing ${acc.invitationCode} data, entries: ${data.length}`);
+        if (data.length > 0) {
+            const mappedData = data.map(p => ({
+                username: formatUsername(p.name || 'Unknown'),
+                totalWager: parseFloat(p.wager) || 0,
+                reward: 0, // Will assign later
+                img: BC_LOGO,
+            }));
+            console.log(`Mapped data for ${acc.invitationCode}:`, JSON.stringify(mappedData.slice(0, 5), null, 2));
+            allResults = allResults.concat(mappedData);
+        }
     }
 
-    // Use embedded data
-    const embeddedData = getEmbeddedData();
-    allResults.push(...embeddedData);
-
-    // Use mock data if no results
-    if (!allResults.length) {
-        console.warn('No data from APIs or embedded source, using mock data');
-        allResults.push(...MOCK_DATA);
+    // Use embedded data only if no API data is retrieved
+    if (allResults.length === 0) {
+        console.warn('No data from BC.Game API for any account, using embedded data');
+        allResults = getEmbeddedData();
     }
+
+    // If still no data, use fallback
+    if (allResults.length === 0) {
+        console.warn('No data from BC.Game API or embedded source, using fallback data');
+        allResults = FALLBACK_DATA;
+    }
+
+    console.log(`Total results before merging: ${allResults.length}`);
 
     // Merge duplicates by username
     const merged = {};
-    for (const p of allResults) {
-        const name = p.username || 'Unknown';
+    for (const entry of allResults) {
+        const name = entry.username || 'Un****wn';
         if (!merged[name]) {
             merged[name] = {
-                rank: p.rank || null,
                 username: name,
                 totalWager: 0,
-                reward: p.reward || 0,
+                reward: 0,
                 img: BC_LOGO,
             };
         }
-        merged[name].totalWager += p.totalWager || 0;
-        // Do not sum rewards from API, as we want custom prizes
+        merged[name].totalWager += entry.totalWager;
     }
 
-    // Convert to array and sort
-    let mergedArray = Object.values(merged);
-    if (embeddedData.length && embeddedData.every(p => p.rank !== null)) {
-        // Use embedded data ranks if available
-        mergedArray = mergedArray.sort((a, b) => (a.rank || Infinity) - (b.rank || Infinity));
-    } else {
-        // Sort by totalWager descending and assign ranks with custom prizes
-        mergedArray = mergedArray
-            .sort((a, b) => b.totalWager - a.totalWager)
-            .map((entry, index) => {
-                // Assign custom prizes based on rank
-                const customPrize = index === 0 ? 3000 : // 1st place
-                                   index === 1 ? 2000 : // 2nd place
-                                   index === 2 ? 1000 : // 3rd place
-                                   index === 3 ? 500 :  // 4th place
-                                   index === 4 ? 250 :  // 5th place
-                                   index === 5 ? 250 :  // 6th place
-                                   0;                   // 7th place and below
-                return {
-                    ...entry,
-                    rank: index + 1,
-                    reward: customPrize, // Override any existing reward
-                };
-            });
+    console.log(`Merged usernames: ${Object.keys(merged).length}`);
+
+    // Sort by totalWager, assign ranks and rewards
+    let mergedArray = Object.values(merged)
+        .sort((a, b) => b.totalWager - a.totalWager)
+        .map((entry, index) => {
+            const rank = entry.username === 'Un****wn' ? null : index + 1;
+            let reward = 0;
+            if (rank === 1) reward = 4000;
+            else if (rank === 2) reward = 2000;
+            else if (rank === 3) reward = 1000;
+            else if (rank >= 4 && rank <= 15) reward = 250;
+            return { ...entry, rank, reward };
+        });
+
+    // Ensure at least 20 entries
+    mergedArray = mergedArray.slice(0, 20);
+
+    // Add "Unknown" if not present
+    if (!mergedArray.some(entry => entry.username === 'Un****wn')) {
+        console.log('Adding fallback "Unknown" entry');
+        mergedArray.push(...FALLBACK_DATA);
     }
+
+    console.log('Final merged leaderboard data:', JSON.stringify(mergedArray, null, 2));
 
     // Cache to file
     try {
-        fs.writeFileSync(CACHE_FILE, JSON.stringify({ timestamp: Date.now(), data: mergedArray }, null, 2));
+        fs.writeFileSync(CACHE_FILE, JSON.stringify({ timestamp, data: mergedArray }, null, 2));
+        console.log('Cache updated:', { timestamp: new Date(timestamp).toISOString() });
     } catch (err) {
         console.error('Error writing cache:', err.message);
     }
 
-    return mergedArray;
+    return { data: mergedArray, timestamp };
 }
 
 // 🩺 Health check endpoint
