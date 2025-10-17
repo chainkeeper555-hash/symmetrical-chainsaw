@@ -61,21 +61,21 @@ try {
 // Embedded leaderboard data as fallback
 const EMBEDDED_DATA = {
   leaderboard: [
-    { rank: 1, username: "ЖЕ*****ЧУ", wagered: 243747.58, prize: 4000, img: BC_LOGO },
+    { rank: 1, username: "ЖЕ*****ЧУ", wagered: 243747.58, prize: 3000, img: BC_LOGO },
     { rank: 2, username: "Ma***ts", wagered: 205427.81, prize: 2000, img: BC_LOGO },
     { rank: 3, username: "Lb*******yb", wagered: 97128.16, prize: 1000, img: BC_LOGO },
-    { rank: 4, username: "El********cc", wagered: 94694.31, prize: 250, img: BC_LOGO },
+    { rank: 4, username: "El********cc", wagered: 94694.31, prize: 500, img: BC_LOGO },
     { rank: 5, username: "St********ac", wagered: 68815, prize: 250, img: BC_LOGO },
     { rank: 6, username: "Ma*****f5", wagered: 35404.04, prize: 250, img: BC_LOGO },
-    { rank: 7, username: "Ki**_K", wagered: 13919.21, prize: 250, img: BC_LOGO },
-    { rank: 8, username: "Ma*****ay", wagered: 13235.44, prize: 250, img: BC_LOGO },
-    { rank: 9, username: "Re**im", wagered: 11396.51, prize: 250, img: BC_LOGO },
-    { rank: 10, username: "Ng******ri", wagered: 10468.95, prize: 250, img: BC_LOGO },
-    { rank: 11, username: "اب***کل", wagered: 9752.73, prize: 250, img: BC_LOGO },
-    { rank: 12, username: "Az******🚬", wagered: 7833.94, prize: 250, img: BC_LOGO },
-    { rank: 13, username: "ᘻᓍ******🎭", wagered: 6474.33, prize: 250, img: BC_LOGO },
-    { rank: 14, username: "Tr******oa", wagered: 6094.99, prize: 250, img: BC_LOGO },
-    { rank: 15, username: "Sa**********te", wagered: 5830.2, prize: 250, img: BC_LOGO },
+    { rank: 7, username: "Ki**_K", wagered: 13919.21, prize: 0, img: BC_LOGO },
+    { rank: 8, username: "Ma*****ay", wagered: 13235.44, prize: 0, img: BC_LOGO },
+    { rank: 9, username: "Re**im", wagered: 11396.51, prize: 0, img: BC_LOGO },
+    { rank: 10, username: "Ng******ri", wagered: 10468.95, prize: 0, img: BC_LOGO },
+    { rank: 11, username: "اب***کل", wagered: 9752.73, prize: 0, img: BC_LOGO },
+    { rank: 12, username: "Az******🚬", wagered: 7833.94, prize: 0, img: BC_LOGO },
+    { rank: 13, username: "ᘻᓍ******🎭", wagered: 6474.33, prize: 0, img: BC_LOGO },
+    { rank: 14, username: "Tr******oa", wagered: 6094.99, prize: 0, img: BC_LOGO },
+    { rank: 15, username: "Sa**********te", wagered: 5830.2, prize: 0, img: BC_LOGO },
     { rank: 16, username: "Bu**********ze", wagered: 5253.2, prize: 0, img: BC_LOGO },
     { rank: 17, username: "Br***um", wagered: 4680, prize: 0, img: BC_LOGO },
     { rank: 18, username: "सा************🚩", wagered: 4331.13, prize: 0, img: BC_LOGO },
@@ -570,10 +570,11 @@ async function fetchAndMerge() {
         .map((entry, index) => {
             const rank = entry.username === 'Un****wn' ? null : index + 1;
             let reward = 0;
-            if (rank === 1) reward = 4000;
+            if (rank === 1) reward = 3000;
             else if (rank === 2) reward = 2000;
             else if (rank === 3) reward = 1000;
-            else if (rank >= 4 && rank <= 15) reward = 250;
+            else if (rank === 4) reward = 500;
+            else if (rank === 5 || rank === 6) reward = 250;
             return { ...entry, rank, reward };
         });
 
