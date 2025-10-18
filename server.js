@@ -12,7 +12,7 @@ import fetch from 'node-fetch';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import bcrypt from 'bcrypt';
+import bcrypt from "bcryptjs";
 import jwt from 'jsonwebtoken';
 import { v4 as uuidv4 } from 'uuid'; // New dependency for random password
 
