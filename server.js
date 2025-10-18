@@ -12,6 +12,9 @@ import fetch from 'node-fetch';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+import { v4 as uuidv4 } from 'uuid'; // New dependency for random password
 
 // Import routes
 import mainRoutes from './routes/index.js';
@@ -90,6 +93,38 @@ const FALLBACK_DATA = [
     { rank: null, username: 'Un****wn', totalWager: 0, reward: 0, img: BC_LOGO }
 ];
 
+// User Schema
+const userSchema = new mongoose.Schema({
+    email: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
+    isDefault: { type: Boolean, default: false },
+    sessionVersion: { type: Number, default: 1 } // Track session version for invalidation
+});
+
+const User = mongoose.model('User', userSchema);
+
+// Create default admin user on startup
+async function initializeDefaultUser() {
+    try {
+        const defaultEmail = 'admin@streamerpulse.com';
+        const defaultPassword = `${uuidv4().slice(0, 12)}!Ab1`; // Random secure password
+        const existingUser = await User.findOne({ email: defaultEmail });
+        if (!existingUser) {
+            const hashedPassword = await bcrypt.hash(defaultPassword, 10);
+            await User.create({
+                email: defaultEmail,
+                password: hashedPassword,
+                isDefault: true,
+                sessionVersion: 1
+            });
+            console.log('Default admin user created with email:', defaultEmail);
+            console.log('Default password (save this, shown only once):', defaultPassword);
+        }
+    } catch (err) {
+        console.error('Error initializing default user:', err.message);
+    }
+}
+
 console.log('UTC Period:', START_DATE.toISOString(), '-', END_DATE.toISOString());
 console.log('Serving images from:', path.join(__dirname, 'img'));
 
@@ -98,7 +133,8 @@ const requiredEnvVars = [
     'CLOUDINARY_CLOUD_NAME',
     'CLOUDINARY_API_KEY',
     'CLOUDINARY_API_SECRET',
-    'MONGO_URI'
+    'MONGO_URI',
+    'JWT_SECRET'
 ];
 const missingEnvVars = requiredEnvVars.filter(varName => !process.env[varName]);
 if (missingEnvVars.length > 0) {
@@ -189,7 +225,7 @@ app.use(cors({
         'http://localhost:3000',
         process.env.CLIENT_URL || 'http://localhost:3000'
     ],
-    methods: ['GET', 'POST', 'DELETE'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true
 }));
 
@@ -200,6 +236,24 @@ app.use(morgan('dev', {
     skip: (req, res) => req.path === '/api' && req.method === 'GET'
 }));
 
+// Authentication middleware
+const authenticateToken = (req, res, next) => {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+    
+    if (!token) {
+        return res.status(401).json({ error: 'Authentication token required' });
+    }
+
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        req.user = decoded;
+        next();
+    } catch (err) {
+        return res.status(403).json({ error: 'Invalid or expired token' });
+    }
+};
+
 // Rate limiter for /api/upload-image
 const uploadLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
@@ -207,6 +261,20 @@ const uploadLimiter = rateLimit({
     message: 'Too many upload requests, please try again later.'
 });
 app.use('/api/upload-image', uploadLimiter);
+
+// Rate limiter for login endpoint
+const loginLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 5, // Limit to 5 login attempts per IP
+    message: 'Too many login attempts, please try again later.'
+});
+
+// Rate limiter for update credentials endpoint
+const updateCredentialsLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 5, // Limit to 5 attempts per IP
+    message: 'Too many credential update attempts, please try again later.'
+});
 
 // 🗂️ Static frontend files
 app.use('/admin', express.static(path.join(__dirname, 'public', 'admin'), {
@@ -231,16 +299,16 @@ app.use(express.static(path.join(__dirname, 'public')));
 // 🧭 API Routes
 console.log('🔗 Mounting API routes');
 app.use('/api', mainRoutes);
-app.use('/api/giveaway', giveawayRoutes);
-app.use('/api/schedule', scheduleRoutes);
-app.use('/api/reviews', reviewRoutes);
-app.use('/api/giveaway-content', giveawayContentRoutes);
-app.use('/api/contact', contactRoutes);
-app.use('/api/tracking', trackingRoutes);
-app.use('/api/news', newsRoutes);
+app.use('/api/giveaway', authenticateToken, giveawayRoutes);
+app.use('/api/schedule', authenticateToken, scheduleRoutes);
+app.use('/api/reviews', authenticateToken, reviewRoutes);
+app.use('/api/giveaway-content', authenticateToken, giveawayContentRoutes);
+app.use('/api/contact', authenticateToken, contactRoutes);
+app.use('/api/tracking', authenticateToken, trackingRoutes);
+app.use('/api/news', authenticateToken, newsRoutes);
 
 // 🖼️ Cloudinary Image Upload Endpoint
-app.post('/api/upload-image', async (req, res) => {
+app.post('/api/upload-image', authenticateToken, uploadLimiter, async (req, res) => {
     try {
         if (!req.body.image) {
             return res.status(400).json({ message: 'No image provided' });
@@ -262,7 +330,8 @@ app.post('/api/upload-image', async (req, res) => {
             base64Length: base64Data.length,
             ip: req.ip,
             userAgent: req.get('User-Agent'),
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
+            user: req.user.email
         });
         const buffer = Buffer.from(base64Data, 'base64');
         if (buffer.length === 0) {
@@ -285,7 +354,8 @@ app.post('/api/upload-image', async (req, res) => {
                             stack: error.stack,
                             ip: req.ip,
                             userAgent: req.get('User-Agent'),
-                            timestamp: new Date().toISOString()
+                            timestamp: new Date().toISOString(),
+                            user: req.user.email
                         });
                         reject(error);
                     } else {
@@ -300,7 +370,8 @@ app.post('/api/upload-image', async (req, res) => {
                     stack: err.stack,
                     ip: req.ip,
                     userAgent: req.get('User-Agent'),
-                    timestamp: new Date().toISOString()
+                    timestamp: new Date().toISOString(),
+                    user: req.user.email
                 });
                 reject(new Error('Stream piping failed'));
             });
@@ -311,7 +382,8 @@ app.post('/api/upload-image', async (req, res) => {
             public_id: result.public_id,
             ip: req.ip,
             userAgent: req.get('User-Agent'),
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
+            user: req.user.email
         });
         res.status(200).json({
             message: 'Image uploaded successfully',
@@ -326,7 +398,8 @@ app.post('/api/upload-image', async (req, res) => {
             stack: err.stack,
             ip: req.ip,
             userAgent: req.get('User-Agent'),
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
+            user: req.user.email
         });
         let errorMessage = 'Failed to upload image';
         if (err.http_code === 401) {
@@ -363,7 +436,7 @@ app.get('/api/leaderboard', async (req, res) => {
 });
 
 // 🧹 Clear Cache Endpoint
-app.post('/api/clear-cache', async (req, res) => {
+app.post('/api/clear-cache', authenticateToken, async (req, res) => {
     try {
         if (fs.existsSync(CACHE_FILE)) {
             fs.unlinkSync(CACHE_FILE);
@@ -377,14 +450,15 @@ app.post('/api/clear-cache', async (req, res) => {
             stack: err.stack,
             ip: req.ip,
             userAgent: req.get('User-Agent'),
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
+            user: req.user.email
         });
         res.status(500).json({ message: 'Failed to clear cache', details: err.message });
     }
 });
 
 // 🩺 BC.Game API Health Check Endpoint
-app.get('/api/bc-health', async (req, res) => {
+app.get('/api/bc-health', authenticateToken, async (req, res) => {
     try {
         const payload = {
             invitationCode: ACCOUNTS[0].invitationCode,
@@ -412,6 +486,112 @@ app.get('/api/bc-health', async (req, res) => {
             details: err.message,
             timestamp: new Date().toISOString()
         });
+    }
+});
+
+// 🔒 Login Endpoint
+app.post('/api/login', loginLimiter, async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        if (!email || !password) {
+            return res.status(400).json({ error: 'Email and password are required' });
+        }
+
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(401).json({ error: 'Invalid email or password' });
+        }
+
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+            return res.status(401).json({ error: 'Invalid email or password' });
+        }
+
+        const token = jwt.sign(
+            { email: user.email, id: user._id, sessionVersion: user.sessionVersion },
+            process.env.JWT_SECRET,
+            { expiresIn: '1h' }
+        );
+
+        res.status(200).json({
+            message: 'Login successful',
+            token,
+            isDefault: user.isDefault
+        });
+    } catch (err) {
+        console.error('Login error:', {
+            message: err.message,
+            stack: err.stack,
+            ip: req.ip,
+            userAgent: req.get('User-Agent'),
+            timestamp: new Date().toISOString()
+        });
+        res.status(500).json({ error: 'Login failed', details: err.message });
+    }
+});
+
+// 🔒 Update Credentials Endpoint
+app.post('/api/update-credentials', authenticateToken, updateCredentialsLimiter, async (req, res) => {
+    try {
+        const { oldEmail, currentPassword, newEmail, newPassword } = req.body;
+        if (!oldEmail || !currentPassword || !newEmail || !newPassword) {
+            return res.status(400).json({ error: 'Current email, current password, new email, and new password are required' });
+        }
+
+        // Validate new password strength
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+        if (!passwordRegex.test(newPassword)) {
+            return res.status(400).json({
+                error: 'New password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character (@$!%*?&)'
+            });
+        }
+
+        if (req.user.email !== oldEmail || req.user.sessionVersion !== (await User.findOne({ email: oldEmail })).sessionVersion) {
+            return res.status(401).json({ error: 'Unauthorized: Invalid session or email' });
+        }
+
+        const user = await User.findOne({ email: oldEmail });
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        // Verify current password
+        const isMatch = await bcrypt.compare(currentPassword, user.password);
+        if (!isMatch) {
+            return res.status(401).json({ error: 'Current password is incorrect' });
+        }
+
+        // Check if new email is already in use
+        if (newEmail !== oldEmail && (await User.findOne({ email: newEmail }))) {
+            return res.status(400).json({ error: 'New email is already in use' });
+        }
+
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        user.email = newEmail;
+        user.password = hashedPassword;
+        user.isDefault = false;
+        user.sessionVersion += 1; // Invalidate existing sessions
+        await user.save();
+
+        console.log('Credentials updated for user:', {
+            oldEmail,
+            newEmail,
+            ip: req.ip,
+            userAgent: req.get('User-Agent'),
+            timestamp: new Date().toISOString()
+        });
+
+        res.status(200).json({ message: 'Credentials updated successfully, please log in again' });
+    } catch (err) {
+        console.error('Update credentials error:', {
+            message: err.message,
+            stack: err.stack,
+            ip: req.ip,
+            userAgent: req.get('User-Agent'),
+            timestamp: new Date().toISOString(),
+            user: req.user.email
+        });
+        res.status(500).json({ error: 'Failed to update credentials', details: err.message });
     }
 });
 
@@ -636,7 +816,8 @@ app.use((err, req, res, next) => {
         method: req.method,
         ip: req.ip,
         userAgent: req.get('User-Agent'),
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        user: req.user ? req.user.email : 'unauthenticated'
     });
     res.status(500).json({ message: 'Something went wrong!', details: err.message });
 });
@@ -647,7 +828,10 @@ mongoose.connect(process.env.MONGO_URI, {
     connectTimeoutMS: 10000,
     serverSelectionTimeoutMS: 5000
 })
-    .then(() => console.log('✅ Connected to MongoDB'))
+    .then(async () => {
+        console.log('✅ Connected to MongoDB');
+        await initializeDefaultUser();
+    })
     .catch(err => {
         console.error('❌ MongoDB connection error:', {
             message: err.message,
