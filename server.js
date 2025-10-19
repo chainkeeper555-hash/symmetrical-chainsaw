@@ -14,7 +14,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import bcrypt from "bcryptjs";
 import jwt from 'jsonwebtoken';
-import { v4 as uuidv4 } from 'uuid'; // New dependency for random password
+import { v4 as uuidv4 } from 'uuid';
 
 // Import routes
 import mainRoutes from './routes/index.js';
@@ -180,7 +180,8 @@ app.use(helmet({
                 'https://unpkg.com',
                 'https://fonts.googleapis.com',
                 'https://fonts.gstatic.com',
-                'https://cdn.jsdelivr.net'
+                'https://cdn.jsdelivr.net',
+                'https://cdn.tailwindcss.com'
             ],
             fontSrc: ["'self'", 'https://fonts.gstatic.com', 'data:', 'https://cdn.jsdelivr.net'],
             imgSrc: [
@@ -190,7 +191,8 @@ app.use(helmet({
                 'http://localhost:3000',
                 'https://cdn.jsdelivr.net',
                 'https://unpkg.com',
-                'https://res.cloudinary.com'
+                'https://res.cloudinary.com',
+                'https://static.photos'
             ],
             connectSrc: [
                 "'self'",
@@ -200,7 +202,10 @@ app.use(helmet({
                 'https://bcgame.st',
                 'https://unpkg.com',
                 'https://api.cloudinary.com',
-                'https://bc.game'
+                'https://bc.game',
+                'https://fonts.googleapis.com',
+                'https://cdn.tailwindcss.com',
+                'https://fonts.gstatic.com' // Ensures font file fetches
             ],
             frameSrc: [
                 "'self'",
@@ -211,6 +216,7 @@ app.use(helmet({
                 'https://player.vimeo.com',
                 'https://www.kick.com'
             ],
+            workerSrc: ["'self'"],
             objectSrc: ["'none'"],
             upgradeInsecureRequests: []
         }
@@ -218,7 +224,6 @@ app.use(helmet({
     crossOriginEmbedderPolicy: false,
     crossOriginResourcePolicy: { policy: 'cross-origin' }
 }));
-
 // 🌍 CORS setup
 app.use(cors({
     origin: [
@@ -308,7 +313,7 @@ app.use('/api/tracking', authenticateToken, trackingRoutes);
 app.use('/api/news', authenticateToken, newsRoutes);
 
 // 🖼️ Cloudinary Image Upload Endpoint
-app.post('/api/upload-image', authenticateToken, uploadLimiter, async (req, res) => {
+app.post('/api/upload-image', uploadLimiter, async (req, res) => {
     try {
         if (!req.body.image) {
             return res.status(400).json({ message: 'No image provided' });
@@ -331,7 +336,7 @@ app.post('/api/upload-image', authenticateToken, uploadLimiter, async (req, res)
             ip: req.ip,
             userAgent: req.get('User-Agent'),
             timestamp: new Date().toISOString(),
-            user: req.user.email
+            user: 'unauthenticated'
         });
         const buffer = Buffer.from(base64Data, 'base64');
         if (buffer.length === 0) {
@@ -355,7 +360,7 @@ app.post('/api/upload-image', authenticateToken, uploadLimiter, async (req, res)
                             ip: req.ip,
                             userAgent: req.get('User-Agent'),
                             timestamp: new Date().toISOString(),
-                            user: req.user.email
+                            user: 'unauthenticated'
                         });
                         reject(error);
                     } else {
@@ -371,7 +376,7 @@ app.post('/api/upload-image', authenticateToken, uploadLimiter, async (req, res)
                     ip: req.ip,
                     userAgent: req.get('User-Agent'),
                     timestamp: new Date().toISOString(),
-                    user: req.user.email
+                    user: 'unauthenticated'
                 });
                 reject(new Error('Stream piping failed'));
             });
@@ -383,7 +388,7 @@ app.post('/api/upload-image', authenticateToken, uploadLimiter, async (req, res)
             ip: req.ip,
             userAgent: req.get('User-Agent'),
             timestamp: new Date().toISOString(),
-            user: req.user.email
+            user: 'unauthenticated'
         });
         res.status(200).json({
             message: 'Image uploaded successfully',
@@ -399,7 +404,7 @@ app.post('/api/upload-image', authenticateToken, uploadLimiter, async (req, res)
             ip: req.ip,
             userAgent: req.get('User-Agent'),
             timestamp: new Date().toISOString(),
-            user: req.user.email
+            user: 'unauthenticated'
         });
         let errorMessage = 'Failed to upload image';
         if (err.http_code === 401) {
