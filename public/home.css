@@ -2,7 +2,7 @@
     --bg-top: #07121a;
     --bg-bottom: #001017;
     --card-bg: #031016;
-    --accent-cyan: #e8e8e884;
+    --accent-cyan: #e8e8e832;
     --accent-cyan-2: #72F4FF;
     --muted-white: #c7dfe6;
     --thumbnail-yellow: #ffd700;
@@ -163,8 +163,8 @@ body {
 
 .cta-button:hover {
     transform: translateY(-4px);
+    box-shadow: 0 0 20px rgba(167, 236, 255, 0.8);
 }
-
 .hero-title {
     font-size: clamp(24px, 6vw, 36px);
     color: var(--text-white);
@@ -181,7 +181,7 @@ body {
 }
 
 .hero-text p {
-    font-size: clamp(10px, 3vw, 12px);
+    font-size: clamp(12px, 3vw, 12px);
     line-height: 1.5;
     text-align: center;
     max-width: clamp(500px, 80vw, 600px);
@@ -622,160 +622,21 @@ body {
     display: block;
 }
 
-.billboard-text {
-    position: relative;
-    width: 100%;
-    max-width: clamp(300px, 80%, 600px);
-    padding: clamp(12px, 3vw, 16px);
-    background: transparent;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    margin-top: 16px;
-}
 
-.billboard.top-vector-image {
-    width: clamp(80px, 15vw, 120px);
-    height: auto;
-    object-fit: contain;
-    margin: 0 auto clamp(8px, 2vw, 12px) auto;
-    transform: none;
-}
-
-.billboard.title {
-    font-family: Impact, sans-serif;
-    font-weight: 400;
-    font-size: clamp(36px, 10vw, 60px);
-    line-height: 100%;
-    background: linear-gradient(270deg, #85E069 0%, #4DE087 30%, #3DE092 60%, #2DE39A 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    margin: 0 auto clamp(8px, 2vw, 12px) auto;
-    max-width: clamp(250px, 90%, 400px);
-}
-
-.billboard.playnow {
-    font-family: 'Acroterion JF', sans-serif;
-    font-weight: 400;
-    font-size: clamp(60px, 15vw, 100px);
-    line-height: 1;
-    color: #ffffff;
-    margin: 0 auto;
-    transform: none;
-}
-
-.billboard.description,
-.billboard.subtext {
-    font-family: 'Poppins', sans-serif;
-    font-weight: 400;
-    font-size: clamp(12px, 3vw, 14px);
-    color: var(--muted-white);
-    max-width: clamp(250px, 90%, 400px);
-    margin: 0 auto clamp(8px, 2vw, 12px) auto;
-    transform: none;
-}
-
-.billboard.vector-image {
-    width: clamp(80px, 15vw, 120px);
-    height: auto;
-    object-fit: contain;
-    border-radius: 30px;
-    margin: clamp(8px, 2vw, 12px) auto;
-    transform: none;
-}
-
-@media (max-width: 640px) {
-    .billboard {
-        margin-top: 20px;
-        margin-bottom: 20px;
-    }
-
-    .billboard.image {
-        max-height: 50vh;
-        object-fit: contain;
-    }
-
-    .billboard-text {
-        padding: clamp(8px, 2vw, 12px);
-        max-width: 90%;
-    }
-
-    .billboard.title {
-        font-size: clamp(28px, 8vw, 40px);
-        max-width: clamp(200px, 85%, 300px);
-    }
-
-    .billboard.playnow {
-        font-size: clamp(40px, 12vw, 60px);
-        max-width: clamp(200px, 85%, 300px);
-    }
-
-    .billboard.description,
-    .billboard.subtext {
-        font-size: clamp(10px, 2.5vw, 12px);
-        max-width: clamp(200px, 85%, 300px);
-    }
-
-    .billboard.top-vector-image,
-    .billboard.vector-image {
-        width: clamp(60px, 12vw, 80px);
-    }
-}
-
-@media (max-width: 320px) {
-    .billboard {
-        margin-top: 16px;
-        margin-bottom: 16px;
-    }
-
-    .billboard.image {
-        max-height: 40vh;
-    }
-
-    .billboard-text {
-        padding: clamp(6px, 1.5vw, 8px);
-        max-width: 95%;
-    }
-
-    .billboard.title {
-        font-size: clamp(24px, 7vw, 32px);
-        max-width: clamp(180px, 90%, 250px);
-    }
-
-    .billboard.playnow {
-        font-size: clamp(32px, 10vw, 48px);
-        max-width: clamp(180px, 90%, 250px);
-    }
-
-    .billboard.description,
-    .billboard.subtext {
-        font-size: clamp(8px, 2vw, 10px);
-        max-width: clamp(180px, 90%, 250px);
-    }
-
-    .billboard.top-vector-image,
-    .billboard.vector-image {
-        width: clamp(50px, 10vw, 60px);
-    }
-}
 
 .hero {
     position: relative;
     background-image: url('/img/4_5938341132000829203.gif');
-    background-size: 1920px 868px;
-    background-position: center;
+    background-size: cover;
+    background-position: center top; /* moved image higher */
     background-repeat: no-repeat;
-    transform: rotate(0deg);
     opacity: 1;
     min-height: 830px;
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
-    
+    margin-top: -60px; /* pulls hero upward */
 }
 
 .image-left,
@@ -791,16 +652,12 @@ body {
 .image-left {
     left: 0;
     width: 60vw;
-    transform: translateX(0);
-    transition: transform 0.3s ease-in-out;
     animation: hoverBounce 2s ease-in-out infinite;
 }
 
 .image-right {
     right: 0;
     width: 40vw;
-    transform: translateX(0);
-    transition: transform 0.3s ease-in-out;
     animation: hoverBounce 2s ease-in-out infinite;
 }
 
@@ -810,7 +667,6 @@ body {
     height: 100%;
     object-fit: cover;
     display: block;
-    opacity: 1;
 }
 
 @keyframes hoverBounce {
@@ -843,6 +699,7 @@ body {
 
 .hero-text {
     padding: clamp(16px, 4vw, 24px);
+    text-align: center;
 }
 
 .primary-cta {
