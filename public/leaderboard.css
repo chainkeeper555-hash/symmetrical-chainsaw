@@ -213,7 +213,7 @@ body {
 .winner-card .winner-rank {
     font-size: clamp(8px, 2vw, 10px);
     font-weight: 700;
-    color: var(--accent-cyan);
+    color: var(--text-white);
     margin-bottom: clamp(2px, 0.5vw, 3px);
 }
 
@@ -521,6 +521,7 @@ body {
     .winner-card .winner-rank {
         font-size: clamp(7px, 1.8vw, 9px);
         margin-bottom: clamp(1px, 0.3vw, 2px);
+        color: var(--text-white);
     }
     .winner-card h4 {
         font-size: clamp(7px, 1.8vw, 9px);
@@ -634,6 +635,7 @@ body {
     }
     .winner-card .winner-rank {
         font-size: clamp(12px, 3vw, 14px);
+        color: var(--text-white);
     }
     .winner-card h4 {
         font-size: clamp(12px, 3vw, 14px);
@@ -712,6 +714,7 @@ body {
     }
     .winner-card .winner-rank {
         font-size: clamp(14px, 3.5vw, 16px);
+        color: var(--text-white);
     }
     .winner-card h4 {
         font-size: clamp(14px, 3.5vw, 16px);
@@ -798,6 +801,7 @@ body {
     .winner-card .winner-rank {
         font-size: clamp(6px, 1.5vw, 8px);
         margin-bottom: clamp(1px, 0.3vw, 2px);
+        color: var(--text-white);
     }
     .winner-card h4 {
         font-size: clamp(6px, 1.5vw, 8px);
