@@ -160,7 +160,6 @@ cloudinary.v2.api.ping()
     .then(() => console.log('✅ Cloudinary API connection successful'))
     .catch(err => console.error('❌ Cloudinary API connection failed:', err.message));
 
-// 🛡️ SECURITY - Helmet setup
 app.use(helmet({
     contentSecurityPolicy: {
         useDefaults: true,
@@ -199,13 +198,15 @@ app.use(helmet({
                 'http://localhost:3000',
                 'https://cdn.jsdelivr.net',
                 'https://kick.com',
+                'https://player.kick.com', // Added for Kick player connections
                 'https://bcgame.st',
                 'https://unpkg.com',
                 'https://api.cloudinary.com',
+                'https://res.cloudinary.com', // Added for service worker image fetching
                 'https://bc.game',
-                'https://fonts.googleapis.com',
-                'https://cdn.tailwindcss.com',
-                'https://fonts.gstatic.com' // Ensures font file fetches
+                'https://t.me',
+                'https://youtube.com',
+                'https://www.instagram.com'
             ],
             frameSrc: [
                 "'self'",
@@ -214,7 +215,8 @@ app.use(helmet({
                 'https://youtu.be',
                 'https://www.youtube-nocookie.com',
                 'https://player.vimeo.com',
-                'https://www.kick.com'
+                'https://www.kick.com',
+                'https://player.kick.com' // Added to allow Kick player iframe
             ],
             workerSrc: ["'self'"],
             objectSrc: ["'none'"],
