@@ -29,11 +29,11 @@
     <div class="bg-pattern"></div>
 
    <header class="header fixed z-50">
-    <div class="w-full px-4 sm:px-6 lg:px-8 h-full flex items-center justify-between"> <!-- Changed: removed max-w-7xl mx-auto for full width -->
+    <div class="w-full px-4 sm:px-6 lg:px-8 h-full flex items-center justify-between">
         <div class="flex items-center w-1/3 left-icons">
           <nav class="flex space-x-2 sm:space-x-4">
-    <a href="index.html" class="text-[#dfefff]/95 uppercase font-semibold text-xs sm:text-sm tracking-wide nav-active">Home</a>
-    <a href="leaderboard.html" class="text-[#dfefff]/95 uppercase font-semibold text-xs sm:text-sm tracking-wide">Leadboard</a>
+    <a href="index.html" class="text-[#dfefff]/95 uppercase font-semibold text-xs sm:text-sm tracking-wide">Home</a>
+    <a href="leaderboard.html" class="text-[#dfefff]/95 uppercase font-semibold text-xs sm:text-sm tracking-wide nav-active">Leadboard</a>
     <a href="game.html" class="text-[#dfefff]/95 uppercase font-semibold text-xs sm:text-sm tracking-wide">Gameplay</a>
     <a href="givaway.html" class="text-[#dfefff]/95 uppercase font-semibold text-xs sm:text-sm tracking-wide">Giveaway</a>
     <a href="help.html" class="text-[#dfefff]/95 uppercase font-semibold text-xs sm:text-sm tracking-wide">Help</a>
@@ -49,27 +49,22 @@
         </svg>
     </a>
     <span class="icon-fallback">X</span>
-
     <a href="https://youtube.com/@sh4neryt?si=mW-9I4vw14vgCbC_" target="_blank" aria-label="YouTube" class="feather-icon">
         <i data-feather="youtube" class="text-white w-6 h-6 sm:w-8 sm:h-8"></i>
     </a>
     <span class="icon-fallback">YT</span>
-
     <a href="https://www.instagram.com/s4r.clips?igsh=Z3pyM3hua21qNmI5" target="_blank" aria-label="Instagram" class="feather-icon">
         <i data-feather="instagram" class="text-white w-6 h-6 sm:w-8 sm:h-8"></i>
     </a>
     <span class="icon-fallback">IG</span>
-
     <a href="https://t.me/SH4NERLOBBY" target="_blank" aria-label="Telegram" class="feather-icon">
         <i data-feather="send" class="text-white w-6 h-6 sm:w-8 sm:h-8"></i>
     </a>
     <span class="icon-fallback">TG</span>
-
     <a href="https://kick.com/sh4ne_r" target="_blank" class="cta-button flex items-center uppercase font-bold tracking-wider">
         Follow on Kick!
     </a>
 </div>
-
     </div>
 </header>
 
@@ -293,26 +288,26 @@
                     // Sort and get top 3 for winner grid and ranks 4-10 for table
                     const sortedData = [...players].sort((a, b) => (a.rank || Infinity) - (b.rank || Infinity)).map((player, index) => ({ ...player, rank: player.rank || index + 1 }));
                     const topWinners = sortedData.slice(0, 3);
-                    const tableData = sortedData.slice(3, 13); // Ranks 4-10
+                    const tableData = sortedData.slice(3, 13);
                     const orderedWinners = [
                         topWinners[1], // 2nd (left)
                         topWinners[0], // 1st (middle)
                         topWinners[2]  // 3rd (right)
                     ].filter(winner => winner);
 
-                    // Render top 3 winners in grid
+                    // Render top 3 winners in grid with white text
                     orderedWinners.forEach((winner, index) => {
-                        const isMiddle = index === 1; // 1st place is middle
+                        const isMiddle = index === 1;
                         const rankText = ['2nd', '1st', '3rd'][index] || `${index + 1}th`;
                         const winnerCard = document.createElement('div');
                         winnerCard.className = `winner-card ${isMiddle ? 'middle-card' : ''}`;
                         winnerCard.innerHTML = `
-                            <p class="winner-rank">${rankText}</p>
+                            <p class="winner-rank text-white">${rankText}</p>
                             <img src="${winner.img || '/img/bc-game-esports-logo-png_seeklogo-619973.png'}" alt="${winner.username || 'Unknown'}" class="winner-avatar">
-                            <h4>${winner.username || 'Unknown'}</h4>
+                            <h4 class="text-white">${winner.username || 'Unknown'}</h4>
                             <img src="/img/Trophy.gif" alt="Trophy" class="trophy-icon">
-                            <p class="winning-amount">$${Number(winner.totalWager || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
-                            <p class="winner-prize">${winner.reward ? '$' + Number(winner.reward).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : ''}</p>
+                            <p class="winning-amount text-white">$${Number(winner.totalWager || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                            <p class="winner-prize text-white">${winner.reward ? '$' + Number(winner.reward).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : ''}</p>
                         `;
                         winnerGrid.appendChild(winnerCard);
                     });
@@ -372,25 +367,26 @@
                     // Use fallback data
                     const sortedData = [...fallbackLeaderboardData].sort((a, b) => (a.rank || Infinity) - (b.rank || Infinity)).map((player, index) => ({ ...player, rank: player.rank || index + 1 }));
                     const topWinners = sortedData.slice(0, 3);
-                    const tableData = sortedData.slice(3, 13); // Ranks 4-10
+                    const tableData = sortedData.slice(3, 13);
                     const orderedWinners = [
                         topWinners[1], // 2nd (left)
                         topWinners[0], // 1st (middle)
                         topWinners[2]  // 3rd (right)
                     ].filter(winner => winner);
 
+                    // Render top 3 winners in grid with white text (fallback)
                     orderedWinners.forEach((winner, index) => {
-                        const isMiddle = index === 1; // 1st place is middle
+                        const isMiddle = index === 1;
                         const rankText = ['2nd', '1st', '3rd'][index] || `${index + 1}th`;
                         const winnerCard = document.createElement('div');
                         winnerCard.className = `winner-card ${isMiddle ? 'middle-card' : ''}`;
                         winnerCard.innerHTML = `
-                            <p class="winner-rank">${rankText}</p>
+                            <p class="winner-rank text-white">${rankText}</p>
                             <img src="${winner.img || '/img/bc-game-esports-logo-png_seeklogo-619973.png'}" alt="${winner.username || 'Unknown'}" class="winner-avatar">
-                            <h4>${winner.username || 'Unknown'}</h4>
+                            <h4 class="text-white">${winner.username || 'Unknown'}</h4>
                             <img src="/img/Trophy.gif" alt="Trophy" class="trophy-icon">
-                            <p class="winning-amount">$${Number(winner.totalWager || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
-                            <p class="winner-prize">${winner.reward ? '$' + Number(winner.reward).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : ''}</p>
+                            <p class="winning-amount text-white">$${Number(winner.totalWager || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                            <p class="winner-prize text-white">${winner.reward ? '$' + Number(winner.reward).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : ''}</p>
                         `;
                         winnerGrid.appendChild(winnerCard);
                     });
