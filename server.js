@@ -34,7 +34,7 @@ const PORT = process.env.PORT || 3000;
 
 // Leaderboard-specific configurations
 const CACHE_FILE = path.join(__dirname, 'bcgame_cache.json');
-const CACHE_TTL = 1 * 60 * 1000; // 1 minute
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 const BC_API_URL = 'https://bc.game/api/agent/open-api/kol/invitees/';
 const BC_LOGO = '/img/bc-game-esports-logo-png_seeklogo-619973.png';
 const ACCOUNTS = [
@@ -684,24 +684,6 @@ function getEmbeddedData() {
 async function fetchAndMerge() {
     let timestamp = Date.now();
 
-    // Check cache
-    if (!forceFetchOnStartup) {
-        try {
-            if (fs.existsSync(CACHE_FILE)) {
-                const cache = JSON.parse(fs.readFileSync(CACHE_FILE, 'utf8'));
-                if (Date.now() - cache.timestamp < CACHE_TTL) {
-                    console.log('Returning cached data:', JSON.stringify(cache.data, null, 2));
-                    return { data: cache.data, timestamp: cache.timestamp };
-                }
-            }
-        } catch (err) {
-            console.error('Error reading cache:', err.message);
-        }
-    } else {
-        console.log('Server restarted or cache cleared, forcing new API fetch');
-        forceFetchOnStartup = false;
-    }
-
     let allResults = [];
 
     // Fetch BC.Game accounts
@@ -829,6 +811,21 @@ app.use((err, req, res, next) => {
     res.status(500).json({ message: 'Something went wrong!', details: err.message });
 });
 
+// 🕒 Schedule API fetch every 5 minutes
+setInterval(async () => {
+    try {
+        console.log('Starting scheduled API fetch at', new Date().toISOString());
+        const { data, timestamp } = await fetchAndMerge();
+        console.log('Scheduled fetch completed, cache updated at', new Date(timestamp).toISOString());
+    } catch (err) {
+        console.error('Error in scheduled API fetch:', {
+            message: err.message,
+            stack: err.stack,
+            timestamp: new Date().toISOString()
+        });
+    }
+}, 5 * 60 * 1000); // 5 minutes
+
 // 🧠 MongoDB Connection
 console.log('🔍 Mongo URI:', process.env.MONGO_URI || 'mongodb://localhost:27017/streamerpulse');
 mongoose.connect(process.env.MONGO_URI, {
@@ -853,4 +850,10 @@ app.listen(PORT, () => {
     console.log(`🚀 Server running on http://localhost:${PORT}`);
     console.log(`🔗 Client URL: ${process.env.CLIENT_URL || 'http://localhost:3000'}`);
     console.log(`🔗 Admin URL: http://localhost:${PORT}/admin`);
+    // Trigger initial fetch on startup
+    fetchAndMerge().then(() => {
+        console.log('Initial API fetch completed on server startup');
+    }).catch(err => {
+        console.error('Error in initial API fetch on startup:', err.message);
+    });
 });
