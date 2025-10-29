@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="
+        default-src 'self';
+        script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdn.jsdelivr.net;
+        style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com;
+        font-src 'self' https://fonts.gstatic.com;
+        img-src 'self' data: http://localhost:3000 https://res.cloudinary.com https://static.photos;
+        connect-src 'self' http://localhost:3000;
+    ">
+    <title>Visitors</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-top: #07121a;
+            --bg-bottom: #001017;
+            --card-bg: #031016;
+            --accent-cyan: #00E0FF;
+            --accent-cyan-2: #72F4FF;
+            --muted-white: #c7dfe6;
+            --thumbnail-yellow: #ffd700;
+            --thumbnail-green: #00ff66;
+            --text-white: #ffffff;
+            --neon-green: #00ff99;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--card-bg);
+            color: var(--muted-white);
+            min-height: 100vh;
+            font-size: clamp(12px, 3vw, 14px);
+            overflow-x: hidden;
+        }
+
+        .chart-card {
+            background: var(--card-bg);
+            border: 1px solid var(--accent-cyan);
+            border-radius: 8px;
+            padding: 16px;
+            transition: all 0.2s ease;
+        }
+
+        .chart-card:hover {
+            background: rgba(0, 224, 255, 0.1);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 224, 255, 0.2);
+        }
+
+        canvas {
+            max-height: 200px;
+            min-height: 150px;
+            width: 100%;
+        }
+
+        .error-message {
+            color: var(--muted-white);
+            font-size: 0.875rem;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <main class="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
+        <div class="bg-[var(--card-bg)] p-6 rounded-lg border border-[var(--accent-cyan)]">
+            <h2 class="text-lg font-medium text-[var(--text-white)] mb-4">Visitor Insights</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="chart-card">
+                    <h3 class="text-sm font-medium text-[var(--muted-white)] mb-2">Daily Visitors (Oct 16, 2025)</h3>
+                    <canvas id="daily-chart"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h3 class="text-sm font-medium text-[var(--muted-white)] mb-2">Weekly Visitors (Oct 10-16, 2025)</h3>
+                    <canvas id="weekly-chart"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h3 class="text-sm font-medium text-[var(--muted-white)] mb-2">Monthly Visitors (Oct 2025)</h3>
+                    <canvas id="monthly-chart"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h3 class="text-sm font-medium text-[var(--muted-white)] mb-2">Engagement Analysis</h3>
+                    <canvas id="engagement-chart"></canvas>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Helper to format dates for WAT (UTC+1)
+            const toWATDate = (date) => {
+                const offset = 1 * 60 * 60 * 1000; // WAT is UTC+1
+                return new Date(new Date(date).getTime() + offset);
+            };
+
+            // Placeholder data in case API fails
+            const placeholderData = {
+                daily: {
+                    labels: ["00:00", "01:00", "02:00", "03:00", "04:00", "05:00", "06:00", "07:00", "08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00"],
+                    data: [10, 15, 8, 12, 20, 18, 25, 30, 28, 22, 15, 10, 12, 18, 20, 25, 30, 28, 22, 15, 10, 12, 18, 20]
+                },
+                weekly: {
+                    labels: ["Oct 10", "Oct 11", "Oct 12", "Oct 13", "Oct 14", "Oct 15", "Oct 16"],
+                    data: [150, 200, 180, 220, 250, 230, 210]
+                },
+                monthly: {
+                    labels: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31"],
+                    data: [100, 120, 130, 150, 140, 160, 180, 200, 190, 210, 220, 230, 240, 250, 230, 210, 200, 190, 180, 170, 160, 150, 140, 130, 120, 110, 100, 90, 80, 70, 60]
+                },
+                engagement: {
+                    labels: ["Clicks", "Views", "Submissions"],
+                    data: [300, 500, 100]
+                }
+            };
+
+            // Function to fetch and process visitor data
+            async function fetchVisitorData() {
+                try {
+                    const response = await fetch('http://localhost:3000/api/tracking/visitors?cacheBust=' + Date.now());
+                    if (!response.ok) throw new Error(`API failed: ${response.status}`);
+                    const visitors = await response.json();
+                    if (!Array.isArray(visitors)) throw new Error('Invalid visitor data');
+
+                    // Process daily visitors (Oct 16, 2025)
+                    const dailyStart = new Date('2025-10-16T00:00:00+01:00');
+                    const dailyEnd = new Date('2025-10-16T23:59:59+01:00');
+                    const dailyCounts = Array(24).fill(0);
+                    const dailyLabels = Array.from({ length: 24 }, (_, i) => `${i.toString().padStart(2, '0')}:00`);
+
+                    visitors.forEach(visitor => {
+                        const date = toWATDate(visitor.createdAt);
+                        if (date >= dailyStart && date <= dailyEnd) {
+                            const hour = date.getHours();
+                            dailyCounts[hour]++;
+                        }
+                    });
+
+                    // Process weekly visitors (Oct 10-16, 2025)
+                    const weeklyStart = new Date('2025-10-10T00:00:00+01:00');
+                    const weeklyEnd = new Date('2025-10-16T23:59:59+01:00');
+                    const weeklyCounts = Array(7).fill(0);
+                    const weeklyLabels = ["Oct 10", "Oct 11", "Oct 12", "Oct 13", "Oct 14", "Oct 15", "Oct 16"];
+
+                    visitors.forEach(visitor => {
+                        const date = toWATDate(visitor.createdAt);
+                        if (date >= weeklyStart && date <= weeklyEnd) {
+                            const dayDiff = Math.floor((date - weeklyStart) / (24 * 60 * 60 * 1000));
+                            if (dayDiff >= 0 && dayDiff < 7) weeklyCounts[dayDiff]++;
+                        }
+                    });
+
+                    // Process monthly visitors (Oct 1-31, 2025)
+                    const monthlyStart = new Date('2025-10-01T00:00:00+01:00');
+                    const monthlyEnd = new Date('2025-10-31T23:59:59+01:00');
+                    const monthlyCounts = Array(31).fill(0);
+                    const monthlyLabels = Array.from({ length: 31 }, (_, i) => (i + 1).toString());
+
+                    visitors.forEach(visitor => {
+                        const date = toWATDate(visitor.createdAt);
+                        if (date >= monthlyStart && date <= monthlyEnd) {
+                            const day = date.getDate() - 1;
+                            monthlyCounts[day]++;
+                        }
+                    });
+
+                    return { daily: { labels: dailyLabels, data: dailyCounts }, weekly: { labels: weeklyLabels, data: weeklyCounts }, monthly: { labels: monthlyLabels, data: monthlyCounts } };
+                } catch (err) {
+                    console.error('Error fetching visitors:', err);
+                    return { daily: placeholderData.daily, weekly: placeholderData.weekly, monthly: placeholderData.monthly };
+                }
+            }
+
+            // Function to fetch and process link click data
+            async function fetchLinkClickData() {
+                try {
+                    const response = await fetch('http://localhost:3000/api/tracking/link-clicks?cacheBust=' + Date.now());
+                    if (!response.ok) throw new Error(`API failed: ${response.status}`);
+                    const linkClicks = await response.json();
+                    if (!Array.isArray(linkClicks)) throw new Error('Invalid link click data');
+
+                    // Group by URL path (e.g., "/home", "/about")
+                    const urlCounts = {};
+                    linkClicks.forEach(click => {
+                        try {
+                            const url = new URL(click.url, 'http://localhost:3000').pathname;
+                            urlCounts[url] = (urlCounts[url] || 0) + 1;
+                        } catch {
+                            urlCounts['Unknown'] = (urlCounts['Unknown'] || 0) + 1;
+                        }
+                    });
+
+                    // Get top 3 URLs
+                    const sortedUrls = Object.entries(urlCounts).sort((a, b) => b[1] - a[1]).slice(0, 3);
+                    const labels = sortedUrls.length ? sortedUrls.map(([url]) => url) : placeholderData.engagement.labels;
+                    const data = sortedUrls.length ? sortedUrls.map(([, count]) => count) : placeholderData.engagement.data;
+
+                    return { labels, data };
+                } catch (err) {
+                    console.error('Error fetching link clicks:', err);
+                    return placeholderData.engagement;
+                }
+            }
+
+            // Fetch data
+            const visitorData = await fetchVisitorData();
+            const engagementData = await fetchLinkClickData();
+
+            // Render Daily Visitors Chart
+            new Chart(document.getElementById('daily-chart'), {
+                type: 'line',
+                data: {
+                    labels: visitorData.daily.labels,
+                    datasets: [{
+                        label: 'Visitors',
+                        data: visitorData.daily.data,
+                        borderColor: '#00E0FF',
+                        backgroundColor: 'rgba(0, 224, 255, 0.2)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        title: { display: false }
+                    },
+                    scales: {
+                        x: { 
+                            ticks: { 
+                                color: '#c7dfe6',
+                                maxTicksLimit: 8
+                            }
+                        },
+                        y: { 
+                            beginAtZero: true,
+                            ticks: { color: '#c7dfe6' }
+                        }
+                    }
+                }
+            });
+
+            // Render Weekly Visitors Chart
+            new Chart(document.getElementById('weekly-chart'), {
+                type: 'line',
+                data: {
+                    labels: visitorData.weekly.labels,
+                    datasets: [{
+                        label: 'Visitors',
+                        data: visitorData.weekly.data,
+                        borderColor: '#ffd700',
+                        backgroundColor: 'rgba(255, 215, 0, 0.2)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        title: { display: false }
+                    },
+                    scales: {
+                        x: { ticks: { color: '#c7dfe6' } },
+                        y: { 
+                            beginAtZero: true,
+                            ticks: { color: '#c7dfe6' }
+                        }
+                    }
+                }
+            });
+
+            // Render Monthly Visitors Chart
+            new Chart(document.getElementById('monthly-chart'), {
+                type: 'line',
+                data: {
+                    labels: visitorData.monthly.labels,
+                    datasets: [{
+                        label: 'Visitors',
+                        data: visitorData.monthly.data,
+                        borderColor: '#00ff99',
+                        backgroundColor: 'rgba(0, 255, 153, 0.2)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        title: { display: false }
+                    },
+                    scales: {
+                        x: { 
+                            ticks: { 
+                                color: '#c7dfe6',
+                                maxTicksLimit: 10
+                            }
+                        },
+                        y: { 
+                            beginAtZero: true,
+                            ticks: { color: '#c7dfe6' }
+                        }
+                    }
+                }
+            });
+
+            // Render Engagement Analysis Chart
+            new Chart(document.getElementById('engagement-chart'), {
+                type: 'pie',
+                data: {
+                    labels: engagementData.labels,
+                    datasets: [{
+                        data: engagementData.data,
+                        backgroundColor: ['#00E0FF', '#ffd700', '#00ff99'],
+                        borderColor: '#031016',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { color: '#c7dfe6' }
+                        },
+                        title: { display: false }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
