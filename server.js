@@ -123,19 +123,70 @@ cloudinary.v2.config({
 // 2. Compression
 app.use(compression());
 
-// Security
+// Security – FIXED CSP: ALLOW cdnjs.cloudflare.com
 app.use(helmet({
     contentSecurityPolicy: {
         useDefaults: true,
         directives: {
             defaultSrc: ["'self'"],
-            scriptSrc: ["'self'", "'unsafe-inline'", 'https://cdn.tailwindcss.com', 'https://unpkg.com', 'https://cdn.jsdelivr.net', 'https://cdnjs.cloudflare.com'],
-            styleSrc: ["'self'", "'unsafe-inline'", 'https://unpkg.com', 'https://fonts.googleapis.com', 'https://fonts.gstatic.com', 'https://cdn.jsdelivr.net', 'https://cdn.tailwindcss.com'],
+            scriptSrc: [
+                "'self'",
+                "'unsafe-inline'",
+                'https://cdn.tailwindcss.com',
+                'https://unpkg.com',
+                'https://cdn.jsdelivr.net',
+                'https://cdnjs.cloudflare.com'   // ← ADDED
+            ],
+            styleSrc: [
+                "'self'",
+                "'unsafe-inline'",
+                'https://unpkg.com',
+                'https://fonts.googleapis.com',
+                'https://fonts.gstatic.com',
+                'https://cdn.jsdelivr.net',
+                'https://cdn.tailwindcss.com'
+            ],
             fontSrc: ["'self'", 'https://fonts.gstatic.com', 'data:', 'https://cdn.jsdelivr.net'],
-            imgSrc: ["'self'", 'data:', 'blob:', 'http://localhost:3000', 'https://cdn.jsdelivr.net', 'https://unpkg.com', 'https://res.cloudinary.com', 'https://static.photos'],
-            connectSrc: ["'self'", 'http://localhost:3000', 'https://cdn.jsdelivr.net', 'https://kick.com', 'https://player.kick.com', 'https://bcgame.st', 'https://unpkg.com', 'https://api.cloudinary.com', 'https://res.cloudinary.com', 'https://bc.game', 'https://t.me', 'https://youtube.com', 'https://www.instagram.com'],
-            frameSrc: ["'self'", 'https://www.youtube.com', 'https://youtube.com', 'https://youtu.be', 'https://www.youtube-nocookie.com', 'https://player.vimeo.com', 'https://www.kick.com', 'https://player.kick.com'],
-            workerSrc: ["'self'"],
+            imgSrc: [
+                "'self'",
+                'data:',
+                'blob:',
+                'https://sh4nerewards.com',
+                'https://cdn.jsdelivr.net',
+                'https://unpkg.com',
+                'https://res.cloudinary.com',
+                'https://static.photos'
+            ],
+            connectSrc: [
+                "'self'",
+                'https://sh4nerewards.com',
+                'https://cdn.jsdelivr.net',
+                'https://kick.com',
+                'https://player.kick.com',
+                'https://bcgame.st',
+                'https://unpkg.com',
+                'https://api.cloudinary.com',
+                'https://res.cloudinary.com',
+                'https://bc.game',
+                'https://t.me',
+                'https://youtube.com',
+                'https://www.instagram.com',
+                'https://fonts.googleapis.com',
+                'https://cdn.tailwindcss.com',
+                'https://fonts.gstatic.com',
+                'https://cdnjs.cloudflare.com'   // ← ADDED
+            ],
+            frameSrc: [
+                "'self'",
+                'https://www.youtube.com',
+                'https://youtube.com',
+                'https://youtu.be',
+                'https://www.youtube-nocookie.com',
+                'https://player.vimeo.com',
+                'https://www.kick.com',
+                'https://player.kick.com'
+            ],
+            workerSrc: ["'self'", 'blob:'],
             objectSrc: ["'none'"],
             upgradeInsecureRequests: []
         }
@@ -145,8 +196,8 @@ app.use(helmet({
 }));
 
 app.use(cors({
-    origin: ['http://localhost:3000', process.env.CLIENT_URL || 'http://localhost:3000'],
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    origin: ['https://sh4nerewards.com', process.env.CLIENT_URL || 'https://sh4nerewards.com'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     credentials: true
 }));
 
@@ -183,15 +234,23 @@ const uploadLimiter = rateLimit({ windowMs: 15*60*1000, max: 10, message: 'Too m
 const loginLimiter = rateLimit({ windowMs: 15*60*1000, max: 5, message: 'Too many login attempts' });
 const updateCredentialsLimiter = rateLimit({ windowMs: 15*60*1000, max: 5, message: 'Too many updates' });
 
-// Static files
+// Static files with correct MIME types for fonts
 app.use('/admin', express.static(path.join(__dirname, 'public', 'admin'), { setHeaders: res => res.set('Cache-Control', 'no-cache') }));
-app.use('/font', express.static(path.join(__dirname, 'font')));
-app.use('/img', express.static(path.join(__dirname, 'img')));
+app.use('/font', express.static(path.join(__dirname, 'font'), {
+    setHeaders: (res, filepath) => {
+        if (filepath.endsWith('.woff2')) res.setHeader('Content-Type', 'font/woff2');
+        if (filepath.endsWith('.woff')) res.setHeader('Content-Type', 'font/woff');
+        res.set('Cache-Control', 'public, max-age=31536000, immutable');
+    }
+}));
+app.use('/img', express.static(path.join(__dirname, 'img'), {
+    setHeaders: (res) => res.set('Cache-Control', 'public, max-age=31536000, immutable')
+}));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Routes
 app.use('/api', mainRoutes);
-app.use('/api/giveaway', authenticateToken, giveawayRoutes);
+app.use('/api/giveaway',authenticateToken, giveawayRoutes);
 app.use('/api/schedule', authenticateToken, scheduleRoutes);
 app.use('/api/reviews', authenticateToken, reviewRoutes);
 app.use('/api/giveaway-content', authenticateToken, giveawayContentRoutes);
@@ -232,7 +291,7 @@ app.get('/api/leaderboard', async (req, res) => {
         leaderboardCache.set('data', result);
         res.json(result);
     } catch {
-        res.status(500).json({ timestamp: Date.now(), data: FALLBACK_DATA, error: 'Fetch failed' });
+        res.status(500).  json({ timestamp: Date.now(), data: FALLBACK_DATA, error: 'Fetch failed' });
     }
 });
 
@@ -281,7 +340,7 @@ app.post('/api/update-credentials', authenticateToken, updateCredentialsLimiter,
     try {
         const { oldEmail, currentPassword, newEmail, newPassword } = req.body;
         if (!oldEmail || !currentPassword || !newEmail || !newPassword) return res.status(400).json({ error: 'All fields required' });
-        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+        const passwordRegex = /^ (?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
         if (!passwordRegex.test(newPassword)) return res.status(400).json({ error: 'Weak password' });
         const user = await User.findOne({ email: oldEmail });
         if (!user || !(await bcrypt.compare(currentPassword, user.password))) return res.status(401).json({ error: 'Invalid credentials' });
@@ -389,7 +448,7 @@ async function fetchAndMerge() {
 }
 
 // Health & SPA
-app.get('/api/', (req, res) => res.json({ message: 'SH4NER Backend running! 🚀' }));
+app.get('/api/', (req, res) => res.json({ message: 'SH4NER Backend running!' }));
 app.get('/admin', (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin', 'dashboard.html')));
 app.use((req, res, next) => {
     if (req.path.startsWith('/api')) return res.status(404).json({ message: 'Not found' });
@@ -429,4 +488,5 @@ app.listen(PORT, async () => {
             leaderboardCache.set(startupCacheKey, true);
         } catch {}
     }
+    console.log(`Server running on port ${PORT}`);
 });
