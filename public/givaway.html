@@ -148,143 +148,6 @@
             }
         }
 
-        /* Wheel Mobile Responsiveness */
-        @media (max-width: 640px) {
-            .spin-container-outer {
-                padding: 1em !important;
-                max-width: 95vw;
-            }
-            
-            .wheel-container {
-                width: 280px !important;
-                height: 280px !important;
-                margin: 0 auto;
-            }
-            
-            img[alt="spinner arrow"] {
-                width: 3em;
-                top: -10%;
-            }
-            
-            #spin-btn {
-                width: 90px;
-                height: 45px;
-                font-size: 1em;
-            }
-            
-            .rewards-section {
-                padding: 1rem !important;
-                margin-top: 2rem;
-            }
-            
-            .rewards-section h2 {
-                font-size: 1.5rem !important;
-            }
-            
-            .rewards-section p {
-                font-size: 0.9rem;
-                line-height: 1.4;
-            }
-            
-            #email-modal .modal-content,
-            #confirmation-modal .modal-content {
-                width: 90%;
-                max-width: 400px;
-            }
-        }
-
-        .wheel-container {
-            position: relative;
-            width: 100%;
-            height: 0;
-            padding-bottom: 100%;
-            border: 2px solid transparent;
-            background: linear-gradient(0deg, #FFFB90 -22.88%, #FBE978 -6.61%, #F8DC65 5.02%, #E6C758 8.5%, #C49F40 16.64%, #AC832F 23.61%, #9E7225 29.43%, #996C22 34.07%, #9D7125 37.56%, #A98030 42.21%, #BD9A42 46.86%, #D9BE5A 51.51%, #FBE878 57.32%, #FFFFAA 66.62%, #FBE878 73.59%, #A4631B 93.35%) border-box;
-            border-radius: 50%;
-            overflow: hidden;
-            box-sizing: border-box;
-        }
-
-        .wheel-container canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            background: transparent;
-            z-index: 1;
-        }
-
-        .small-blue-circle {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(225deg, #0E5DF8, #0F26A2, #10249F);
-            border-radius: 50%;
-            z-index: 5;
-        }
-
-        img[alt="spinner arrow"] {
-            position: absolute;
-            width: 4em;
-            top: -8%;
-            left: 50%;
-            transform-origin: 50% 100%;
-            transform: translateX(-50%);
-            transition: transform 0.6s ease-in-out;
-            z-index: 10;
-        }
-
-        @keyframes vibrate {
-            0% { transform: translateX(-50%) rotate(-15deg); }
-            20% { transform: translateX(-50%) rotate(-17deg); }
-            40% { transform: translateX(-50%) rotate(-13deg); }
-            60% { transform: translateX(-50%) rotate(-17deg); }
-            80% { transform: translateX(-50%) rotate(-13deg); }
-            100% { transform: translateX(-50%) rotate(-15deg); }
-        }
-
-        .vibrate {
-            animation: vibrate 0.5s ease-in-out;
-        }
-
-        .spin-button-container {
-            text-align: center;
-            margin-top: 1em;
-        }
-
-        #spin-btn {
-            cursor: pointer;
-            border: 2px solid #FFD700;
-            background: linear-gradient(270deg, #0E5DF8 -3.89%, #0E4DE0 28.42%, #0F26A2 96.19%, #10249F 100.36%);
-            color: #FFFFFF;
-            text-transform: uppercase;
-            font-size: 1.2em;
-            letter-spacing: 0.1em;
-            font-weight: 600;
-            padding: 0;
-            width: 100px;
-            height: 50px;
-            border-radius: 15px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .spinner.active {
-            display: inline-block;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
         /* Email Modal */
         #email-modal {
             display: none;
@@ -521,11 +384,6 @@
             }
         }
 
-        /* Hide spin instructions */
-        #final-value p {
-            display: none;
-        }
-
         /* Banner image section */
         .banner-section {
             margin: 2rem 0;
@@ -596,6 +454,32 @@
         .entry-trigger-btn:hover {
             transform: scale(1.05);
         }
+
+        /* Wheel Image Styles */
+        .wheel-image-container {
+            position: relative;
+            width: 100%;
+            max-width: 39.5255em;
+            margin: 0 auto;
+            padding: 3em;
+            border-radius: 1em;
+            background: transparent;
+        }
+
+        .wheel-image {
+            width: 100%;
+            height: auto;
+            border-radius: 50%;
+            display: block;
+            margin: 0 auto;
+        }
+
+        @media (max-width: 640px) {
+            .wheel-image-container {
+                padding: 1em !important;
+                max-width: 95vw;
+            }
+        }
     </style>
 </head>
 <body>
@@ -650,24 +534,8 @@
         <h2 class="social-heading">BC Game Magic Wheel Giveaway </h2>
         <div class="flex flex-col lg:flex-row lg:gap-8">
             <section class="spin-section max-w-3xl mx-auto lg:w-1/2" style="background: transparent;">
-                <div class="spin-container-outer" style="width: 100%; max-width: 39.5255em; max-height: 90vh; position: relative; padding: 3em; border-radius: 1em;">
-                    <div class="spin-container-wrapper" style="position: relative; width: 100%; height: 100%;">
-                        <div style="background: linear-gradient(270deg, #0E5DF8 -3.89%, #0E4DE0 28.42%, #0F26A2 96.19%, #10249F 100.36%); padding: 16px; border-radius: 50%; width: 100%; height: 100%; box-sizing: border-box;">
-                            <div class="wheel-container">
-                                <canvas id="wheel" aria-label="Prize wheel"></canvas>
-                                <div class="small-blue-circle"></div>
-                            </div>
-                        </div>
-                        <img src="/img/pngtree-the-gold-arrow-png-image-png-image_10276849-removebg-preview.png" alt="spinner arrow" />
-                    </div>
-                    <div class="spin-button-container">
-                        <button id="spin-btn" aria-label="Spin the wheel to win a prize">
-                            Spin <span class="spinner" aria-hidden="true"></span>
-                        </button>
-                    </div>
-                    <div id="final-value" aria-live="polite" style="font-size: 1.5em; text-align: center; margin-top: 1.5em; color: var(--muted-white); font-weight: 500;">
-                        <p>Click On The Spin Button To Start</p>
-                    </div>
+                <div class="wheel-image-container">
+                    <img src="/img/wheel.png" alt="Prize wheel" class="wheel-image">
                 </div>
                 <div id="email-modal">
                     <div class="modal-content">
@@ -811,17 +679,11 @@
         </div>
     </footer>
 
-    <audio id="spin-sound" src="/sound/wheel-spin-click-slow-down-101152.mp3" preload="auto"></audio>
-    <audio id="stop-sound" src="/sound/sonar-ping-95840.mp3" preload="auto"></audio>
-
 <script>
 document.addEventListener('DOMContentLoaded', async function() {
     console.log('DOM loaded, initializing giveaway');
 
     // === ELEMENTS ===
-    const wheel = document.getElementById("wheel");
-    const spinBtn = document.getElementById("spin-btn");
-    const finalValue = document.getElementById("final-value");
     const stopSound = document.getElementById("stop-sound");
     const emailModal = document.getElementById("email-modal");
     const emailForm = document.getElementById("email-form");
@@ -833,9 +695,6 @@ document.addEventListener('DOMContentLoaded', async function() {
     const entryTriggerBtn = document.getElementById("entry-trigger-btn");
     const confirmationModal = document.getElementById("confirmation-modal");
     const closeConfirmation = document.querySelector(".close-confirmation");
-
-    // Hide spin button initially
-    if (spinBtn) spinBtn.style.display = 'none';
 
     // === TOAST ===
     function showToast() {
@@ -883,43 +742,30 @@ document.addEventListener('DOMContentLoaded', async function() {
         }
     }
 
-    // === SPIN & SAVE RESULT ===
-    async function spinAndSave() {
-        spinBtn.disabled = true;
-        finalValue.innerHTML = `<p>Spinning...</p>`;
-
+    // === SAVE RESULT ===
+    async function saveResult() {
         const prizes = ["$10", "$18", "$30", "$40", "$60", "$150", "$200", "$250", "$300", "$350"];
         const prizeIndex = Math.floor(Math.random() * prizes.length);
-        const rotation = 3600 + (prizeIndex * 36) + Math.random() * 36;
+        const prize = prizes[prizeIndex];
 
-        wheel.style.transition = 'all 4s cubic-bezier(0.17, 0.67, 0.12, 0.99)';
-        wheel.style.transform = `rotate(${rotation}deg)`;
+        const email = userEmailInput.value.trim();
 
-        setTimeout(async () => {
-            const prize = prizes[prizeIndex];
-            finalValue.innerHTML = `<p>Congratulations! You won <strong>${prize}</strong>!</p>`;
+        try {
+            const res = await fetch('/api/giveaway/spin-result', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ prize, email })
+            });
 
-            const email = userEmailInput.value.trim();
-
-            try {
-                const res = await fetch('/api/giveaway/spin-result', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ prize, email })
-                });
-
-                if (res.ok) {
-                    showConfirmation(prize);
-                } else {
-                    const err = await res.json();
-                    alert(`Failed to save prize: ${err.message || 'Try again.'}`);
-                }
-            } catch (err) {
-                alert('Failed to save prize. Please contact support.');
+            if (res.ok) {
+                showConfirmation(prize);
+            } else {
+                const err = await res.json();
+                alert(`Failed to save prize: ${err.message || 'Try again.'}`);
             }
-
-            spinBtn.disabled = false;
-        }, 4000);
+        } catch (err) {
+            alert('Failed to save prize. Please contact support.');
+        }
     }
 
     // === CONFIRMATION MODAL - UPDATED ===
@@ -949,14 +795,10 @@ document.addEventListener('DOMContentLoaded', async function() {
             emailModal.style.display = 'none';
             emailForm.reset();
 
-            // Show spin button
-            if (spinBtn) {
-                spinBtn.style.display = 'block';
-                spinBtn.onclick = () => {
-                    spinAndSave();
-                    spinBtn.style.display = 'none';
-                };
-            }
+            // Save result
+            setTimeout(() => {
+                saveResult();
+            }, 1000);
         });
     }
 
@@ -981,76 +823,6 @@ document.addEventListener('DOMContentLoaded', async function() {
     confirmationModal?.addEventListener('click', (e) => {
         if (e.target === confirmationModal) hideConfirmation();
     });
-
-    // === WHEEL INIT (Chart.js) - UNCHANGED ===
-    if (wheel && window.Chart) {
-        new Chart(wheel, {
-            plugins: [ChartDataLabels],
-            type: "pie",
-            data: {
-                labels: ["$10", "$18", "$30", "$40", "$60", "$150", "$200", "$250", "$300", "$350"],
-                datasets: [{
-                    backgroundColor: (context) => {
-                        const chart = context.chart;
-                        const { ctx, chartArea } = chart;
-                        if (!chartArea) return;
-                        const index = context.dataIndex;
-                        if (index % 2 === 0) return "#FFFFFF";
-                        const centerX = (chartArea.left + chartArea.right) / 2;
-                        const centerY = (chartArea.top + chartArea.bottom) / 2;
-                        const radius = Math.min(chartArea.right - chartArea.left, chartArea.bottom - chartArea.top) / 2;
-                        const gradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, radius);
-                        switch (index) {
-                            case 1: gradient.addColorStop(0, "rgba(32, 105, 255, 1)"); gradient.addColorStop(1, "rgba(80, 219, 255, 1)"); break;
-                            case 3: gradient.addColorStop(0, "rgba(32, 105, 255, 1)"); gradient.addColorStop(0.7, "rgba(80, 219, 255, 1)"); break;
-                            case 5: gradient.addColorStop(0, "rgba(32, 105, 255, 1)"); gradient.addColorStop(0.4, "rgba(80, 219, 255, 1)"); break;
-                            case 7: gradient.addColorStop(0, "rgba(32, 105, 255, 1)"); gradient.addColorStop(0.6, "rgba(80, 219, 255, 1)"); break;
-                            case 9: gradient.addColorStop(0, "rgba(32, 105, 255, 1)"); gradient.addColorStop(0.8, "rgba(80, 219, 255, 1)"); break;
-                        }
-                        return gradient;
-                    },
-                    data: Array(10).fill(36)
-                }]
-            },
-            options: {
-                responsive: true,
-                animation: { duration: 0 },
-                plugins: {
-                    tooltip: false,
-                    legend: { display: false },
-                    datalabels: {
-                        color: (context) => {
-                            const chart = context.chart;
-                            const { ctx, chartArea } = chart;
-                            if (!chartArea) return;
-                            const index = context.dataIndex;
-                            if ([0, 2, 4, 6, 8].includes(index)) {
-                                const gradient = ctx.createLinearGradient(chartArea.left, chartArea.top, chartArea.right, chartArea.bottom);
-                                gradient.addColorStop(0, "rgba(145, 92, 191, 1)");
-                                gradient.addColorStop(0.5, "rgba(255, 81, 131, 1)");
-                                gradient.addColorStop(1, "rgba(32, 105, 255, 1)");
-                                return gradient;
-                            }
-                            if (index % 2 === 0) {
-                                const gradient = ctx.createLinearGradient(chartArea.left, chartArea.top, chartArea.right, chartArea.bottom);
-                                gradient.addColorStop(0.0945, "#50DBFF");
-                                gradient.addColorStop(0.9182, "#2069FF");
-                                gradient.addColorStop(0.9182, "#915CBF");
-                                gradient.addColorStop(0.9182, "#FF5183");
-                                return gradient;
-                            }
-                            return "#FFFFFF";
-                        },
-                        formatter: (_, context) => context.chart.data.labels[context.dataIndex],
-                        font: { size: 16, family: 'Poppins', weight: 'bold' },
-                        textShadow: "2px 2px 2px #000000"
-                    }
-                }
-            }
-        });
-    } else {
-        finalValue.innerHTML = `<p>Error: Wheel not supported. Update browser.</p>`;
-    }
 
     // === SCROLL HANDLING (unchanged) ===
     let lastScrollTop = 0;
