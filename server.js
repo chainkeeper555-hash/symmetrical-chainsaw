@@ -196,7 +196,7 @@ app.use(helmet({
 }));
 
 app.use(cors({
-    origin: ['https://sh4nerewards.com', process.env.CLIENT_URL || 'https://sh4nerewards.com'],
+    origin: ['https://sh4nerewards.com', process.env.CLIENT_URL || 'https://sh4nerewards.com', 'http://localhost:3000'],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     credentials: true
 }));
@@ -252,9 +252,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/api', mainRoutes);
 app.use('/api/giveaway',authenticateToken, giveawayRoutes);
 app.use('/api/schedule', authenticateToken, scheduleRoutes);
-app.use('/api/reviews', authenticateToken, reviewRoutes);
+app.use('/api/reviews', reviewRoutes);  // Removed auth for public access
 app.use('/api/giveaway-content', authenticateToken, giveawayContentRoutes);
-app.use('/api/contact', authenticateToken, contactRoutes);
+app.use('/api/contact', contactRoutes);  // Removed auth for public access
 app.use('/api/tracking', authenticateToken, trackingRoutes);
 app.use('/api/news', authenticateToken, newsRoutes);
 
