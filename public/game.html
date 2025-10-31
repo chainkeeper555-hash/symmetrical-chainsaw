@@ -8,9 +8,9 @@
     script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://unpkg.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com;
     style-src 'self' 'unsafe-inline' https://unpkg.com https://fonts.googleapis.com https://fonts.gstatic.com;
     font-src 'self' https://fonts.gstatic.com;
-    img-src 'self' data: https://sh4nerewards.com https://res.cloudinary.com https://*.cloudinary.com;
+    img-src 'self' data:https://sh4nerewards.comhttps://res.cloudinary.com https://*.cloudinary.com;
     connect-src 'self' 
-        https://sh4nerewards.com 
+       https://sh4nerewards.com
         https://cdn.jsdelivr.net 
         https://kick.com 
         https://player.kick.com 
@@ -317,7 +317,7 @@
                 <span class="loader" id="slot-review-loader"></span>
                 <div id="slot-review-container" class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-8 w-full"></div>
                 <div class="flex justify-end w-full">
-                    <a href="#" class="cta-button flex items-center uppercase font-bold tracking-wider">View More</a>
+                    <a href="slot-reviews.html" class="cta-button flex items-center uppercase font-bold tracking-wider">View More</a>
                 </div>
             </div>
         </section>
@@ -335,11 +335,11 @@
         </section>
         <section class="promo-section" aria-labelledby="promo-heading">
             <div class="flex flex-col items-center mb-8 sm:mb-12">
-                <h3 class="review-heading text-right self-end">Casino Review</h3>
+                <h3 class="review-heading text-right self-end">bc game Casino Review</h3>
                 <span class="loader" id="casino-review-loader"></span>
                 <div id="casino-review-container" class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-8 w-full"></div>
                 <div class="flex justify-end w-full">
-                    <a href="#" class="cta-button flex items-center uppercase font-bold tracking-wider">View More</a>
+                    <a href="casino-reviews.html" class="cta-button flex items-center uppercase font-bold tracking-wider">View More</a>
                 </div>
             </div>
         </section>
@@ -517,8 +517,8 @@
                 scheduleContainer.innerHTML = '<p class="text-[var(--muted-white)] text-center text-xl font-bold">Coming soon</p>';
             }
 
-            // Fetch Reviews (Slot and Casino)
-            async function fetchReviews(type, containerId, loaderId) {
+            // Fetch Reviews (Slot and Casino) - Updated with optional limit parameter
+            async function fetchReviews(type, containerId, loaderId, limit = null) {
                 showLoader(loaderId);
                 const container = document.getElementById(containerId);
                 if (!container) {
@@ -527,7 +527,7 @@
                     return;
                 }
                 try {
-                    const response = await fetch(`https://sh4nerewards.com/api/reviews?type=${type}`);
+                    const response = await fetch(`http://localhost:3000/api/reviews?type=${type}`);
                     const data = await response.json();
                     hideLoader(loaderId);
                     if (response.ok && Array.isArray(data.reviews)) {
@@ -535,8 +535,10 @@
                             container.innerHTML = `<p class="text-[var(--muted-white)] text-center">No ${type} reviews available at this time.</p>`;
                             return;
                         }
+                        // Apply limit if specified
+                        const reviewsToShow = limit ? data.reviews.slice(0, limit) : data.reviews;
                         container.innerHTML = '';
-                        data.reviews.forEach((review, index) => {
+                        reviewsToShow.forEach((review, index) => {
                             const rating = parseInt(review.rating, 10);
                             const validRating = isNaN(rating) || rating < 1 || rating > 5 ? 0 : rating;
                             const starIcons = Array(validRating).fill().map(() => '<i data-feather="star" class="star-rating"></i>').join('');
@@ -586,7 +588,7 @@
                         message: document.getElementById('message').value
                     };
                     try {
-                        const response = await fetch('https://sh4nerewards.com/api/contact', {
+                        const response = await fetch('http://localhost:3000/api/contact', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify(formData)
@@ -605,10 +607,10 @@
                 });
             }
 
-            // Initial fetches
+            // Initial fetches - Updated to limit to 6
             renderSchedule();
-            fetchReviews('slot', 'slot-review-container', 'slot-review-loader');
-            fetchReviews('casino', 'casino-review-container', 'casino-review-loader');
+            fetchReviews('slot', 'slot-review-container', 'slot-review-loader', 6);
+            fetchReviews('casino', 'casino-review-container', 'casino-review-loader', 6);
         });
     </script>
 </body>
