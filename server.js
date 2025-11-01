@@ -41,8 +41,8 @@ const ACCOUNTS = [
     { invitationCode: 'sh4ner', accessKey: process.env.BC_ACCESS_KEY_2 || 'ZyFuCnq66f3ODBCv' },
 ];
 
-// Fixed UTC period: October 1, 2025 - October 31, 2025
-const START_DATE = new Date(Date.UTC(2025, 9, 1, 0, 0, 0));
+// Fixed UTC period: November 1, 2025 - November 30, 2025
+const START_DATE = new Date(Date.UTC(2025, 10, 1, 0, 0, 0));
 const END_DATE = new Date(Date.UTC(START_DATE.getUTCFullYear(), START_DATE.getUTCMonth() + 1, 0, 23, 59, 59));
 const BEGIN_UTC = Math.floor(START_DATE.getTime() / 1000);
 const END_UTC = Math.floor(END_DATE.getTime() / 1000);
