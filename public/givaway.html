@@ -24,229 +24,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/giveaway.css">
-    <style>
-        /* Body Padding to Prevent Footer Overlap */
-        @media (max-width: 640px) {
-            body {
-                padding-bottom: 3.5rem; /* Height of bottom-nav (3rem) + buffer */
-            }
-        }
-
-        /* Bottom Navigation (Mobile Only) */
-        .bottom-nav {
-            display: none;
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            max-width: 100%;
-            margin: 0 auto;
-            background: rgba(0, 14, 15, 0.407);
-            backdrop-filter: blur(10px);
-            z-index: 900;
-            padding: 0.5rem 0;
-        }
-
-        @media (max-width: 640px) {
-            .bottom-nav {
-                display: flex;
-                justify-content: space-around;
-                align-items: center;
-            }
-            .bottom-nav a {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                color: #dfefff;
-                font-size: 0.625rem;
-                font-weight: 600;
-                text-transform: uppercase;
-                padding: 0.125rem 0.5rem;
-                transition: color 0.2s, background 0.2s;
-                width: 20%;
-                min-width: 60px;
-            }
-            .bottom-nav a:hover {
-                color: #ffffff;
-            }
-            .bottom-nav a.nav-active {
-                color: #ffffff;
-                background: #72F4FF;
-            }
-            .bottom-nav a.nav-active i {
-                color: #ffffff;
-            }
-            .bottom-nav a i {
-                width: 1.5rem;
-                height: 1.5rem;
-                margin-bottom: 0.25rem;
-                color: #dfefff;
-                transition: color 0.2s;
-            }
-        }
-
-        /* Floating Kick Button (Mobile Only) */
-        .floating-kick-button {
-            display: none;
-            position: fixed;
-            bottom: 4.5rem;
-            right: 1rem;
-            background: #6addc24d;
-            color: #ffffff;
-            font-size: 0.75rem;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            padding: 0.5rem 1rem;
-            border-radius: 0.75rem;
-            z-index: 950;
-            transition: transform 0.2s, opacity 0.3s, visibility 0.3s;
-        }
-
-        .floating-kick-button.hidden {
-            opacity: 0;
-            visibility: hidden;
-        }
-
-        .floating-kick-button:hover {
-            transform: scale(1.05);
-        }
-
-        /* Floating Help Button (Mobile Only) */
-        .floating-help-button {
-            display: none;
-            position: fixed;
-            bottom: 7.5rem; /* Above Kick button */
-            right: 1rem;
-            background: #6addc24d;
-            color: #ffffff;
-            font-size: 0.75rem;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            padding: 0.5rem 1rem;
-            border-radius: 0.75rem;
-            z-index: 950;
-            transition: transform 0.2s, opacity 0.3s, visibility 0.3s;
-        }
-
-        .floating-help-button.hidden {
-            opacity: 0;
-            visibility: hidden;
-        }
-
-        .floating-help-button:hover {
-            transform: scale(1.05);
-        }
-
-        @media (max-width: 640px) {
-            .floating-kick-button,
-            .floating-help-button {
-                display: block;
-                font-size: 0.6rem;
-                padding: 0.25rem 0.5rem;
-            }
-        }
-
-        /* Special title styles - reduced size */
-        .special-title {
-            font-size: 1.8rem;
-            font-weight: 900;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            background: linear-gradient(90deg, #00ff00, #00cc00);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            text-shadow: 0 0 8px rgba(0, 255, 0, 0.3);
-            margin: 1.5rem 0 1rem;
-            text-align: left;
-        }
-
-        @media (min-width: 640px) {
-            .special-title {
-                font-size: 2.5rem;
-            }
-        }
-
-        /* Banner image section */
-        .banner-section {
-            margin: 2rem 0;
-            text-align: center;
-        }
-
-        .banner-image {
-            max-width: 100%;
-            height: auto;
-            border-radius: 1rem;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-            display: block;
-            margin: 0 auto;
-        }
-
-        @media (max-width: 640px) {
-            .banner-section {
-                margin: 1.5rem 0;
-            }
-            .banner-image {
-                border-radius: 0.75rem;
-            }
-        }
-
-        /* New Entry Button - Updated to match website button color */
-        .entry-trigger-btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(167, 236, 255, 1);
-            box-shadow: 0 6px 30px rgba(0,224,255,0.36), inset 0 -2px 8px rgba(255,255,255,0.06);
-            color: #021d22;
-            border: 1px solid var(--accent-cyan);
-            border-radius: 15px;
-            font-weight: 600;
-            text-transform: uppercase;
-            padding: 0.75rem 1.5rem;
-            cursor: pointer;
-            font-size: 1rem;
-            margin-top: 1rem;
-            transition: all 180ms cubic-bezier(.2,.9,.3,1);
-            width: auto;
-            min-width: 250px;
-            letter-spacing: 0.05em;
-            font-family: 'Poppins', sans-serif;
-        }
-
-        .entry-trigger-btn:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 40px rgba(0,224,255,0.48);
-        }
-
-        /* Wheel Image Styles */
-        .wheel-image-container {
-            position: relative;
-            width: 100%;
-            max-width: 39.5255em;
-            margin: 0 auto;
-            padding: 3em;
-            border-radius: 1em;
-            background: transparent;
-        }
-
-        .wheel-image {
-            width: 100%;
-            height: auto;
-            border-radius: 50%;
-            display: block;
-            margin: 0 auto;
-        }
-
-        @media (max-width: 640px) {
-            .wheel-image-container {
-                padding: 1em !important;
-                max-width: 95vw;
-            }
-        }
-    </style>
+   
 </head>
 <body>
     <div class="bg-pattern"></div>
@@ -328,9 +106,27 @@
                     <strong>The more you play, the more chances you have to get on the wheel!</strong>
                 </p>
 
-                <!-- Slot Review Button -->
+                <!-- Primary Signup Button -->
                 <div class="mt-6">
                     <a href="https://bcgame.st/?i=sh4ner&utm_source=sh4ner" class="cta-button entry-trigger-btn">Sign Up with Sh4ne Code </a>
+                </div>
+
+                <!-- Secondary Change Code Button -->
+                <div class="mt-3">
+                    <button id="changeCodeBtn" class="secondary-cta">Already signed up? — How to Change Code.</button>
+                </div>
+
+                <!-- Enter Giveaway Button and Form -->
+                <div class="mt-6">
+                    <button id="enterGiveawayBtn" class="giveaway-trigger-btn">Enter Giveaway</button>
+                    <form id="giveawayForm" class="giveaway-form">
+                        <input type="text" name="firstName" placeholder="First Name" required>
+                        <input type="text" name="lastName" placeholder="Last Name" required>
+                        <input type="email" name="email" placeholder="Email" required>
+                        <input type="tel" name="phone" placeholder="Phone Number">
+                        <textarea name="message" rows="3" placeholder="Additional Details (Optional)"></textarea>
+                        <button type="submit">Submit Entry</button>
+                    </form>
                 </div>
             </section>
         </div>
@@ -340,6 +136,16 @@
             <img src="img/download.jpg" alt="Giveaway Banner" class="banner-image">
         </div>
     </main>
+
+    <!-- Video Modal -->
+    <div id="videoModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div class="video-container">
+                <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="How to Change Code" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+        </div>
+    </div>
 
     <!-- Contact Section -->
     <section class="contact-section" aria-labelledby="contact-heading">
@@ -364,9 +170,7 @@
                 <div class="mb-4">
                     <input type="tel" id="phone" name="phone" placeholder="Phone Number" class="w-full p-3 rounded-lg bg-[rgba(3,16,22,0.8)] border border-gray-500 text-white placeholder-white placeholder-opacity-70 focus:outline-none focus:ring-2 focus:ring-gray-500">
                 </div>
-                <div class="mb-4">
-                    <input type="text" id="username" name="username" placeholder="USERNAME" class="w-full p-3 rounded-lg bg-[rgba(3,16,22,0.8)] border border-gray-500 text-white placeholder-white placeholder-opacity-70 focus:outline-none focus:ring-2 focus:ring-gray-500" required>
-                </div>
+               
                 <div class="mb-4">
                     <textarea id="message" name="message" rows="5" placeholder="Message" class="w-full p-3 rounded-lg bg-[rgba(3,16,22,0.8)] border border-gray-500 text-white placeholder-white placeholder-opacity-70 focus:outline-none focus:ring-2 focus:ring-gray-500" required></textarea>
                 </div>
@@ -391,13 +195,16 @@
     <!-- Floating Help Button (Mobile Only) -->
     <a href="help.html" class="floating-help-button">Help</a>
 
-    <!-- Footer -->
     <footer class="footer">
-          <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+            <div class="h-divider">
+                <div class="shadow"></div>
+            </div>
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="section-divider w-full mb-8"></div>
                 <h2 class="text-[#FFFF00] font-bold text-[48px] text-center font-['Poppins']">Disclaimer</h2>
                 <p class="text-[16px] text-center font-['Poppins'] font-normal mt-4 max-w-2xl mx-auto disclaimer-text">
-                    sh4ner.com is an independent igaming news site and casino comparison service. Every effort is made to ensure that the bonus offers listed here are accurate and up-to-date. However, we accept no responsibility for inaccuracies or errors. Please check terms and conditions before deciding to take a bonus.
+                    sh4ner.com is an independent gaming news site and casino comparison service. Every effort is made to ensure that the bonus offers listed here are accurate and up-to-date. However, we accept no responsibility for inaccuracies or errors. Please check terms and conditions before deciding to take a bonus.
                 </p>
                 <h1 class="text-[#FF0000] font-bold text-[48px] text-center font-['Poppins'] mt-8">Gamble Responsibly</h1>
                 <p class="text-[16px] text-center font-['Poppins'] font-normal mt-4 max-w-2xl mx-auto gamble-text">
@@ -468,6 +275,60 @@ document.addEventListener('DOMContentLoaded', async function() {
         console.error('Icons/AOS init failed:', e);
     }
 
+    // === VIDEO MODAL ===
+    const modal = document.getElementById('videoModal');
+    const changeCodeBtn = document.getElementById('changeCodeBtn');
+    const closeBtn = document.querySelector('.close');
+
+    if (changeCodeBtn && modal && closeBtn) {
+        changeCodeBtn.addEventListener('click', () => {
+            modal.style.display = 'block';
+        });
+
+        closeBtn.addEventListener('click', () => {
+            modal.style.display = 'none';
+        });
+
+        window.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+    }
+
+    // === GIVEAWAY FORM ===
+    const giveawayBtn = document.getElementById('enterGiveawayBtn');
+    const giveawayForm = document.getElementById('giveawayForm');
+
+    if (giveawayBtn && giveawayForm) {
+        giveawayBtn.addEventListener('click', () => {
+            giveawayForm.style.display = giveawayForm.style.display === 'block' ? 'none' : 'block';
+        });
+
+        giveawayForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(giveawayForm);
+            const data = Object.fromEntries(formData.entries());
+            try {
+                const response = await fetch('/api/giveaway', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                if (response.ok) {
+                    alert('Entry submitted successfully!');
+                    giveawayForm.reset();
+                    giveawayForm.style.display = 'none';
+                } else {
+                    alert('Error: ' + (result.message || result.error));
+                }
+            } catch (error) {
+                alert('Submission failed. Try again.');
+            }
+        });
+    }
+
     // === CONTACT FORM (unchanged) ===
     const contactForm = document.getElementById('contactForm');
     if (contactForm) {
@@ -478,7 +339,6 @@ document.addEventListener('DOMContentLoaded', async function() {
                 lastName: document.getElementById('lastName').value,
                 email: document.getElementById('email').value,
                 phone: document.getElementById('phone').value,
-                username: document.getElementById('username').value,
                 message: document.getElementById('message').value
             };
             try {
