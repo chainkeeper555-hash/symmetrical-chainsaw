@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="
+        default-src 'self';
+        script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://unpkg.com https://cdn.jsdelivr.net;
+        style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com;
+        font-src 'self' https://fonts.gstatic.com;
+        img-src 'self' data: https://sh4nerewards.com https://res.cloudinary.com https://static.photos;
+        connect-src 'self' https://sh4nerewards.com https://unpkg.com https://cdn.jsdelivr.net;
+    ">
+    <title>Dashboard Content</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-top: #07121a;
+            --bg-bottom: #001017;
+            --card-bg: #031016;
+            --accent-cyan: #00E0FF;
+            --accent-cyan-2: #72F4FF;
+            --muted-white: #c7dfe6;
+            --thumbnail-yellow: #ffd700;
+            --thumbnail-green: #00ff66;
+            --text-white: #ffffff;
+            --neon-green: #00ff99;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--card-bg);
+            color: var(--muted-white);
+            min-height: 100vh;
+            font-size: clamp(12px, 3vw, 14px);
+            overflow-x: hidden;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border: 1px solid var(--accent-cyan);
+            backdrop-filter: blur(6px);
+            transition: all 0.25s cubic-bezier(.2,.9,.3,1);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0,224,255,0.28);
+        }
+
+        .chart-container {
+            background: rgba(10, 30, 40, 0.5);
+            border: 1px solid var(--accent-cyan);
+            backdrop-filter: blur(6px);
+        }
+    </style>
+</head>
+<body>
+    <main class="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
+        <!-- Stats Grid -->
+        <div id="dashboard" class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-8">
+            <div class="stat-card rounded-lg">
+                <div class="px-4 py-5 sm:p-6 flex items-center">
+                    <div class="flex-shrink-0 bg-[var(--accent-cyan)] rounded-md p-3">
+                        <i data-feather="message-square" class="h-6 w-6 text-[var(--text-white)]"></i>
+                    </div>
+                    <div class="ml-5">
+                        <dt class="text-sm font-medium text-[var(--muted-white)]">Total Contacts</dt>
+                        <dd class="flex items-baseline">
+                            <div id="total-contacts" class="text-2xl font-semibold text-[var(--text-white)]">0</div>
+                        </dd>
+                    </div>
+                </div>
+            </div>
+            <div class="stat-card rounded-lg">
+                <div class="px-4 py-5 sm:p-6 flex items-center">
+                    <div class="flex-shrink-0 bg-[var(--thumbnail-green)] rounded-md p-3">
+                        <i data-feather="award" class="h-6 w-6 text-[var(--text-white)]"></i>
+                    </div>
+                    <div class="ml-5">
+                        <dt class="text-sm font-medium text-[var(--muted-white)]">Giveaway Entries</dt>
+                        <dd class="flex items-baseline">
+                            <div id="total-entries" class="text-2xl font-semibold text-[var(--text-white)]">0</div>
+                        </dd>
+                    </div>
+                </div>
+            </div>
+            <div class="stat-card rounded-lg">
+                <div class="px-4 py-5 sm:p-6 flex items-center">
+                    <div class="flex-shrink-0 bg-[var(--thumbnail-yellow)] rounded-md p-3">
+                        <i data-feather="users" class="h-6 w-6 text-[var(--text-white)]"></i>
+                    </div>
+                    <div class="ml-5">
+                        <dt class="text-sm font-medium text-[var(--muted-white)]">Total Visitors</dt>
+                        <dd class="flex items-baseline">
+                            <div id="total-visitors" class="text-2xl font-semibold text-[var(--text-white)]">0</div>
+                        </dd>
+                    </div>
+                </div>
+            </div>
+            <div class="stat-card rounded-lg">
+                <div class="px-4 py-5 sm:p-6 flex items-center">
+                    <div class="flex-shrink-0 bg-[var(--accent-cyan-2)] rounded-md p-3">
+                        <i data-feather="link" class="h-6 w-6 text-[var(--text-white)]"></i>
+                    </div>
+                    <div class="ml-5">
+                        <dt class="text-sm font-medium text-[var(--muted-white)]">Total Link Clicks</dt>
+                        <dd class="flex items-baseline">
+                            <div id="total-link-clicks" class="text-2xl font-semibold text-[var(--text-white)]">0</div>
+                        </dd>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            <div class="chart-container p-6 rounded-lg">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-lg font-medium text-[var(--text-white)]">Visitor Activity (Last 14 Days)</h2>
+                    <div class="flex space-x-2">
+                        <button id="chart-all" class="px-3 py-1 text-sm rounded-md bg-[rgba(0,224,255,0.2)] text-[var(--accent-cyan)]">All</button>
+                        <button id="chart-unique" class="px-3 py-1 text-sm rounded-md text-[var(--muted-white)] hover:bg-[rgba(0,224,255,0.1)]">Unique</button>
+                    </div>
+                </div>
+                <div class="h-80">
+                    <canvas id="mainChart"></canvas>
+                </div>
+            </div>
+            <div class="chart-container p-6 rounded-lg">
+                <h2 class="text-lg font-medium text-[var(--text-white)] mb-4">Giveaway Entries</h2>
+                <div class="h-80">
+                    <canvas id="subscribersChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activity and Leaderboard Row -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div class="bg-[var(--card-bg)] p-6 rounded-lg border border-[var(--accent-cyan)]">
+                <h2 class="text-lg font-medium text-[var(--text-white)] mb-4">Recent Activity</h2>
+                <div id="recent-activity" class="space-y-4">
+                    <p class="text-sm text-[var(--muted-white)]">No recent activity</p>
+                </div>
+            </div>
+            <div class="chart-container p-6 rounded-lg">
+                <h2 class="text-lg font-medium text-[var(--text-white)] mb-4">Leaderboard Wager Distribution</h2>
+                <div class="h-80">
+                    <canvas id="leaderboardChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Embedded fallback data
+        const fallbackLeaderboardData = [
+            { rank: 1, username: "ЖЕ*****ЧУ", totalWager: 243747.58, reward: 3000, img: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
+            { rank: 2, username: "Ma***ts", totalWager: 205427.81, reward: 2000, img: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
+            { rank: 3, username: "Lb*******yb", totalWager: 97128.16, reward: 1000, img: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
+            { rank: 4, username: "El********cc", totalWager: 94694.31, reward: 500, img: "/img/bc-game-esports-logo-png_seeklogo-619973.png" },
+            { rank: 5, username: "St********ac", totalWager: 68815, reward: 250, img: "/img/bc-game-esports-logo-png_seeklogo-619973.png" }
+        ];
+
+        const fallbackEntriesData = [
+            { email: "user1@example.com", prize: "Prize A", createdAt: new Date(Date.now() - 86400000).toISOString() },
+            { email: "user2@example.com", prize: "Prize B", createdAt: new Date(Date.now() - 2 * 86400000).toISOString() }
+        ];
+
+        feather.replace();
+
+        // Track visitor on page load
+        async function trackVisitor() {
+            try {
+                const sessionId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+                const response = await fetch('https://sh4nerewards.com/api/tracking/trackVisitor', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ sessionId })
+                });
+                if (!response.ok) throw new Error(`Visitor API failed: ${response.status}`);
+                const data = await response.json();
+                console.log('Visitor tracked:', data);
+            } catch (err) {
+                console.error('Error tracking visitor:', err);
+            }
+        }
+
+        // Fetch and display stats
+        async function fetchStats() {
+            try {
+                const [contactsResponse, entriesResponse, visitorsResponse, linkClicksResponse] = await Promise.all([
+                    fetch('https://sh4nerewards.com/api/contact?cacheBust=' + Date.now()).catch((err) => {
+                        console.error('Contact API fetch failed:', err);
+                        return { ok: false, status: 500 };
+                    }),
+                    fetch('https://sh4nerewards.com/api/giveaway/entries?cacheBust=' + Date.now()).catch((err) => {
+                        console.error('Giveaway Entries API fetch failed:', err);
+                        return { ok: false, status: 500 };
+                    }),
+                    fetch('https://sh4nerewards.com/api/tracking/visitors?cacheBust=' + Date.now()).catch((err) => {
+                        console.error('Visitors API fetch failed:', err);
+                        return { ok: false, status: 500 };
+                    }),
+                    fetch('https://sh4nerewards.com/api/tracking/link-clicks?cacheBust=' + Date.now()).catch((err) => {
+                        console.error('Link Clicks API fetch failed:', err);
+                        return { ok: false, status: 500 };
+                    })
+                ]);
+
+                const contacts = contactsResponse.ok ? await contactsResponse.json().catch((err) => {
+                    console.error('Contact JSON parse error:', err);
+                    return [];
+                }) : [];
+                
+                let entriesData = entriesResponse.ok ? await entriesResponse.json().catch((err) => {
+                    console.error('Giveaway Entries JSON parse error:', err);
+                    return fallbackEntriesData;
+                }) : fallbackEntriesData;
+
+                console.log('Giveaway Entries response (stats):', {
+                    status: entriesResponse.status,
+                    ok: entriesResponse.ok,
+                    headers: Object.fromEntries(entriesResponse.headers.entries()),
+                    body: entriesData
+                });
+
+                const entries = Array.isArray(entriesData) ? entriesData : (entriesData.entries && Array.isArray(entriesData.entries) ? entriesData.entries : fallbackEntriesData);
+
+                const visitors = visitorsResponse.ok ? await visitorsResponse.json().catch((err) => {
+                    console.error('Visitors JSON parse error:', err);
+                    return [];
+                }) : [];
+                const linkClicks = linkClicksResponse.ok ? await linkClicksResponse.json().catch((err) => {
+                    console.error('Link Clicks JSON parse error:', err);
+                    return [];
+                }) : [];
+
+                document.getElementById('total-contacts').textContent = contacts.length || '0';
+                document.getElementById('total-entries').textContent = entries.length || '0';
+                document.getElementById('total-visitors').textContent = visitors.length || '0';
+                document.getElementById('total-link-clicks').textContent = linkClicks.length || '0';
+
+                // Notify parent to update sidebar counters
+                if (window.parent && window.parent.document) {
+                    ['contact-count', 'entry-count', 'visitor-count', 'link-click-count'].forEach(id => {
+                        if (window.parent.document.getElementById(id)) {
+                            window.parent.document.getElementById(id).textContent = 
+                                id === 'contact-count' ? contacts.length || '0' :
+                                id === 'entry-count' ? entries.length || '0' :
+                                id === 'visitor-count' ? visitors.length || '0' :
+                                linkClicks.length || '0';
+                            if (id === 'entry-count') {
+                                window.parent.document.getElementById(id).classList.toggle('hidden', !entries.length);
+                            }
+                        }
+                    });
+                }
+
+                return { entries }; // Return entries for use in fetchChartData
+            } catch (err) {
+                console.error('Error fetching stats:', err);
+                document.getElementById('total-contacts').textContent = 'Error';
+                document.getElementById('total-entries').textContent = 'Error';
+                document.getElementById('total-visitors').textContent = 'Error';
+                document.getElementById('total-link-clicks').textContent = 'Error';
+                return { entries: fallbackEntriesData };
+            }
+        }
+
+        // Fetch and display charts
+        async function fetchChartData() {
+            try {
+                // Track visitor before fetching data
+                await trackVisitor();
+
+                // Fetch stats and reuse entries data
+                const { entries } = await fetchStats();
+
+                // Fetch remaining data
+                const [visitorsResponse, leaderboardResponse] = await Promise.all([
+                    fetch('https://sh4nerewards.com/api/tracking/visitors?cacheBust=' + Date.now()).catch((err) => {
+                        console.error('Visitors API fetch failed:', err);
+                        return { ok: false, status: 500 };
+                    }),
+                    fetch('https://sh4nerewards.com/api/leaderboard?cacheBust=' + Date.now()).catch((err) => {
+                        console.error('Leaderboard API fetch failed:', err);
+                        return { ok: false, status: 500 };
+                    })
+                ]);
+
+                const visitors = visitorsResponse.ok ? await visitorsResponse.json().catch((err) => {
+                    console.error('Visitors JSON parse error:', err);
+                    return [];
+                }) : [];
+                const leaderboardData = leaderboardResponse.ok ? await leaderboardResponse.json().catch((err) => {
+                    console.error('Leaderboard JSON parse error:', err);
+                    return fallbackLeaderboardData;
+                }) : fallbackLeaderboardData;
+                const leaderboard = Array.isArray(leaderboardData) ? leaderboardData : (leaderboardData.leaderboard && Array.isArray(leaderboardData.leaderboard) ? leaderboardData.leaderboard : fallbackLeaderboardData);
+
+                console.log('Leaderboard response:', leaderboardData); // Debug log
+
+                // Process visitor activity (last 14 days)
+                const today = new Date();
+                const labels = Array.from({ length: 14 }, (_, i) => {
+                    const date = new Date(today);
+                    date.setDate(today.getDate() - (13 - i));
+                    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                });
+                const visitorCounts = Array(14).fill(0);
+                const uniqueVisitors = new Set();
+                const uniqueCounts = Array(14).fill(0);
+
+                visitors.forEach(visitor => {
+                    if (!visitor.createdAt) return;
+                    try {
+                        const visitedAt = new Date(visitor.createdAt);
+                        const diffDays = Math.floor((today - visitedAt) / (1000 * 60 * 60 * 24));
+                        if (diffDays >= 0 && diffDays < 14) {
+                            visitorCounts[13 - diffDays]++;
+                            if (!uniqueVisitors.has(visitor.sessionId)) {
+                                uniqueVisitors.add(visitor.sessionId);
+                                uniqueCounts[13 - diffDays]++;
+                            }
+                        }
+                    } catch {
+                        console.warn('Invalid visitor date:', visitor.createdAt);
+                    }
+                });
+
+                const mainChartConfig = {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [
+                            {
+                                label: 'Visitors',
+                                data: visitorCounts,
+                                borderColor: '#00b7eb',
+                                backgroundColor: 'rgba(0,183,235,0.2)',
+                                borderWidth: 4,
+                                tension: 0.3,
+                                fill: true
+                            },
+                            {
+                                label: 'Unique Visitors',
+                                data: uniqueCounts,
+                                borderColor: '#ffd700',
+                                backgroundColor: 'rgba(255,215,0,0.2)',
+                                borderWidth: 4,
+                                tension: 0.3,
+                                fill: true,
+                                hidden: true
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                                labels: {
+                                    color: '#ffffff',
+                                    font: { size: 18, weight: 'bold' }
+                                }
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(0,0,0,0.8)',
+                                titleColor: '#ffffff',
+                                bodyColor: '#ffffff',
+                                borderColor: '#00E0FF',
+                                borderWidth: 1
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: { color: 'rgba(199,223,230,0.2)' },
+                                ticks: {
+                                    color: '#ffffff',
+                                    font: { size: 16, weight: 'bold' }
+                                }
+                            },
+                            x: {
+                                grid: { display: false },
+                                ticks: {
+                                    color: '#ffffff',
+                                    font: { size: 16, weight: 'bold' }
+                                }
+                            }
+                        }
+                    }
+                };
+
+                const mainChart = new Chart(document.getElementById('mainChart').getContext('2d'), mainChartConfig);
+
+                // Toggle between All and Unique Visitors
+                document.getElementById('chart-all').addEventListener('click', () => {
+                    mainChart.data.datasets[0].hidden = false;
+                    mainChart.data.datasets[1].hidden = true;
+                    mainChart.update();
+                    document.getElementById('chart-all').classList.add('bg-[rgba(0,224,255,0.2)]', 'text-[var(--accent-cyan)]');
+                    document.getElementById('chart-unique').classList.remove('bg-[rgba(0,224,255,0.2)]', 'text-[var(--accent-cyan)]');
+                    document.getElementById('chart-unique').classList.add('text-[var(--muted-white)]');
+                });
+                document.getElementById('chart-unique').addEventListener('click', () => {
+                    mainChart.data.datasets[0].hidden = true;
+                    mainChart.data.datasets[1].hidden = false;
+                    mainChart.update();
+                    document.getElementById('chart-unique').classList.add('bg-[rgba(0,224,255,0.2)]', 'text-[var(--accent-cyan)]');
+                    document.getElementById('chart-all').classList.remove('bg-[rgba(0,224,255,0.2)]', 'text-[var(--accent-cyan)]');
+                    document.getElementById('chart-all').classList.add('text-[var(--muted-white)]');
+                });
+
+                // Process giveaway entries (monthly)
+                const entryCounts = Array(12).fill(0);
+                const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                entries.forEach(entry => {
+                    if (!entry.createdAt) return;
+                    try {
+                        const enteredAt = new Date(entry.createdAt);
+                        const month = enteredAt.getMonth();
+                        entryCounts[month]++;
+                    } catch {
+                        console.warn('Invalid entry date:', entry.createdAt);
+                    }
+                });
+
+                const subscribersChartConfig = {
+                    type: 'bar',
+                    data: {
+                        labels: months,
+                        datasets: [
+                            {
+                                label: 'Giveaway Entries',
+                                data: entryCounts,
+                                backgroundColor: 'rgba(0,183,235,0.9)',
+                                borderColor: '#00b7eb',
+                                borderWidth: 1
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                                labels: {
+                                    color: '#ffffff',
+                                    font: { size: 18, weight: 'bold' }
+                                }
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(0,0,0,0.8)',
+                                titleColor: '#ffffff',
+                                bodyColor: '#ffffff',
+                                borderColor: '#00E0FF',
+                                borderWidth: 1
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: { color: 'rgba(199,223,230,0.2)' },
+                                ticks: {
+                                    color: '#ffffff',
+                                    font: { size: 16, weight: 'bold' }
+                                }
+                            },
+                            x: {
+                                grid: { display: false },
+                                ticks: {
+                                    color: '#ffffff',
+                                    font: { size: 16, weight: 'bold' }
+                                }
+                            }
+                        }
+                    }
+                };
+
+                const subscribersChart = new Chart(document.getElementById('subscribersChart').getContext('2d'), subscribersChartConfig);
+
+                // Process leaderboard data for pie chart
+                const topLeaderboard = leaderboard.slice(0, 5); // Take top 5 for pie chart
+                const leaderboardLabels = topLeaderboard.map(entry => entry.username);
+                const leaderboardWagers = topLeaderboard.map(entry => entry.totalWager);
+
+                const leaderboardChartConfig = {
+                    type: 'pie',
+                    data: {
+                        labels: leaderboardLabels,
+                        datasets: [{
+                            label: 'Total Wager',
+                            data: leaderboardWagers,
+                            backgroundColor: [
+                                'rgba(0,183,235,0.9)', // Cyan
+                                'rgba(255,215,0,0.9)',  // Yellow
+                                'rgba(0,255,102,0.9)', // Green
+                                'rgba(255,99,132,0.9)', // Pink
+                                'rgba(153,102,255,0.9)' // Purple
+                            ],
+                            borderColor: '#00E0FF',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                                labels: {
+                                    color: '#ffffff',
+                                    font: { size: 18, weight: 'bold' }
+                                }
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(0,0,0,0.8)',
+                                titleColor: '#ffffff',
+                                bodyColor: '#ffffff',
+                                borderColor: '#00E0FF',
+                                borderWidth: 1,
+                                callbacks: {
+                                    label: function(context) {
+                                        const value = context.parsed;
+                                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                        const percentage = ((value / total) * 100).toFixed(1);
+                                        return `${context.label}: $${value.toLocaleString()} (${percentage}%)`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                };
+
+                const leaderboardChart = new Chart(document.getElementById('leaderboardChart').getContext('2d'), leaderboardChartConfig);
+            } catch (err) {
+                console.error('Error fetching chart data:', err);
+                document.getElementById('mainChart').parentElement.innerHTML = '<p class="text-sm text-[var(--muted-white)]">Error loading chart</p>';
+                document.getElementById('subscribersChart').parentElement.innerHTML = '<p class="text-sm text-[var(--muted-white)]">Error loading chart</p>';
+                document.getElementById('leaderboardChart').parentElement.innerHTML = '<p class="text-sm text-[var(--muted-white)]">Error loading chart</p>';
+            }
+        }
+
+        // Fetch and display recent activity
+        async function fetchRecentActivity() {
+            try {
+                const [entriesResponse, newsResponse, shortsResponse, videosResponse, scheduleResponse] = await Promise.all([
+                    fetch('https://sh4nerewards.com/api/giveaway/entries?cacheBust=' + Date.now()).catch((err) => {
+                        console.error('Giveaway Entries API fetch failed (recent activity):', err);
+                        return { ok: false, status: 500 };
+                    }),
+                    fetch('https://sh4nerewards.com/api/news?cacheBust=' + Date.now()).catch((err) => {
+                        console.error('News API fetch failed:', err);
+                        return { ok: false, status: 500 };
+                    }),
+                    fetch('https://sh4nerewards.com/api/shorts?cacheBust=' + Date.now()).catch((err) => {
+                        console.error('Shorts API fetch failed:', err);
+                        return { ok: false, status: 500 };
+                    }),
+                    fetch('https://sh4nerewards.com/api/videos?cacheBust=' + Date.now()).catch((err) => {
+                        console.error('Videos API fetch failed:', err);
+                        return { ok: false, status: 500 };
+                    }),
+                    fetch('https://sh4nerewards.com/api/schedule?cacheBust=' + Date.now()).catch((err) => {
+                        console.error('Schedule API fetch failed:', err);
+                        return { ok: false, status: 500 };
+                    })
+                ]);
+
+                const entriesData = entriesResponse.ok ? await entriesResponse.json().catch((err) => {
+                    console.error('Giveaway Entries JSON parse error (recent activity):', err);
+                    return fallbackEntriesData;
+                }) : fallbackEntriesData;
+                const entries = Array.isArray(entriesData) ? entriesData : (entriesData.entries && Array.isArray(entriesData.entries) ? entriesData.entries : fallbackEntriesData);
+
+                console.log('Giveaway Entries response (recent activity):', {
+                    status: entriesResponse.status,
+                    ok: entriesResponse.ok,
+                    headers: entriesResponse.ok ? Object.fromEntries(entriesResponse.headers.entries()) : {},
+                    body: entriesData
+                });
+
+                const newsData = newsResponse.ok ? await newsResponse.json().catch((err) => {
+                    console.error('News JSON parse error:', err);
+                    return { news: [] };
+                }) : { news: [] };
+                const shortsData = shortsResponse.ok ? await shortsResponse.json().catch((err) => {
+                    console.error('Shorts JSON parse error:', err);
+                    return { shorts: [] };
+                }) : { shorts: [] };
+                const videosData = videosResponse.ok ? await videosResponse.json().catch((err) => {
+                    console.error('Videos JSON parse error:', err);
+                    return { videos: [] };
+                }) : { videos: [] };
+                const schedule = scheduleResponse.ok ? await scheduleResponse.json().catch((err) => {
+                    console.error('Schedule JSON parse error:', err);
+                    return [];
+                }) : [];
+
+                const activities = [
+                    ...entries.map(entry => ({
+                        type: 'Giveaway Entry',
+                        icon: 'award',
+                        title: entry.email || 'Unknown Email',
+                        description: `Prize: ${entry.prize || 'Unknown'}`,
+                        timestamp: entry.createdAt ? new Date(entry.createdAt) : null
+                    })),
+                    ...newsData.news.map(item => ({
+                        type: 'News',
+                        icon: 'file-text',
+                        title: item.title || 'Untitled News',
+                        description: item.content || 'No content',
+                        timestamp: item.createdAt ? new Date(item.createdAt) : null
+                    })),
+                    ...shortsData.shorts.map(item => ({
+                        type: 'Short',
+                        icon: 'video',
+                        title: item.title || 'Untitled Short',
+                        description: item.description || 'No description',
+                        timestamp: item.createdAt ? new Date(item.createdAt) : null
+                    })),
+                    ...videosData.videos.map(item => ({
+                        type: 'Video',
+                        icon: 'film',
+                        title: item.title || 'Untitled Video',
+                        description: item.description || 'No description',
+                        timestamp: item.createdAt ? new Date(item.createdAt) : null
+                    })),
+                    ...schedule.map(item => ({
+                        type: 'Schedule',
+                        icon: 'calendar',
+                        title: item.title || 'Untitled Event',
+                        description: item.description || 'No description',
+                        timestamp: item.date ? new Date(item.date) : null
+                    }))
+                ].filter(item => item.timestamp).sort((a, b) => b.timestamp - a.timestamp);
+
+                const activityContainer = document.getElementById('recent-activity');
+                activityContainer.innerHTML = activities.length === 0 ? 
+                    '<p class="text-sm text-[var(--muted-white)]">No recent activity</p>' :
+                    activities.slice(0, 3).map(activity => `
+                        <div class="flex items-start">
+                            <div class="flex-1">
+                                <div class="flex items-center justify-between">
+                                    <p class="text-sm font-medium text-[var(--text-white)]">${activity.title}</p>
+                                    <span class="text-xs text-[var(--muted-white)]">${
+                                        activity.timestamp ? activity.timestamp.toLocaleString() : 'Unknown'
+                                    }</span>
+                                </div>
+                                <p class="text-sm text-[var(--muted-white)]">${activity.description}</p>
+                                <div class="mt-1 flex items-center text-xs text-[var(--muted-white)]">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-[rgba(0,224,255,0.2)] text-[var(--accent-cyan)]">
+                                        <i data-feather="${activity.icon}" class="h-3 w-3 mr-1"></i> ${activity.type}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                feather.replace();
+            } catch (err) {
+                console.error('Error fetching recent activity:', err);
+                document.getElementById('recent-activity').innerHTML = '<p class="text-sm text-[var(--muted-white)]">Error loading activity</p>';
+            }
+        }
+
+        // Initialize data
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchChartData(); // fetchChartData calls fetchStats internally
+            fetchRecentActivity();
+        });
+    </script>
+</body>
+</html>
