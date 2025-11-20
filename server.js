@@ -151,7 +151,7 @@ app.use(helmet({
                 "'self'",
                 'data:',
                 'blob:',
-                'https://sh4nerewards.com',
+                'https://sh4ner.com',
                 'https://cdn.jsdelivr.net',
                 'https://unpkg.com',
                 'https://res.cloudinary.com',
@@ -159,7 +159,7 @@ app.use(helmet({
             ],
             connectSrc: [
                 "'self'",
-                'https://sh4nerewards.com',
+                'https://sh4ner.com',
                 'https://cdn.jsdelivr.net',
                 'https://kick.com',
                 'https://player.kick.com',
@@ -196,7 +196,7 @@ app.use(helmet({
 }));
 
 app.use(cors({
-    origin: ['https://sh4nerewards.com', process.env.CLIENT_URL || 'https://sh4nerewards.com', 'http://localhost:3000'],
+    origin: ['https://sh4ner.com', process.env.CLIENT_URL || 'https://sh4ner.com', 'http://localhost:3000'],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     credentials: true
 }));
@@ -490,3 +490,4 @@ app.listen(PORT, async () => {
     }
     console.log(`Server running on port ${PORT}`);
 });
+
