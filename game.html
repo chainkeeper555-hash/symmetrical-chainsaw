@@ -8,9 +8,9 @@
     script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://unpkg.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com;
     style-src 'self' 'unsafe-inline' https://unpkg.com https://fonts.googleapis.com https://fonts.gstatic.com;
     font-src 'self' https://fonts.gstatic.com;
-    img-src 'self' data:https://sh4nerewards.comhttps://res.cloudinary.com https://*.cloudinary.com;
+    img-src 'self' data:https://sh4ner.comhttps://res.cloudinary.com https://*.cloudinary.com;
     connect-src 'self' 
-       https://sh4nerewards.com
+       https://sh4ner.com
         https://cdn.jsdelivr.net 
         https://kick.com 
         https://player.kick.com 
@@ -522,7 +522,7 @@
                     return;
                 }
                 try {
-                    const response = await fetch(`https://sh4nerewards.com/api/reviews?type=${type}`);
+                    const response = await fetch(`https://sh4ner.com/api/reviews?type=${type}`);
                     const data = await response.json();
                     hideLoader(loaderId);
                     if (response.ok && Array.isArray(data.reviews)) {
@@ -583,7 +583,7 @@
                         message: document.getElementById('message').value
                     };
                     try {
-                        const response = await fetch('https://sh4nerewards.com/api/contact', {
+                        const response = await fetch('https://sh4ner.com/api/contact', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify(formData)
@@ -609,4 +609,5 @@
         });
     </script>
 </body>
+
 </html>
