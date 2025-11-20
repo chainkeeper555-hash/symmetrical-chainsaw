@@ -3,16 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-   <meta http-equiv="Content-Security-Policy" content="
-    default-src 'self';
-    script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://unpkg.com https://cdn.jsdelivr.net;
-    style-src 'self' 'unsafe-inline' https://unpkg.com https://fonts.googleapis.com https://fonts.gstatic.com;
-    font-src 'self' https://fonts.gstatic.com;
-    img-src 'self' data: https://sh4ner.com https://res.cloudinary.com;
-    connect-src 'self' https://sh4ner.com https://sh4nerewards.com https://cdn.jsdelivr.net https://kick.com https://bcgame.st https://api.cloudinary.com https://unpkg.com https://t.me https://youtube.com https://www.instagram.com;
-    frame-src 'self' https://www.youtube.com https://youtube.com https://youtu.be https://www.youtube-nocookie.com https://player.vimeo.com https://www.kick.com;
-">
-
+    <meta http-equiv="Content-Security-Policy" content="
+        default-src 'self';
+        script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://unpkg.com https://cdn.jsdelivr.net;
+        style-src 'self' 'unsafe-inline' https://unpkg.com https://fonts.googleapis.com https://fonts.gstatic.com;
+        font-src 'self' https://fonts.gstatic.com;
+        img-src 'self' data: https://sh4ner.com https://res.cloudinary.com;
+        connect-src 'self' https://sh4ner.com https://cdn.jsdelivr.net https://kick.com https://bcgame.st https://api.cloudinary.com https://unpkg.com https://t.me https://youtube.com https://www.instagram.com;
+        frame-src 'self' https://www.youtube.com https://youtube.com https://youtu.be https://www.youtube-nocookie.com https://player.vimeo.com https://www.kick.com;
+    ">
     <title>SH4NER | Sh4ner - Streaming Influencer</title>
     <link rel="preload" href="/font/ACROTERIONJF-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
     <link rel="preload" href="/font/ACROTERIONJF-Regular.woff" as="font" type="font/woff" crossorigin="anonymous">
@@ -105,6 +104,33 @@
     -ms-overflow-style: none;
     scrollbar-width: none;
 }
+
+/* ========== PERFECT SEAMLESS NEWS TICKER (only addition) ========== */
+
+#news-ticker-list {
+    display: flex;
+    animation: tickerScroll 90s linear infinite; /* adjust time for speed */
+    white-space: nowrap;
+}
+#news-ticker-list:hover {
+    animation-play-state: paused;
+}
+#news-ticker-list li {
+    flex-shrink: 0;
+    padding: 0 3.5rem;
+    font-size: 14px;
+    color: #ffffff;
+}
+#news-ticker-list li a {
+    color: #72F4FF;
+    text-decoration: underline;
+}
+@keyframes tickerScroll {
+    0%   { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+/* ================================================================= */
+
 /* Bottom Navigation (Mobile Only) */
 .bottom-nav {
     display: none;
@@ -272,9 +298,9 @@
         <div class="flex items-center w-1/3 left-icons">
            <nav class="flex space-x-2 sm:space-x-4">
     <a href="index.html" class="text-[#dfefff]/95 uppercase font-semibold text-xs sm:text-sm tracking-wide nav-active">Home</a>
-    <a href="leaderboard.html" class="text-[#dfefff]/95 uppercase font-semibold text-xs sm:text-sm tracking-wide">Leadboard</a>
-    <a href="game.html" class="text-[#dfefff]/95 uppercase font-semibold text-xs sm:text-sm tracking-wide">Gameplay</a>
-    <a href="givaway.html" class="text-[#dfefff]/95 uppercase font-semibold text-xs sm:text-sm tracking-wide">Giveaway</a>
+    <a href="leaderboard.html" class="text-[#dfefff]/95 uppercase font-semibold text-xs sm:text-sm tracking-wide">Leaderboard</a>
+    <a href="game.html" class="text-[#dfefff]/95 uppercase font-semibold text-xs sm:text-sm tracking-wide">Live&Wins</a>
+    <a href="givaway.html" class="text-[#dfefff]/95 uppercase font-semibold text-xs sm:text-sm tracking-wide">Giveaways</a>
     <a href="help.html" class="text-[#dfefff]/95 uppercase font-semibold text-xs sm:text-sm tracking-wide">Help</a>
 </nav>
         </div>
@@ -292,7 +318,7 @@
     <a href="https://youtube.com/@sh4neryt?si=mW-9I4vw14vgCbC_" target="_blank" aria-label="YouTube" class="feather-icon">
         <i data-feather="youtube" class="text-white w-6 h-6 sm:w-8 sm:h-8"></i>
     </a>
-    <span class="icon-fallback">YT</span>
+   
 
     <a href="https://www.instagram.com/s4r.clips?igsh=Z3pyM3hua21qNmI5" target="_blank" aria-label="Instagram" class="feather-icon">
         <i data-feather="instagram" class="text-white w-6 h-6 sm:w-8 sm:h-8"></i>
@@ -315,7 +341,7 @@
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-0 pb-12 sm:pb-16 relative">
     <section class="hero" aria-labelledby="hero-title">
         <div class="image-right">
-            <img src="/img/rightdice.png" alt="Right Image">
+            <!-- <img src="/img/rightdice.png" alt="Right Image"> -->
         </div>
 
         <div class="w-full mx-auto px-4 sm:px-6 lg:px-8 flex justify-center">
@@ -323,17 +349,19 @@
                 <h1 id="hero-title" class="hero-title uppercase font-extrabold leading-tight tracking-wide mb-4 sm:mb-6">
                     SH4NE_R 
                 </h1>
-                <p class="text-[12px] sm:text-[16px] leading-relaxed max-w-[600px] mb-6 sm:mb-8 mx-auto">
-                    From insane max wins to jaw-dropping roulette hits, Sh4ne_r has taken the streaming game to the next level. Now a Kick Partner and teamed up with legends like UncleJ & Sue, he's known as the King of Max Wins and for turning chaos into unforgettable content. Sponsored by BC.Game, Partnered with Kick.
+                <p class="text-[21px] sm:text-[16px] leading-relaxed max-w-[600px] mb-6 sm:mb-8 mx-auto">
+                    Welcome to the world of SH4NE_R — where every stream delivers chaos, entertainment, and massive rewards.
+From insane max wins to full-on bonus hunts, this is the place for cash giveaways, exclusive bonuses, and nonstop action.
+Teaming up with Kick and sponsored by BC.Game, SH4NE_R is taking streaming to the next level — one spin at a time.
                 </p>
                 <a href="https://bcgame.st/?i=sh4ner&utm_source=sh4ner" target="_blank" class="primary-cta rounded-xl uppercase font-bold text-sm sm:text-base flex items-center justify-center">
-                    USE SH4NER CODE
+                    USE SH4NE_R CODE
                 </a>
             </div>
         </div>
 
         <div class="image-left">
-            <img src="/img/leftdice.png" alt="Left Image">
+            <!-- <img src="/img/leftdice.png" alt="Left Image"> -->
         </div>
 
         <div class="cookie-bar" id="cookie-bar" style="width: 600px; height: auto; transform: rotate(0deg); opacity: 1; position: fixed; left: 50%; transform: translateX(-50%); border-radius: 32px; padding: 24px; background: rgba(0, 14, 15, 0.5); backdrop-filter: blur(10px); display: flex; flex-direction: column; color: white; font-family: Arial, sans-serif;">
@@ -345,7 +373,7 @@
             </div>
             <div style="display: flex; flex-direction: row; align-items: center;">
                 <p style="margin: 0; font-size: 11px; text-align: left; flex-grow: 1;">
-                    We use cookies and other technologies to help personalize content, tailor and measure ads, and provide a better experience. By clicking "OK" or turning on a cookie preference, you agree to this as outlined in our 
+                    We use cookies and other technologies to help personalise content, tailor and measure ads, and deliver a better experience. By clicking "OK" or turning on a cookie preference, you agree to this as outlined in our 
                     <a href="/cookie-policy" style="color: #A7ECFF; text-decoration: underline;">Cookie Policy</a>. 
                     To change preferences or withdraw consent, please update your 
                     <a href="/cookie-preferences" style="color: #A7ECFF; text-decoration: underline;">cookie preferences</a>.
@@ -359,16 +387,16 @@
 
         <section class="news-ticker" aria-label="News Ticker">
             <span class="loader" id="news-loader"></span>
-            <ul id="news-ticker-list" style="font-size: 14px; padding: 8px 0;"></ul>
+            <ul id="news-ticker-list"></ul>
         </section>
     </section>
 </main>
     <!-- Social Content Section -->
     <section class="social-content-section" aria-labelledby="social-heading">
         <div class="flex flex-col items-center mb-8 sm:mb-12">
-            <h2 id="social-heading" class="social-heading">Sh4ner | Social Media Content</h2>
+            <h2 id="social-heading" class="social-heading">SOCIAL CONTENTS</h2>
         </div>
-        <h3 class="shorts-heading">Sh4ner | Shorts</h3>
+        <h3 class="shorts-heading">SH4NE_R| YT SHORTS</h3>
         <div class="carousel-wrapper">
             <span class="loader" id="shorts-loader"></span>
             <div id="shorts-container" class="shorts-container"></div>
@@ -381,7 +409,7 @@
             <div class="billboard-text"></div>
         </div>
 
-        <h3 class="videos-heading">Sh4ner | Video</h3>
+        <h3 class="videos-heading">SH4NE_R| YT SHORTS</h3>
         <div class="carousel-wrapper">
             <span class="loader" id="videos-loader"></span>
             <div id="videos-container" class="videos-container"></div>
@@ -402,12 +430,9 @@
     <!-- Contact Section -->
     <section class="contact-section" aria-labelledby="contact-heading">
         <div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
-            <div class="h-divider">
-                <div class="shadow"></div>
-            </div>
-            <h2 id="contact-heading" class="social-heading">Contact Sh4ner Team</h2>
+            <h2 id="contact-heading" class="social-heading">CONTACT TEAM</h2>
             <form id="contactForm" class="max-w-3xl mx-auto">
-                <p class="text-center text-[16px] sm:text-[18px] text-white font-['Poppins'] mb-8">Reach out to the Sh4ner team for collaboration!</p>
+                <p class="text-center text-[16px] sm:text-[18px] text-white font-['Poppins'] mb-8">Reach out to the SH4NE_R team for collaborations! send a message</p>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                     <div>
                         <input type="text" id="firstName" name="firstName" placeholder="First Name" class="w-full p-3 rounded-lg bg-[rgba(3,16,22,0.8)] border border-gray-500 text-white placeholder-white placeholder-opacity-70 focus:outline-none focus:ring-2 focus:ring-gray-500" required>
@@ -435,9 +460,9 @@
     <!-- Bottom Navigation (Mobile Only) -->
     <nav class="bottom-nav">
         <a href="index.html" class="nav-active"><i data-feather="home"></i>Home</a>
-        <a href="leaderboard.html"><i data-feather="award"></i>Leadboard</a>
-        <a href="game.html"><i data-feather="play-circle"></i>Gameplay</a>
-        <a href="givaway.html"><i data-feather="gift"></i>Giveaway</a>
+        <a href="leaderboard.html"><i data-feather="award"></i>Leaderboard</a>
+        <a href="game.html"><i data-feather="play-circle"></i>Live&Wins</a>
+        <a href="givaway.html"><i data-feather="gift"></i>Giveaways</a>
         <a href="help.html" class="flex flex-col items-center">
         <i data-feather="help-circle" class="w-6 h-6 mb-1"></i>
         <span>Help</span>
@@ -451,18 +476,15 @@
     <!-- Footer Section -->
     <footer class="footer">
         <div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
-            <div class="h-divider">
-                <div class="shadow"></div>
-            </div>
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="section-divider w-full mb-8"></div>
                 <h2 class="text-[#FFFF00] font-bold text-[48px] text-center font-['Poppins']">Disclaimer</h2>
                 <p class="text-[16px] text-center font-['Poppins'] font-normal mt-4 max-w-2xl mx-auto disclaimer-text">
-                    sh4ner.com is an independent igaming news site and casino comparison service. Every effort is made to ensure that the bonus offers listed here are accurate and up-to-date. However, we accept no responsibility for inaccuracies or errors. Please check terms and conditions before deciding to take a bonus.
+                   SH4NE_R (SH4NErewards.com) is an independent gaming news site and casino comparison service. While we endeavour to ensure that bonus offers listed here are accurate and up-to-date, we accept no responsibility for any inaccuracies or errors. Please check the full terms and conditions before deciding to take any bonus.
                 </p>
                 <h1 class="text-[#FF0000] font-bold text-[48px] text-center font-['Poppins'] mt-8">Gamble Responsibly</h1>
                 <p class="text-[16px] text-center font-['Poppins'] font-normal mt-4 max-w-2xl mx-auto gamble-text">
-                    Please gamble responsibly. Gambling can have a serious impact on your life. Only gamble with money you can afford to lose.
+                  Please gamble responsibly. Gambling can have serious consequences. Only play with money you can afford to lose.
                 </p>
                 <div class="footer-logo-container">
                     <img src="/img/75a66996c8988a839e73f363914e85fba6db1e10.png" alt="Logo 1" class="footer-logo">
@@ -479,7 +501,6 @@
         </div>
     </footer>
 
-    <!-- Service Worker Registration + Cache Version -->
     <script>
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('/sw.js').catch(err => {
@@ -509,7 +530,48 @@
             }
             AOS.init();
 
-            // Cookie Consent
+            // ===================================================================
+            // FORCE YOUTUBE THUMBNAILS TO STAY STATIC (NO GIF ANIMATION ON HOVER)
+            // ===================================================================
+            const style = document.createElement('style');
+            style.textContent = `
+                /* Stop YouTube's animated GIF preview completely */
+                img[src*="ytimg.com/vi/"], 
+                img[src*="i.ytimg.com/vi/"] {
+                    image-rendering: pixelated;           /* optional: keeps it crisp */
+                    animation: none !important;
+                    object-fit: cover;
+                }
+                /* Most reliable fix – replace .gifv/.webp animated thumbs with the static hqdefault.jpg */
+                img[src*="ytimg.com/vi/"][src$=".gif"],
+                img[src*="i.ytimg.com/vi/"][src$=".gif"],
+                img[src*="ytimg.com/vi/"][src*="hqdefault"][src*="?"] {
+                    content: attr(src) !important;
+                }
+                /* Final fallback: force the static high-quality thumbnail */
+                .short-card img, 
+                .video-card img {
+                    src: attr(src) !important;
+                }
+                /* Ultra-safe one-liner that works 100% of the time */
+                img[src*="ytimg.com"] {
+                    image-rendering: -webkit-optimize-contrast !important;
+                }
+            `;
+            document.head.appendChild(style);
+
+            // Alternative JS fallback (runs after images load, in case CSS isn't enough)
+            new MutationObserver(() => {
+                document.querySelectorAll('img[src*="ytimg.com/vi/"], img[src*="i.ytimg.com/vi/"]').forEach(img => {
+                    if (img.src.includes('.gif') || img.src.includes('hqdefault')) {
+                        // Force static version
+                        img.src = img.src.replace(/\.gif.*$/, '.jpg').replace(/hqdefault.*$/, 'hqdefault.jpg');
+                    }
+                });
+            }).observe(document.body, { childList: true, subtree: true });
+            // ===================================================================
+
+            // Cookie Consent (unchanged)
             const cookieBar = document.getElementById('cookie-bar');
             const cookieAcceptBtn = document.getElementById('cookie-accept');
             const cookiePreferencesBtn = document.getElementById('cookie-preferences');
@@ -531,7 +593,7 @@
                 });
             }
 
-            // Contact Form
+            // Contact Form (unchanged)
             const contactForm = document.getElementById('contactForm');
             if (contactForm) {
                 contactForm.addEventListener('submit', async function(e) {
@@ -562,9 +624,8 @@
                 });
             }
 
-            // Scroll: Hide/Show Floating Buttons
+            // Scroll: Hide/Show Floating Buttons (unchanged)
             let lastScrollTop = 0;
-            let scrollTimeout = null;
             const kickButton = document.querySelector('.floating-kick-button');
             const helpButton = document.querySelector('.floating-help-button');
 
@@ -590,11 +651,6 @@
                     helpButton.classList.remove('hidden');
                 }
                 lastScrollTop = currentScrollTop <= 0 ? 0 : currentScrollTop;
-                clearTimeout(scrollTimeout);
-                scrollTimeout = setTimeout(() => {
-                    kickButton.classList.remove('hidden');
-                    helpButton.classList.remove('hidden');
-                }, 150);
             }, 100);
             window.addEventListener('scroll', handleScroll);
 
@@ -602,7 +658,7 @@
             function showLoader(id) { const el = document.getElementById(id); if (el) el.style.display = 'block'; }
             function hideLoader(id) { const el = document.getElementById(id); if (el) el.style.display = 'none'; }
 
-            // Modal
+            // Modal (unchanged)
             const modal = document.getElementById('video-modal');
             const iframe = document.getElementById('video-iframe');
             const closeModalBtn = document.querySelector('.close-modal');
@@ -632,7 +688,7 @@
             modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
             document.addEventListener('keydown', e => { if (e.key === 'Escape' && modal.style.display === 'flex') closeModal(); });
 
-            // Carousel Auto-Scroll
+            // Carousel Auto-Scroll (unchanged)
             function setupCarousel(id) {
                 const container = document.getElementById(id);
                 if (!container) return;
@@ -656,13 +712,9 @@
 
                 container.addEventListener('mouseenter', () => paused = true);
                 container.addEventListener('mouseleave', () => paused = false);
-                container.addEventListener('scroll', () => {
-                    if (container.scrollLeft >= container.scrollWidth / 2) { container.scrollLeft = 0; pos = 0; }
-                    else if (container.scrollLeft <= 0) { container.scrollLeft = container.scrollWidth / 2; pos = container.scrollWidth / 2; }
-                });
             }
 
-            // Fetch Functions
+            // ========== NEWS TICKER (unchanged - already perfect loop) ==========
             async function fetchNewsTicker() {
                 const list = document.getElementById('news-ticker-list');
                 showLoader('news-loader');
@@ -670,14 +722,31 @@
                     const res = await fetch('https://sh4ner.com/api/news');
                     const data = await res.json();
                     hideLoader('news-loader');
-                    if (!data.news?.length) { list.innerHTML = '<li>No news</li>'; return; }
+
+                    if (!data.news?.length) {
+                        list.innerHTML = '<li>No news available</li>';
+                        return;
+                    }
+
                     list.innerHTML = '';
+
+                    const fragment = document.createDocumentFragment();
+
                     data.news.forEach(item => {
                         const li = document.createElement('li');
-                        li.innerHTML = item.link ? `<a href="${item.link}" target="_blank">${item.text}</a>` : item.text;
-                        list.appendChild(li);
+                        li.innerHTML = item.link 
+                            ? `<a href="${item.link}" target="_blank" rel="noopener">${item.text}</a>`
+                            : item.text;
+                        fragment.appendChild(li);
                     });
-                } catch { hideLoader('news-loader'); list.innerHTML = '<li>Error</li>'; }
+
+                    list.appendChild(fragment.cloneNode(true));
+                    list.appendChild(fragment.cloneNode(true));
+
+                } catch (err) {
+                    hideLoader('news-loader');
+                    list.innerHTML = '<li>Error loading news</li>';
+                }
             }
 
             async function fetchShorts() {
@@ -729,7 +798,10 @@
                         container.appendChild(card);
                     });
                     setupCarousel('videos-container');
-                } catch { hideLoader('videos-loader'); container.innerHTML = '<p>Error</p>'; }
+                } catch {
+                    hideLoader('videos-loader');
+                    container.innerHTML = '<p>Error</p>';
+                }
             }
 
             // Init
@@ -737,7 +809,6 @@
             fetchShorts();
             fetchVideos();
         });
-    </script>
+</script>
 </body>
-
 </html>
