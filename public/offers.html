@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>SH4NER | Sh4ner - Offers</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&display=block" rel="stylesheet">
+    <link rel="stylesheet" href="/help.css">
+
+    <style>
+        :root {
+            --muted-white: #e0e0e0;
+            --text-white: #ffffff;
+            --bg-top: #000000;
+        }
+
+        html, body { margin:0; padding:0; overflow-x:hidden; }
+
+        .full-bg {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%;
+            height: 100vh;
+            z-index: -1;
+        }
+        .full-bg img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: top;
+        }
+        @media (min-width:640px) {
+            .full-bg img { object-position: center; }
+        }
+
+        .hero-image {
+            position: relative;
+            width: 100vw;
+            left: 50%; right: 50%;
+            margin-left: -50vw; margin-right: -50vw;
+            margin-top: 1px;
+            overflow: hidden;
+        }
+        .hero-image img { width:100%; height:100vh; object-fit:cover; object-position:top; display:block; }
+        @media (min-width:640px) { .hero-image img { object-position:center; } }
+
+        .hero-text {
+            position: absolute;
+            top: 77%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            width: 95%;
+            max-width: 1400px;
+            z-index: 10;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1px;
+        }
+        .hero-text > * { pointer-events: auto; }
+
+        .hero-content-scaled {
+            width: 100%;
+            transform: scale(0.81);
+            transform-origin: center top;
+        }
+
+        /* DESKTOP STYLES */
+        .hero-text h1 {font-family:'Poppins',sans-serif; font-weight:700; font-size:clamp(27.36px,6.48vw,44.64px); color:#15FF00; text-shadow:0 4px 30px rgba(0,0,0,0.9); margin: -20px !important;}
+        .bonus-numbers {font-family:'Poppins',sans-serif; font-weight:900; font-size:clamp(100.56px,8.64vw,57.6px); color:#15FF00; text-shadow:0 4px 30px rgba(0,0,0,0.9); letter-spacing:-2px; margin:0 !important;}
+        .hero-text p {font-family:'Poppins',sans-serif; font-weight:600; font-size:clamp(13.68px,3.6vw,24.48px); color:#fff; text-shadow:0 2px 15px rgba(0,0,0,0.8); margin:0 !important;}
+        .rewards-box {background:rgba(0,0,0,0.85); backdrop-filter:blur(10px); border:2px solid #000000; border-radius:20px; padding:10px 20px; display:inline-block; margin:0 !important;}
+        .rewards-text {font-family:'Poppins',sans-serif; font-size:clamp(17.28px,4.32vw,23.2px); font-weight:400; color:#fff;}
+        .rewards-text span {color:#15FF00; font-weight:900;}
+
+        /* BUTTONS */
+        .main-cta {
+            background:#15FF00;
+            color:#000;
+            font-family:'Poppins',sans-serif;
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+            justify-content:center;
+            padding:0 30px;
+            border-radius:21px;
+            text-decoration:none;
+            box-shadow:0 10px 35px rgba(21,255,0,0.5);
+            transition:all .3s;
+            min-width:1000px;
+            width:1000px;
+            max-width:1000px;
+            height:70px;
+            margin:10px auto 0 !important;
+        }
+        .main-cta:hover {
+            transform:translateY(-6px);
+            box-shadow:0 16px 50px rgba(21,255,0,0.7);
+        }
+        .main-cta .big {font-weight:600; font-size:clamp(21px,5.25vw,36px); line-height:1;}
+        .main-cta .small {font-weight:700; font-size:clamp(8.8px,2.2vw,10.8px); opacity:0.9; line-height:1; margin-top:2px;}
+
+        .text-desktop { display: block; }
+        .text-mobile { display: none; }
+
+        .bottom-buttons {display:flex; flex-direction:column; gap:16px; align-items:center; width:100%; margin-top:20px;}
+        @media (min-width:640px) {.bottom-buttons {flex-direction:row; justify-content:center; gap:28px;}}
+        .btn-existing, .btn-discord {font-family:'Poppins',sans-serif; font-weight:700; font-size:14.4px; padding:16px 44px; border-radius:50px; text-align:center; white-space:nowrap; text-decoration:none; transition:all .3s; min-width:300px;}
+        .btn-existing {background:#FFFF00; color:#000;}
+        .btn-existing:hover {background:#ffff40; transform:translateY(-4px);}
+        .btn-discord {background:transparent; color:#E8E8E8; border:2px solid #E8E8E8;}
+        .btn-discord:hover {background:#E8E8E8; color:#000;}
+
+        /* MOBILE ADJUSTMENTS */
+        @media (max-width: 640px) {
+            .hero-text {top: 68% !important; gap: 10px !important;}
+            .hero-content-scaled {transform: scale(0.86) !important;}
+            .hero-text h1 {font-size: 1.9rem !important; line-height: 1.1 !important; margin: 4px 0 !important;}
+            .bonus-numbers {font-size: 2.2rem !important; letter-spacing: -1.2px !important; white-space: nowrap !important; margin: 8px 0 !important;}
+            .hero-text p {font-size: 1.05rem !important; line-height: 1.4 !important;}
+            .rewards-box {padding: 12px 20px !important;}
+            .rewards-text {font-size: 1.1rem !important;}
+            .main-cta {min-width: unset !important; width: 92% !important; max-width: 380px !important; height: 76px !important; padding: 0 20px !important; border-radius: 24px !important;}
+            .main-cta .big {font-size: 1.65rem !important; font-weight: 800 !important;}
+            .main-cta .small {display: none !important;}
+            .text-desktop {display: none !important;}
+            .text-mobile {display: block !important;}
+            .btn-existing, .btn-discord {width: 88% !important; max-width: 340px !important; font-size: 1.05rem !important; padding: 18px 20px !important;}
+        }
+
+        @media (max-width: 370px) {
+            .hero-text {top: 66% !important;}
+            .hero-content-scaled {transform: scale(0.90) !important;}
+            .bonus-numbers {font-size: 1.95rem !important;}
+            .main-cta {height: 72px !important;}
+            .main-cta .big {font-size: 1.55rem !important;}
+        }
+
+        header {position:fixed; top:0; left:0; right:0; z-index:50;}
+
+        /* ==========================================================================
+           NEW RESPONSIVE FOOTER – YOUR EXACT CSS APPLIED
+           ========================================================================== */
+        .footer {
+            background: rgb(2, 2, 2);
+            backdrop-filter: blur(10px);
+            padding: clamp(60px, 8vw, 100px) 20px clamp(40px, 6vw, 80px);
+            text-align: center;
+            color: var(--text-white);
+        }
+
+        .footer h2 {color:#FFFF00;}
+        .footer h1 {color:#FF0000;}
+        .footer h2,
+        .footer h1 {
+            font-size: clamp(24px, 6vw, 36px);
+            font-weight: 800;
+            margin: clamp(20px, 4vw, 40px) 0 clamp(12px, 2vw, 20px);
+        }
+
+        .disclaimer-text,
+        .gamble-text {
+            font-size: clamp(10px, 3vw, 12px);
+            line-height: 1.5;
+            max-width: 90%;
+            margin: 0 auto clamp(20px, 4vw, 40px);
+            color: var(--muted-white);
+        }
+
+        .footer-logo-container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: clamp(20px, 5vw, 40px);
+            margin: clamp(30px, 6vw, 60px) 0;
+        }
+
+        .footer-logo {
+            width: clamp(50px, 12vw, 80px);
+            height: clamp(50px, 12vw, 80px);
+            object-fit: contain;
+            transition: transform 0.3s ease;
+            filter: brightness(0.9);
+        }
+
+        .footer-logo:hover {
+            transform: scale(1.15);
+            filter: brightness(1.1);
+        }
+
+        .footer small {
+            font-size: clamp(9px, 2.5vw, 11px);
+            color: #888;
+        }
+
+        /* NAV LOGO (already fixed from previous request) */
+        .nav-logo {
+            height: 36px;
+            width: auto;
+            transition: height 0.2s ease;
+        }
+        @media (min-width: 640px) {.nav-logo {height: 44px;}}
+        @media (min-width: 1024px) {.nav-logo {height: 52px;}}
+
+        @media (max-width: 640px) {
+            .footer h2,
+            .footer h1 {
+                font-size: clamp(20px, 6vw, 26px);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="full-bg">
+        <img src="img/offer.jpg" alt="Background">
+    </div>
+
+    <header class="header fixed z-50 bg-black/30 backdrop-blur-md">
+        <div class="w-full px-4 sm:px-6 lg:px-8 h-full flex items-center justify-between py-3">
+            <div class="flex items-center w-1/3 left-icons">
+                <nav class="flex space-x-2 sm:space-x-4">
+                    <a href="index.html" class="text-[#dfefff]/95 uppercase font-semibold text-xs sm:text-sm tracking-wide">Home</a>
+                    <a href="leaderboard.html" class="text-[#dfefff]/95 uppercase font-semibold text-xs sm:text-sm tracking-wide">Leaderboard</a>
+                    <a href="game.html" class="text-[#dfefff]/95 uppercase font-semibold text-xs sm:text-sm tracking-wide">Live&Wins</a>
+                    <a href="givaway.html" class="text-[#dfefff]/95 uppercase font-semibold text-xs sm:text-sm tracking-wide">Giveaways</a>
+                    <a href="offers.html" class="text-[#dfefff]/95 uppercase font-semibold text-xs sm:text-sm tracking-wide nav-active">Offers</a>
+                </nav>
+            </div>
+            <div class="flex justify-center w-1/3 logo-container">
+                <img src="/img/Sh4ner_White 1.png" alt="Logo" class="nav-logo rounded-full object-contain">
+            </div>
+            <div class="flex items-center space-x-1 sm:space-x-2 w-1/3 justify-end right-icons">
+                <a href="index.html" target="_blank"><i data-feather="home" class="text-white w-6 h-6 sm:w-8 sm:h-8"></i></a>
+            </div>
+        </div>
+    </header>
+
+    <div class="hero-image">
+        <img src="img/offer.jpg" alt="Exclusive Offer">
+
+        <div class="hero-text" style="box-sizing:border-box; overflow:visible !important;">
+            <img src="img/brush_bg.png" alt="Back Brush" style="position:absolute; top:25%; left:50%; min-width:80vw; width:auto; height:50%; max-width:none; transform:translate(-50%, -50%); z-index:1; opacity:1.28; pointer-events:none; user-select:none;">
+
+            <div class="hero-content-scaled" style="position:relative; z-index:2; display:flex; flex-direction:column; align-items:center; gap:1px; width:100%; max-width:1400px; margin:0 auto;">
+                <img src="img/logo.webp" alt="Logo" style="width:120px; height:auto; margin-bottom:8px;">
+                <h1 style="margin:0 !important;">STREAM CASINO REWARDS</h1>
+                <p style="margin:0 !important;">
+                    Join the SH4NE_R community for exclusive bonuses <br>alongside live casino games, streams, and highlights!
+                </p>
+                <div class="bonus-numbers">+$1,000  |  +$10,000  |  +375%</div>
+                <div class="rewards-box">
+                    <div class="rewards-text"><span>$75,000</span> rank awards and exclusive streamer rewards</div>
+                </div>
+
+                <a href="https://bcgame.st/i-sh4ner-n" target="_blank" class="main-cta">
+                    <div class="big">
+                        <span class="text-desktop">CLICK HERE TO GET STARTED</span>
+                        <span class="text-mobile">GET STARTED</span>
+                    </div>
+                    <span class="small">Bonuses are promotional and not guaranteed income. +18 only. Terms apply.</span>
+                </a>
+
+                <div class="bottom-buttons">
+                    <a href="https://youtu.be/y5zxLyfDaU4?si=qLj8JqLXprohfE-x" target="_blank" class="btn-existing">
+                        Existing users: Switch to SH4NE_R 
+                    </a>
+                    <a href="https://discord.gg/MtwT9rgPq" target="_blank" class="btn-discord">
+                        JOIN DISCORD
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- NEW RESPONSIVE FOOTER -->
+    <footer class="footer">
+        <h2 class="font-bold">Disclaimer</h2>
+        <p class="disclaimer-text max-w-2xl mx-auto">
+            SH4NE_R (sh4ner.com) is an independent gaming news site and casino comparison service. While we endeavour to ensure that bonus offers listed here are accurate and up-to-date, we accept no responsibility for any inaccuracies or errors. Please check the full terms and conditions before deciding to take any bonus.
+        </p>
+
+        <h1 class="font-bold">Gamble Responsibly</h1>
+        <p class="gamble-text max-w-2xl mx-auto">
+            Please gamble responsibly. Gambling can have serious consequences. Only play with money you can afford to lose.
+        </p>
+
+        <div class="footer-logo-container">
+            <img src="/img/75a66996c8988a839e73f363914e85fba6db1e10.png" alt="Partner 1" class="footer-logo">
+            <img src="/img/1be4be065fedecbf48f67c6f6b5dc6ffa0b85cfb.png" alt="Partner 2" class="footer-logo">
+            <img src="/img/b787bdceb376f6ca4007ae8c5de2c7bcea17b7ef.png" alt="Partner 3" class="footer-logo">
+            <img src="/img/164ae989bb0b639138196e2074669754ca16ba85.png" alt="Partner 4" class="footer-logo">
+        </div>
+
+        <small>© 2024 SH4NE_R. All rights reserved. 
+            <a href="#" class="underline hover:text-white">Privacy Policy</a> | 
+            <a href="#" class="underline hover:text-white">Terms of Service</a>
+        </small>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            feather.replace(); 
+            AOS.init();
+        });
+    </script>
+</body>
+</html>
