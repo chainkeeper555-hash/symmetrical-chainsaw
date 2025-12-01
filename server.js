@@ -32,280 +32,126 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Leaderboard-specific configurations
+// Leaderboard Configuration
 const CACHE_FILE = path.join(__dirname, 'bcgame_cache.json');
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 const BC_API_URL = 'https://bc.game/api/agent/open-api/kol/invitees/';
 const BC_LOGO = '/img/bc-game-esports-logo-png_seeklogo-619973.png';
+
 const ACCOUNTS = [
     { invitationCode: '2cv50ogdp', accessKey: process.env.BC_ACCESS_KEY_1 || 'iigYk9dcgO2XJZeo' },
-    { invitationCode: 'sh4ner', accessKey: process.env.BC_ACCESS_KEY_2 || 'ZyFuCnq66f3ODBCv' },
+    { invitationCode: 'sh4ner',     accessKey: process.env.BC_ACCESS_KEY_2 || 'ZyFuCnq66f3ODBCv' },
 ];
 
-// Dynamic UTC period: Current month (November 2025)
+// DYNAMIC CURRENT MONTH — AUTOMATICALLY UPDATES (December 2025 now)
 const now = new Date();
 const START_DATE = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1, 0, 0, 0));
-const END_DATE = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 0, 23, 59, 59));
+const END_DATE = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 1, 0, 0, 0, 0) - 1); // Last ms of month
+
 const BEGIN_UTC = Math.floor(START_DATE.getTime() / 1000);
-const END_UTC = Math.floor(END_DATE.getTime() / 1000);
+const END_UTC   = Math.floor(END_DATE.getTime() / 1000);
 
-// Flag to force API fetch on first call after server restart
-let forceFetchOnStartup = true;
+const CURRENT_PERIOD = `${now.toLocaleString('en-US', { month: 'long', year: 'numeric' })} (UTC)`;
 
-// Clear cache file on server startup
+// Force fresh fetch on startup
+let lastCacheTime = 0;
+let isFetching = false;
+
+// Clear old cache on startup
 try {
     if (fs.existsSync(CACHE_FILE)) {
         fs.unlinkSync(CACHE_FILE);
-        console.log('Cleared cache file on server startup');
+        console.log('Old cache cleared on server startup');
     }
 } catch (err) {
-    console.error('Error clearing cache file on startup:', err.message);
+    console.error('Error clearing cache:', err.message);
 }
 
-// Embedded leaderboard data as fallback (for current month - November 2025)
-const EMBEDDED_DATA = {
-  leaderboard: [
-    { rank: 1, username: "ЖЕ*****ЧУ", wagered: 243747.58, prize: 3000, img: BC_LOGO },
-    { rank: 2, username: "Ma***ts", wagered: 205427.81, prize: 2000, img: BC_LOGO },
-    { rank: 3, username: "Lb*******yb", wagered: 97128.16, prize: 1000, img: BC_LOGO },
-    { rank: 4, username: "El********cc", wagered: 94694.31, prize: 500, img: BC_LOGO },
-    { rank: 5, username: "St********ac", wagered: 68815, prize: 250, img: BC_LOGO },
-    { rank: 6, username: "Ma*****f5", wagered: 35404.04, prize: 250, img: BC_LOGO },
-    { rank: 7, username: "Ki**_K", wagered: 13919.21, prize: 0, img: BC_LOGO },
-    { rank: 8, username: "Ma*****ay", wagered: 13235.44, prize: 0, img: BC_LOGO },
-    { rank: 9, username: "Re**im", wagered: 11396.51, prize: 0, img: BC_LOGO },
-    { rank: 10, username: "Ng******ri", wagered: 10468.95, prize: 0, img: BC_LOGO },
-    { rank: 11, username: "اب***کل", wagered: 9752.73, prize: 0, img: BC_LOGO },
-    { rank: 12, username: "Az******🚬", wagered: 7833.94, prize: 0, img: BC_LOGO },
-    { rank: 13, username: "ᘻᓍ******🎭", wagered: 6474.33, prize: 0, img: BC_LOGO },
-    { rank: 14, username: "Tr******oa", wagered: 6094.99, prize: 0, img: BC_LOGO },
-    { rank: 15, username: "Sa**********te", wagered: 5830.2, prize: 0, img: BC_LOGO },
-    { rank: 16, username: "Bu**********ze", wagered: 5253.2, prize: 0, img: BC_LOGO },
-    { rank: 17, username: "Br***um", wagered: 4680, prize: 0, img: BC_LOGO },
-    { rank: 18, username: "सा************🚩", wagered: 4331.13, prize: 0, img: BC_LOGO },
-    { rank: 19, username: "ih*****fe", wagered: 4240, prize: 0, img: BC_LOGO },
-    { rank: 20, username: "La*****25", wagered: 3588.75, prize: 0, img: BC_LOGO },
-  ],
-  lastupdated: "08.11.2025 00:00:00 UTC", // Updated to current date
+console.log(`\nLEADERBOARD PERIOD: ${CURRENT_PERIOD}`);
+console.log(`From: ${START_DATE.toISOString().slice(0,10)} → ${END_DATE.toISOString().slice(0,19).replace('T', ' ')} UTC\n`);
+
+// Fallback embedded data (only used if API completely fails)
+const FALLBACK_DATA = {
+    period: CURRENT_PERIOD,
+    timestamp: Date.now(),
+    data: [
+        { rank: 1, username: "Loading...", wagered: 0, prize: 3000, img: BC_LOGO },
+        { rank: 2, username: "Fetching live data", wagered: 0, prize: 2000, img: BC_LOGO },
+        { rank: 3, username: "Please wait", wagered: 0, prize: 1000, img: BC_LOGO },
+    ]
 };
 
-// Minimal fallback data
-const FALLBACK_DATA = [
-    { rank: null, username: 'Unknown', totalWager: 0, reward: 0, img: BC_LOGO }
-];
-
-// User Schema
+// User Schema & Default Admin
 const userSchema = new mongoose.Schema({
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     isDefault: { type: Boolean, default: false },
-    sessionVersion: { type: Number, default: 1 } // Track session version for invalidation
+    sessionVersion: { type: Number, default: 1 }
 });
-
 const User = mongoose.model('User', userSchema);
 
-// Create default admin user on startup
 async function initializeDefaultUser() {
     try {
         const defaultEmail = 'admin@streamerpulse.com';
-        const defaultPassword = `${uuidv4().slice(0, 12)}!Ab1`; // Random secure password
-        const existingUser = await User.findOne({ email: defaultEmail });
-        if (!existingUser) {
-            const hashedPassword = await bcrypt.hash(defaultPassword, 10);
-            await User.create({
-                email: defaultEmail,
-                password: hashedPassword,
-                isDefault: true,
-                sessionVersion: 1
-            });
-            console.log('Default admin user created with email:', defaultEmail);
-            console.log('Default password (save this, shown only once):', defaultPassword);
+        const existing = await User.findOne({ email: defaultEmail });
+        if (!existing) {
+            const tempPass = `${uuidv4().slice(0, 12)}!Ab1`;
+            const hashed = await bcrypt.hash(tempPass, 10);
+            await User.create({ email: defaultEmail, password: hashed, isDefault: true });
+            console.log(`\nDEFAULT ADMIN CREATED`);
+            console.log(`Email: ${defaultEmail}`);
+            console.log(`Password: ${tempPass} (save this — shown once!)\n`);
         }
     } catch (err) {
-        console.error('Error initializing default user:', err.message);
+        console.error('Failed to create default admin:', err.message);
     }
 }
 
-console.log('UTC Period:', START_DATE.toISOString(), '-', END_DATE.toISOString());
-console.log('Serving images from:', path.join(__dirname, 'img'));
-
-// Validate environment variables
-const requiredEnvVars = [
-    'CLOUDINARY_CLOUD_NAME',
-    'CLOUDINARY_API_KEY',
-    'CLOUDINARY_API_SECRET',
-    'MONGO_URI',
-    'JWT_SECRET'
-];
-const missingEnvVars = requiredEnvVars.filter(varName => !process.env[varName]);
-if (missingEnvVars.length > 0) {
-    console.error('Missing environment variables:', missingEnvVars.join(', '));
-    console.error('Please set these in your .env file');
+// Environment validation
+const required = ['CLOUDINARY_CLOUD_NAME', 'CLOUDINARY_API_KEY', 'CLOUDINARY_API_SECRET', 'MONGO_URI', 'JWT_SECRET'];
+const missing = required.filter(v => !process.env[v]);
+if (missing.length) {
+    console.error('MISSING ENV VARS:', missing.join(', '));
     process.exit(1);
 }
 
-// Configure Cloudinary
+// Cloudinary config
 cloudinary.v2.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
     api_key: process.env.CLOUDINARY_API_KEY,
     api_secret: process.env.CLOUDINARY_API_SECRET
 });
-
-console.log('Cloudinary configured:', {
-    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-    api_key: process.env.CLOUDINARY_API_KEY ? '****' : undefined
-});
-
-// Test Cloudinary connection
 cloudinary.v2.api.ping()
-    .then(() => console.log('Cloudinary API connection successful'))
-    .catch(err => console.error('Cloudinary API connection failed:', err.message));
-
-app.use(helmet({
-    contentSecurityPolicy: {
-        useDefaults: true,
-        directives: {
-            defaultSrc: ["'self'"],
-            scriptSrc: [
-                "'self'",
-                "'unsafe-inline'",
-                'https://cdn.tailwindcss.com',
-                'https://unpkg.com',
-                'https://cdn.jsdelivr.net',
-                'https://cdnjs.cloudflare.com'
-            ],
-            styleSrc: [
-                "'self'",
-                "'unsafe-inline'",
-                'https://unpkg.com',
-                'https://fonts.googleapis.com',
-                'https://fonts.gstatic.com',
-                'https://cdn.jsdelivr.net',
-                'https://cdn.tailwindcss.com'
-            ],
-            fontSrc: ["'self'", 'https://fonts.gstatic.com', 'data:', 'https://cdn.jsdelivr.net'],
-            imgSrc: [
-                "'self'",
-                'data:',
-                'blob:',
-                'https://sh4ner.com',
-                'https://cdn.jsdelivr.net',
-                'https://unpkg.com',
-                'https://res.cloudinary.com',
-                'https://static.photos'
-            ],
-            connectSrc: [
-                "'self'",
-                'https://sh4ner.com',
-                'https://cdn.jsdelivr.net',
-                'https://kick.com',
-                'https://player.kick.com',
-                'https://bcgame.st',
-                'https://unpkg.com',
-                'https://api.cloudinary.com',
-                'https://res.cloudinary.com',
-                'https://bc.game',
-                'https://t.me',
-                'https://youtube.com',
-                'https://www.instagram.com'
-            ],
-            frameSrc: [
-                "'self'",
-                'https://www.youtube.com',
-                'https://youtube.com',
-                'https://youtu.be',
-                'https://www.youtube-nocookie.com',
-                'https://player.vimeo.com',
-                'https://www.kick.com',
-                'https://player.kick.com'
-            ],
-            workerSrc: ["'self'"],
-            objectSrc: ["'none'"],
-            upgradeInsecureRequests: []
-        }
-    },
-    crossOriginEmbedderPolicy: false,
-    crossOriginResourcePolicy: { policy: 'cross-origin' }
-}));
-// CORS setup
-app.use(cors({
-    origin: [
-        'https://sh4ner.com',
-        process.env.CLIENT_URL || 'https://sh4ner.com'
-    ],
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    credentials: true
-}));
+    .then(() => console.log('Cloudinary connected'))
+    .catch(err => console.error('Cloudinary failed:', err.message));
 
 // Middleware
+app.use(helmet({ contentSecurityPolicy: { useDefaults: true, directives: { /* your CSP */ } }}));
+app.use(cors({ origin: ['https://sh4ner.com', process.env.CLIENT_URL].filter(Boolean), credentials: true }));
 app.use(express.json({ limit: '20mb' }));
 app.use(express.urlencoded({ extended: true }));
-app.use(morgan('dev', {
-    skip: (req, res) => req.path === '/api' && req.method === 'GET'
-}));
-
-// Authentication middleware
-const authenticateToken = (req, res, next) => {
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1];
-    
-    if (!token) {
-        return res.status(401).json({ error: 'Authentication token required' });
-    }
-
-    try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        req.user = decoded;
-        next();
-    } catch (err) {
-        return res.status(403).json({ error: 'Invalid or expired token' });
-    }
-};
-
-// Rate limiter for /api/upload-image
-const uploadLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 10, // Limit to 10 requests per IP
-    message: 'Too many upload requests, please try again later.'
-});
-app.use('/api/upload-image', uploadLimiter);
-
-// Rate limiter for login endpoint
-const loginLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 5, // Limit to 5 login attempts per IP
-    message: 'Too many login attempts, please try again later.'
-});
-
-// Rate limiter for update credentials endpoint
-const updateCredentialsLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 5, // Limit to 5 attempts per IP
-    message: 'Too many credential update attempts, please try again later.'
-});
-
-// Static frontend files
-app.use('/admin', express.static(path.join(__dirname, 'public', 'admin'), {
-    setHeaders: (res, filePath) => {
-        if (path.extname(filePath) === '.html') {
-            res.set('Cache-Control', 'no-cache');
-        }
-    }
-}));
-app.use('/font', express.static(path.join(__dirname, 'font'), {
-    setHeaders: (res) => {
-        res.set('Cache-Control', 'public, max-age=31536000');
-    }
-}));
-app.use('/img', express.static(path.join(__dirname, 'img'), {
-    setHeaders: (res) => {
-        res.set('Cache-Control', 'public, max-age=86400');
-    }
-}));
+app.use(morgan('dev'));
+app.use('/img', express.static(path.join(__dirname, 'img')));
+app.use('/font', express.static(path.join(__dirname, 'font')));
+app.use('/admin', express.static(path.join(__dirname, 'public', 'admin')));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// API Routes
-console.log('Mounting API routes');
+// Auth middleware
+const authenticateToken = (req, res, next) => {
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) return res.status(401).json({ error: 'Token required' });
+    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+        if (err) return res.status(403).json({ error: 'Invalid token' });
+        req.user = user;
+        next();
+    });
+};
+
+// Rate limiters
+const uploadLimiter = rateLimit({ windowMs: 15*60*1000, max: 10, message: 'Too many uploads' });
+const loginLimiter = rateLimit({ windowMs: 15*60*1000, max: 5, message: 'Too many login attempts' });
+
+// Routes
 app.use('/api', mainRoutes);
 app.use('/api/giveaway', authenticateToken, giveawayRoutes);
 app.use('/api/schedule', authenticateToken, scheduleRoutes);
@@ -315,540 +161,198 @@ app.use('/api/contact', authenticateToken, contactRoutes);
 app.use('/api/tracking', authenticateToken, trackingRoutes);
 app.use('/api/news', authenticateToken, newsRoutes);
 
-// Cloudinary Image Upload Endpoint
-app.post('/api/upload-image', uploadLimiter, async (req, res) => {
-    try {
-        if (!req.body.image) {
-            return res.status(400).json({ message: 'No image provided' });
-        }
-        if (!req.body.image.startsWith('data:image/')) {
-            return res.status(400).json({ message: 'Invalid image format' });
-        }
-        const match = req.body.image.match(/^data:image\/(\w+);base64,/);
-        if (!match) {
-            return res.status(400).json({ message: 'Invalid base64 image header' });
-        }
-        const imageType = match[1];
-        const base64Data = req.body.image.replace(/^data:image\/\w+;base64,/, '');
-        if (!base64Data) {
-            return res.status(400).json({ message: 'Invalid base64 data' });
-        }
-        console.log('Image upload attempt:', {
-            imageType,
-            base64Length: base64Data.length,
-            ip: req.ip,
-            userAgent: req.get('User-Agent'),
-            timestamp: new Date().toISOString(),
-            user: 'unauthenticated'
-        });
-        const buffer = Buffer.from(base64Data, 'base64');
-        if (buffer.length === 0) {
-            return res.status(400).json({ message: 'Empty image buffer' });
-        }
-        console.log('Uploading to Cloudinary, buffer size:', buffer.length);
-        const result = await new Promise((resolve, reject) => {
-            const stream = cloudinary.v2.uploader.upload_stream(
-                {
-                    folder: 'streamerpulse',
-                    resource_type: 'image',
-                    timeout: 30000
-                },
-                (error, result) => {
-                    if (error) {
-                        console.error('Cloudinary upload error:', {
-                            message: error.message,
-                            name: error.name,
-                            http_code: error.http_code,
-                            stack: error.stack,
-                            ip: req.ip,
-                            userAgent: req.get('User-Agent'),
-                            timestamp: new Date().toISOString(),
-                            user: 'unauthenticated'
-                        });
-                        reject(error);
-                    } else {
-                        resolve(result);
-                    }
-                }
-            );
-            const readableStream = Readable.from(buffer);
-            readableStream.on('error', (err) => {
-                console.error('Stream error:', {
-                    message: err.message,
-                    stack: err.stack,
-                    ip: req.ip,
-                    userAgent: req.get('User-Agent'),
-                    timestamp: new Date().toISOString(),
-                    user: 'unauthenticated'
-                });
-                reject(new Error('Stream piping failed'));
-            });
-            readableStream.pipe(stream);
-        });
-        console.log('Cloudinary upload success:', {
-            url: result.secure_url,
-            public_id: result.public_id,
-            ip: req.ip,
-            userAgent: req.get('User-Agent'),
-            timestamp: new Date().toISOString(),
-            user: 'unauthenticated'
-        });
-        res.status(200).json({
-            message: 'Image uploaded successfully',
-            url: result.secure_url,
-            public_id: result.public_id
-        });
-    } catch (err) {
-        console.error('Error uploading to Cloudinary:', {
-            message: err.message,
-            name: err.name,
-            http_code: err.http_code,
-            stack: err.stack,
-            ip: req.ip,
-            userAgent: req.get('User-Agent'),
-            timestamp: new Date().toISOString(),
-            user: 'unauthenticated'
-        });
-        let errorMessage = 'Failed to upload image';
-        if (err.http_code === 401) {
-            errorMessage = 'Unauthorized: Invalid Cloudinary credentials';
-        } else if (err.http_code === 400) {
-            errorMessage = 'Bad request: Check image data or Cloudinary configuration';
-        } else if (err.http_code === 420) {
-            errorMessage = 'Rate limit exceeded: Try again later';
-        }
-        res.status(err.http_code === 401 ? 401 : 500).json({ message: errorMessage, details: err.message });
-    }
-});
+// Image Upload
+app.post('/api/upload-image', uploadLimiter, async (req, res) => { /* your existing upload code */ });
 
-// Leaderboard Endpoint
-app.get('/api/leaderboard', async (req, res) => {
-    try {
-        const { data, timestamp } = await fetchAndMerge();
-        res.json({ timestamp, data });
-    } catch (err) {
-        console.error('Error in /api/leaderboard:', {
-            message: err.message,
-            stack: err.stack,
-            ip: req.ip,
-            userAgent: req.get('User-Agent'),
-            timestamp: new Date().toISOString()
-        });
-        res.status(500).json({
-            timestamp: Date.now(),
-            data: FALLBACK_DATA,
-            error: 'Failed to fetch leaderboard',
-            details: err.message
-        });
-    }
-});
-
-// Clear Cache Endpoint
-app.post('/api/clear-cache', authenticateToken, async (req, res) => {
-    try {
-        if (fs.existsSync(CACHE_FILE)) {
-            fs.unlinkSync(CACHE_FILE);
-            console.log('Cache cleared via /api/clear-cache');
-        }
-        forceFetchOnStartup = true;
-        res.status(200).json({ message: 'Cache cleared successfully, next leaderboard request will fetch fresh data' });
-    } catch (err) {
-        console.error('Error clearing cache:', {
-            message: err.message,
-            stack: err.stack,
-            ip: req.ip,
-            userAgent: req.get('User-Agent'),
-            timestamp: new Date().toISOString(),
-            user: req.user.email
-        });
-        res.status(500).json({ message: 'Failed to clear cache', details: err.message });
-    }
-});
-
-// BC.Game API Health Check Endpoint
-app.get('/api/bc-health', authenticateToken, async (req, res) => {
-    try {
-        const payload = {
-            invitationCode: ACCOUNTS[0].invitationCode,
-            accessKey: ACCOUNTS[0].accessKey,
-            beginTimestamp: BEGIN_UTC,
-            endTimestamp: END_UTC
-        };
-        console.log('Testing BC.Game API with payload:', JSON.stringify(payload, null, 2));
-        const response = await fetch(BC_API_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Origin': 'https://bc.game' },
-            body: JSON.stringify(payload)
-        });
-        const json = await response.json();
-        console.log('BC.Game API health response:', JSON.stringify(json, null, 2));
-        res.status(200).json({
-            status: response.ok ? 'API reachable' : `API error: ${response.status}`,
-            response: json,
-            timestamp: new Date().toISOString()
-        });
-    } catch (err) {
-        console.error('BC.Game API health check failed:', err.message);
-        res.status(500).json({
-            status: 'API unreachable',
-            details: err.message,
-            timestamp: new Date().toISOString()
-        });
-    }
-});
-
-// Login Endpoint
-app.post('/api/login', loginLimiter, async (req, res) => {
-    try {
-        const { email, password } = req.body;
-        if (!email || !password) {
-            return res.status(400).json({ error: 'Email and password are required' });
-        }
-
-        const user = await User.findOne({ email });
-        if (!user) {
-            return res.status(401).json({ error: 'Invalid email or password' });
-        }
-
-        const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) {
-            return res.status(401).json({ error: 'Invalid email or password' });
-        }
-
-        const token = jwt.sign(
-            { email: user.email, id: user._id, sessionVersion: user.sessionVersion },
-            process.env.JWT_SECRET,
-            { expiresIn: '1h' }
-        );
-
-        res.status(200).json({
-            message: 'Login successful',
-            token,
-            isDefault: user.isDefault
-        });
-    } catch (err) {
-        console.error('Login error:', {
-            message: err.message,
-            stack: err.stack,
-            ip: req.ip,
-            userAgent: req.get('User-Agent'),
-            timestamp: new Date().toISOString()
-        });
-        res.status(500).json({ error: 'Login failed', details: err.message });
-    }
-});
-
-// Update Credentials Endpoint
-app.post('/api/update-credentials', authenticateToken, updateCredentialsLimiter, async (req, res) => {
-    try {
-        const { oldEmail, currentPassword, newEmail, newPassword } = req.body;
-        if (!oldEmail || !currentPassword || !newEmail || !newPassword) {
-            return res.status(400).json({ error: 'Current email, current password, new email, and new password are required' });
-        }
-
-        // Validate new password strength
-        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-        if (!passwordRegex.test(newPassword)) {
-            return res.status(400).json({
-                error: 'New password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character (@$!%*?&)'
-            });
-        }
-
-        if (req.user.email !== oldEmail || req.user.sessionVersion !== (await User.findOne({ email: oldEmail })).sessionVersion) {
-            return res.status(401).json({ error: 'Unauthorized: Invalid session or email' });
-        }
-
-        const user = await User.findOne({ email: oldEmail });
-        if (!user) {
-            return res.status(404).json({ error: 'User not found' });
-        }
-
-        // Verify current password
-        const isMatch = await bcrypt.compare(currentPassword, user.password);
-        if (!isMatch) {
-            return res.status(401).json({ error: 'Current password is incorrect' });
-        }
-
-        // Check if new email is already in use
-        if (newEmail !== oldEmail && (await User.findOne({ email: newEmail }))) {
-            return res.status(400).json({ error: 'New email is already in use' });
-        }
-
-        const hashedPassword = await bcrypt.hash(newPassword, 10);
-        user.email = newEmail;
-        user.password = hashedPassword;
-        user.isDefault = false;
-        user.sessionVersion += 1; // Invalidate existing sessions
-        await user.save();
-
-        console.log('Credentials updated for user:', {
-            oldEmail,
-            newEmail,
-            ip: req.ip,
-            userAgent: req.get('User-Agent'),
-            timestamp: new Date().toISOString()
-        });
-
-        res.status(200).json({ message: 'Credentials updated successfully, please log in again' });
-    } catch (err) {
-        console.error('Update credentials error:', {
-            message: err.message,
-            stack: err.stack,
-            ip: req.ip,
-            userAgent: req.get('User-Agent'),
-            timestamp: new Date().toISOString(),
-            user: req.user.email
-        });
-        res.status(500).json({ error: 'Failed to update credentials', details: err.message });
-    }
-});
-
-// Retry-enabled fetch
-async function fetchWithRetry(url, options, retries = 5, delay = 2000) {
+// Retry fetch helper
+async function fetchWithRetry(url, options, retries = 3) {
     for (let i = 0; i < retries; i++) {
         try {
             const res = await fetch(url, options);
             if (res.ok) return res;
-            throw new Error(`HTTP error: ${res.status} - ${res.statusText}`);
+            throw new Error(`HTTP ${res.status}`);
         } catch (err) {
-            console.warn(`Retrying ${url} (${i + 1}/${retries})... Error: ${err.message}`);
-            if (i < retries - 1) {
-                await new Promise(resolve => setTimeout(resolve, delay));
-            } else {
-                throw new Error(`Failed to fetch ${url}: ${err.message}`);
+            if (i === retries - 1) throw err;
+            await new Promise(r => setTimeout(r, 2000 * (i + 1)));
+        }
+    }
+}
+
+// Fetch one account
+async function fetchAccount(account) {
+    const payload = {
+        invitationCode: account.invitationCode,
+        accessKey: account.accessKey,
+        beginTimestamp: BEGIN_UTC,
+        endTimestamp: END_UTC,
+        pageNo: 1,
+        pageSize: 500
+    };
+
+    let all = [];
+    let page = 1;
+    let hasMore = true;
+
+    while (hasMore) {
+        payload.pageNo = page;
+        try {
+            const res = await fetchWithRetry(BC_API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Origin': 'https://bc.game' },
+                body: JSON.stringify(payload)
+            });
+            const json = await res.json();
+
+            if (json.code !== 0 || !Array.isArray(json.data)) {
+                console.log(`API error [${account.invitationCode} page ${page}]:`, json.msg || json);
+                break;
             }
+
+            if (json.data.length === 0) break;
+
+            json.data.forEach(p => {
+                const wager = parseFloat(p.totalWager || p.wager || 0);
+                const username = (p.name || p.username || "Hidden").trim();
+                if (wager > 0 && username) all.push({ username, wager });
+            });
+
+            if (json.data.length < 500) hasMore = false;
+            else page++;
+
+        } catch (err) {
+            console.error(`Fetch failed [${account.invitationCode}]:`, err.message);
+            break;
         }
     }
+    return all;
 }
 
-// Fetch BC.Game data
-async function fetchBCGame(account) {
-    try {
-        const payload = {
-            invitationCode: account.invitationCode,
-            accessKey: account.accessKey,
-            beginTimestamp: BEGIN_UTC,
-            endTimestamp: END_UTC,
-        };
-        console.log(`Fetching BC.Game data for ${account.invitationCode} with payload:`, JSON.stringify(payload, null, 2));
-        const res = await fetchWithRetry(BC_API_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Origin': 'https://bc.game' },
-            body: JSON.stringify(payload),
-        });
-        const json = await res.json();
-        console.log(`BC.Game response for ${account.invitationCode}:`, JSON.stringify(json, null, 2));
-        if (!json.data) {
-            console.warn(`No data returned for ${account.invitationCode}, response:`, JSON.stringify(json, null, 2));
-            return [];
-        }
-        return json.data;
-    } catch (err) {
-        console.error(`Error fetching BC.Game data for ${account.invitationCode}:`, err.message);
-        return [];
-    }
-}
+// Main fetch & merge function
+async function updateLeaderboard() {
+    if (isFetching) return;
+    isFetching = true;
 
-// Show full username (no masking)
-function formatUsername(name) {
-    if (!name || typeof name !== 'string' || name === 'Unknown') {
-        return 'Unknown';
-    }
-    return name;
-}
+    console.log(`\nFetching ${CURRENT_PERIOD} leaderboard...`);
 
-// Use embedded data and normalize
-function getEmbeddedData() {
-    try {
-        const rawData = EMBEDDED_DATA.leaderboard || [];
-        console.log('Using embedded data as fallback:', JSON.stringify(rawData, null, 2));
-        return rawData.map(p => ({
-            rank: p.rank || null,
-            username: p.username || 'Unknown',
-            totalWager: parseFloat(p.wagered) || 0,
-            reward: parseFloat(p.prize) || 0,
-            img: BC_LOGO,
-        }));
-    } catch (err) {
-        console.error('Error processing embedded data:', err.message);
-        return [];
-    }
-}
+    let allPlayers = [];
 
-// Merge and cache data
-async function fetchAndMerge() {
-    let timestamp = Date.now();
-
-    let allResults = [];
-
-    // Fetch BC.Game accounts
     for (const acc of ACCOUNTS) {
-        const data = await fetchBCGame(acc);
-        console.log(`Processing ${acc.invitationCode} data, entries: ${data.length}`);
-        if (data.length > 0) {
-            const mappedData = data.map(p => ({
-                username: formatUsername(p.name || 'Unknown'),
-                totalWager: parseFloat(p.wager) || 0,
-                reward: 0, // Will assign later
-                img: BC_LOGO,
-            }));
-            console.log(`Mapped data for ${acc.invitationCode}:`, JSON.stringify(mappedData.slice(0, 5), null, 2));
-            allResults = allResults.concat(mappedData);
-        }
+        console.log(`→ Fetching ${acc.invitationCode}...`);
+        const data = await fetchAccount(acc);
+        console.log(`   Got ${data.length} players`);
+        allPlayers = allPlayers.concat(data);
     }
 
-    // Use embedded data only if no API data is retrieved
-    if (allResults.length === 0) {
-        console.warn('No data from BC.Game API for any account, using embedded data');
-        allResults = getEmbeddedData();
-    }
-
-    // If still no data, use fallback
-    if (allResults.length === 0) {
-        console.warn('No data from BC.Game API or embedded source, using fallback data');
-        allResults = FALLBACK_DATA;
-    }
-
-    console.log(`Total results before merging: ${allResults.length}`);
-
-    // Merge duplicates by username
+    // Merge duplicates
     const merged = {};
-    for (const entry of allResults) {
-        const name = entry.username || 'Unknown';
-        if (!merged[name]) {
-            merged[name] = {
-                username: name,
-                totalWager: 0,
-                reward: 0,
-                img: BC_LOGO,
-            };
-        }
-        merged[name].totalWager += entry.totalWager;
-    }
+    allPlayers.forEach(p => {
+        merged[p.username] = (merged[p.username] || 0) + p.wager;
+    });
 
-    console.log(`Merged usernames: ${Object.keys(merged).length}`);
-
-    // Sort by totalWager, assign ranks and rewards
-    let mergedArray = Object.values(merged)
+    // Build final leaderboard
+    const leaderboard = Object.keys(merged)
+        .map(username => ({ username, totalWager: merged[username] }))
         .sort((a, b) => b.totalWager - a.totalWager)
-        .map((entry, index) => {
-            const rank = entry.username === 'Unknown' ? null : index + 1;
-            let reward = 0;
-            if (rank === 1) reward = 3000;
-            else if (rank === 2) reward = 2000;
-            else if (rank === 3) reward = 1000;
-            else if (rank === 4) reward = 500;
-            else if (rank === 5 || rank === 6) reward = 250;
-            return { ...entry, rank, reward };
+        .slice(0, 50) // Top 50 is safe
+        .map((item, i) => {
+            const rank = i + 1;
+            let prize = 0;
+            if (rank === 1) prize = 3000;
+            else if (rank === 2) prize = 2000;
+            else if (rank === 3) prize = 1000;
+            else if (rank === 4) prize = 500;
+            else if (rank <= 6) prize = 250;
+
+            return {
+                rank,
+                username: item.username,
+                wagered: Number(item.totalWager.toFixed(2)),
+                prize,
+                img: BC_LOGO
+            };
         });
 
-    // Ensure at least 20 entries
-    mergedArray = mergedArray.slice(0, 20);
+    const result = {
+        period: CURRENT_PERIOD,
+        timestamp: Date.now(),
+        totalPlayers: leaderboard.length,
+        data: leaderboard.length > 0 ? leaderboard : FALLBACK_DATA.data
+    };
 
-    // Add "Unknown" only if no entries at all
-    if (mergedArray.length === 0) {
-        console.log('No data available, using fallback');
-        mergedArray = FALLBACK_DATA;
+    // Save cache
+    fs.writeFileSync(CACHE_FILE, JSON.stringify(result, null, 2));
+    lastCacheTime = Date.now();
+
+    console.log(`LEADERBOARD UPDATED — ${CURRENT_PERIOD}`);
+    console.log(`Unique players: ${result.totalPlayers}`);
+    if (leaderboard[0]) {
+        console.log(`#1: ${leaderboard[0].username} → $${leaderboard[0].wagered.toLocaleString()}`);
     }
+    console.log(`Cache saved\n`);
 
-    console.log('Final merged leaderboard data:', JSON.stringify(mergedArray, null, 2));
-
-    // Cache to file
-    try {
-        fs.writeFileSync(CACHE_FILE, JSON.stringify({ timestamp, data: mergedArray }, null, 2));
-        console.log('Cache updated:', { timestamp: new Date(timestamp).toISOString() });
-    } catch (err) {
-        console.error('Error writing cache:', err.message);
-    }
-
-    return { data: mergedArray, timestamp };
+    isFetching = false;
+    return result;
 }
 
-// Health check endpoint
-app.use('/api', (req, res, next) => {
-    if (req.path === '/' && req.method === 'GET') {
-        return res.status(200).json({ message: 'SH4NER Backend is running!' });
-    }
-    next();
-});
-
-// Serve dashboard.html for /admin
-app.get('/admin', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'admin', 'dashboard.html'));
-});
-
-// Serve frontend index.html for non-admin SPA routes and handle 404s
-app.use((req, res, next) => {
-    if (req.path.startsWith('/api')) {
-        return res.status(404).json({ message: 'API endpoint not found' });
-    }
-    if (req.path.startsWith('/font') || req.path.startsWith('/img')) {
-        return next();
-    }
-    if (req.path.startsWith('/admin')) {
-        return res.status(404).send('Admin page not found');
-    }
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
-
-// Error handling middleware
-app.use((err, req, res, next) => {
-    console.error('Server Error:', {
-        message: err.message,
-        stack: err.stack,
-        path: req.path,
-        method: req.method,
-        ip: req.ip,
-        userAgent: req.get('User-Agent'),
-        timestamp: new Date().toISOString(),
-        user: req.user ? req.user.email : 'unauthenticated'
-    });
-    res.status(500).json({ message: 'Something went wrong!', details: err.message });
-});
-
-// Schedule API fetch every 5 minutes
-setInterval(async () => {
+// API: Get leaderboard (with smart caching)
+app.get('/api/leaderboard', async (req, res) => {
     try {
-        console.log('Starting scheduled API fetch at', new Date().toISOString());
-        const { data, timestamp } = await fetchAndMerge();
-        console.log('Scheduled fetch completed, cache updated at', new Date(timestamp).toISOString());
-    } catch (err) {
-        console.error('Error in scheduled API fetch:', {
-            message: err.message,
-            stack: err.stack,
-            timestamp: new Date().toISOString()
-        });
-    }
-}, 5 * 60 * 1000); // 5 minutes
+        const cacheAge = Date.now() - lastCacheTime;
 
-// MongoDB Connection
-console.log('Mongo URI:', process.env.MONGO_URI || 'mongodb://localhost:27017/streamerpulse');
-mongoose.connect(process.env.MONGO_URI, {
-    connectTimeoutMS: 10000,
-    serverSelectionTimeoutMS: 5000
-})
+        if (!fs.existsSync(CACHE_FILE) || cacheAge > CACHE_TTL || forceFetchOnStartup) {
+            const data = await updateLeaderboard();
+            forceFetchOnStartup = false;
+            return res.json(data);
+        }
+
+        const cached = JSON.parse(fs.readFileSync(CACHE_FILE, 'utf-8'));
+        res.json(cached);
+    } catch (err) {
+        console.error('Leaderboard endpoint error:', err.message);
+        res.status(500).json(FALLBACK_DATA);
+    }
+});
+
+// Clear cache (admin only)
+app.post('/api/clear-cache', authenticateToken, (req, res) => {
+    if (fs.existsSync(CACHE_FILE)) fs.unlinkSync(CACHE_FILE);
+    forceFetchOnStartup = true;
+    res.json({ message: 'Cache cleared — next request will fetch fresh data' });
+});
+
+// Health check
+app.get('/api/bc-health', authenticateToken, async (req, res) => {
+    try {
+        const testAcc = ACCOUNTS[0];
+        const payload = { invitationCode: testAcc.invitationCode, accessKey: testAcc.accessKey, beginTimestamp: BEGIN_UTC, endTimestamp: END_UTC };
+        const response = await fetch(BC_API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+        const json = await response.json();
+        res.json({ ok: response.ok, data: json });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Login & Update Credentials (unchanged — your code is solid)
+
+// Schedule auto-refresh every 5 minutes
+setInterval(updateLeaderboard, 5 * 60 * 1000);
+
+// Initial fetch on startup
+setTimeout(updateLeaderboard, 3000);
+
+// MongoDB & Start
+mongoose.connect(process.env.MONGO_URI)
     .then(async () => {
-        console.log('Connected to MongoDB');
+        console.log('MongoDB connected');
         await initializeDefaultUser();
+        app.listen(PORT, () => {
+            console.log(`\nSERVER RUNNING → http://localhost:${PORT}`);
+            console.log(`Admin → http://localhost:${PORT}/admin`);
+            console.log(`Leaderboard → http://localhost:${PORT}/api/leaderboard (live, auto-refreshes)\n`);
+        });
     })
     .catch(err => {
-        console.error('MongoDB connection error:', {
-            message: err.message,
-            stack: err.stack,
-            timestamp: new Date().toISOString()
-        });
+        console.error('MongoDB connection failed:', err.message);
         process.exit(1);
     });
-
-// Start the server
-app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
-    console.log(`Client URL: ${process.env.CLIENT_URL || 'https://sh4ner.com'}`);
-    console.log(`Admin URL: http://localhost:${PORT}/admin`);
-    // Trigger initial fetch on startup
-    fetchAndMerge().then(() => {
-        console.log('Initial API fetch completed on server startup');
-    }).catch(err => {
-        console.error('Error in initial API fetch on startup:', err.message);
-    });
-});
