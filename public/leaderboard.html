@@ -311,27 +311,39 @@
                     tbody.appendChild(tr);
                 });
 
-                // Countdown (until end of month - adjust as needed)
-                const updateCountdown = () => {
-                    const now = new Date().getTime();
-                    const end = new Date('2025-11-30T23:59:59Z').getTime();
-                    const distance = end - now;
-                    if (distance < 0) {
-                        ['days','hours','minutes','seconds'].forEach(id => document.getElementById('countdown-'+id).textContent = '00');
-                        return;
-                    }
-                    const days = Math.floor(distance / (1000*60*60*24)).toString().padStart(2,'0');
-                    const hours = Math.floor((distance % (1000*60*60*24)) / (1000*60*60)).toString().padStart(2,'0');
-                    const minutes = Math.floor((distance % (1000*60*60)) / (1000*60)).toString().padStart(2,'0');
-                    const seconds = Math.floor((distance % (1000*60)) / 1000).toString().padStart(2,'0');
-                    document.getElementById('countdown-days').textContent = days;
-                    document.getElementById('countdown-hours').textContent = hours;
-                    document.getElementById('countdown-minutes').textContent = minutes;
-                    document.getElementById('countdown-seconds').textContent = seconds;
-                };
-                updateCountdown();
-                setInterval(updateCountdown, 1000);
+                 // Countdown logic (unchanged)
+            function getEndOfCurrentMonthUTC() {
+                const now = new Date();
+                return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 0, 23, 59, 59, 999));
+            }
 
+            function updateCountdown() {
+                const endDate = getEndOfCurrentMonthUTC();
+                const now = new Date().getTime();
+                const distance = endDate.getTime() - now;
+
+                if (distance < 0) {
+                    ['days','hours','minutes','seconds'].forEach(unit => 
+                        document.getElementById(`countdown-${unit}`).textContent = '00'
+                    );
+                    return;
+                }
+
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                document.getElementById('countdown-days').textContent = days.toString().padStart(2, '0');
+                document.getElementById('countdown-hours').textContent = hours.toString().padStart(2, '0');
+                document.getElementById('countdown-minutes').textContent = minutes.toString().padStart(2, '0');
+                document.getElementById('countdown-seconds').textContent = seconds.toString().padStart(2, '0');
+            }
+
+            updateCountdown();
+            setInterval(updateCountdown, 1000);
+
+            let currentLeaderboardData = [];
                 // Show modal
                 document.getElementById('promo-modal').style.display = 'flex';
 
