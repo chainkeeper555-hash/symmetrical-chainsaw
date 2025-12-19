@@ -1,13 +1,7 @@
-            <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Google Tag Manager -->
-    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-    })(window,document,'script','dataLayer','GTM-M532LHGL');</script>
-    <!-- End Google Tag Manager -->
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
     <title>SH4NER | Sh4ner - Offers</title>
@@ -101,7 +95,7 @@
             align-items: center;
         }
 
-        .hero-text p {font-family:'Poppins',sans-serif; font-weight:600; font-size:clamp(13.68px,3.6vw,24.48px); color:#fff; text-shadow:0 2px 15px rgba(0,0,0,0.8); margin:0 !important;}
+        .hero-text p {font-family:'Poppins',sans-serif; font-weight:600; font-size:clamp(10.50px,2.4vw,20.38px); color:#fff; text-shadow:0 2px 15px rgba(0,0,0,0.8); margin:0 !important;}
         .rewards-box {background:rgba(0,0,0,0.85); backdrop-filter:blur(10px); border:2px solid #000000; border-radius:20px; padding:10px 20px; display:inline-block; margin:0 !important;}
         .rewards-text {font-family:'Poppins',sans-serif; font-size:clamp(17.28px,4.32vw,23.2px); font-weight:400; color:#fff;}
         .rewards-text span {color:#15FF00; font-weight:900;}
@@ -172,6 +166,7 @@
             align-items: flex-start;
             z-index: 40;
             pointer-events: none;
+            height: 10px;
         }
         .top-corner-buttons > * { pointer-events: auto; }
         @media (min-width: 640px) {
@@ -335,8 +330,8 @@
                 transform: translate(-50%, -50%) scale(0.7) !important;
             }
 
-            .hero-text p {font-size: 1.05rem !important; line-height: 1.4 !important;}
-            .rewards-box {padding: 12px 20px !important;}
+            .hero-text p {font-size: 1.05rem ; line-height: 1.4 !important;}
+            .rewards-box {padding: 12px 12px !important;}
             .rewards-text {font-size: clamp(12px, 3.2vw, 16px) !important; white-space: nowrap !important; overflow: hidden; text-overflow: ellipsis; max-width: 90vw;}
 
             .steps-title {
@@ -543,6 +538,41 @@
         @media (max-width: 640px) {
             .footer h2, .footer h1 { font-size: clamp(20px, 6vw, 26px); }
         }
+
+        /* Updated styles for "Bonus Subject To Terms ... Deposit Bonus." */
+        .terms-text {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            color: #fff;
+            text-shadow: 0 2px 15px rgba(0,0,0,0.8);
+            margin: 8px 0 0 !important;
+        }
+        @media (min-width: 640px) {
+            .terms-text {
+                font-size: clamp(18px, 3.2vw, 30px); /* Even larger on desktop */
+            }
+        }
+        @media (max-width: 639px) {
+            .terms-text {
+                font-size: clamp(9px, 2.6vw, 12px); /* Smaller than before on mobile */
+            }
+        }
+        @media (max-width: 370px) {
+            .terms-text {
+                font-size: 12px !important; /* Even smaller on very small phones */
+            }
+        }
+        .dot{
+            letter-spacing: 300px !important;
+        }
+        
+        @media(max-width:370px) {
+            .dot{
+                letter-spacing: 100px !important;
+            }
+            
+        }
+        
     </style>
 </head>
 <body>
@@ -646,7 +676,7 @@
         </a>
     </div>
 
-    <!-- Rest of the page remains unchanged -->
+    <!-- Rest of the page -->
     <div class="hero-image">
         <img src="/img/offer.jpg" alt="Exclusive Offer">
 
@@ -669,12 +699,16 @@
                 <p style="margin:0 !important;">
                    🔥 Limited-Time Offer — Bonus Must Be Claimed Today<br>
 
-⏳ Offer reserved for new players only. Bonus availability is time-limited.
+                ⏳ Offer reserved for new players only. Bonus availability is time-limited.
                 </p>
                 <div class="bonus-numbers">UP TO +$10,000 | UP TO +375%</div>
+                
+                <p class="terms-text">Bonus Subject To Terms <span class="dot">.</span>Deposit Bonus.</p>
+
                 <div class="rewards-box">
                     <div class="rewards-text"><span>$75,000</span> rank awards and exclusive streamer rewards</div>
                 </div>
+                
 
                 <!-- New "Start in 3 Easy Steps" section added here -->
                 <h2 class="steps-title">Start in 3 Easy Steps</h2>
@@ -748,4 +782,3 @@
     </script>
 </body>
 </html>
-
