@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
+    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
     <title>SH4NER | Sh4ner - Offers</title>
@@ -313,6 +313,7 @@
         @media (max-width: 640px) {
             .hero-text {
                 top: 78% !important;
+                font-size: smaller;
             }
             .hero-content-scaled {
                 transform: scale(0.86) !important;
@@ -350,16 +351,17 @@
             .text-mobile {display: block !important;}
         }
 
-        @media (max-width: 370px) {
+        @media (max-width: 700px) {
             .hero-text {top: 83% !important;}
             .hero-content-scaled {transform: scale(0.65) !important;}
             .bonus-numbers {
-                font-size: clamp(20px, 7.35vw, 29px) !important;
+                font-size: clamp(13px, 8.64vw, 29px) !important;
                 letter-spacing: -1px !important;
                 margin-top: 24px !important;
             }
             .main-cta {height: 72px !important;}
             .main-cta .big {font-size: 1.55rem !important;}
+            .terms-text {font-size: clamp(7px, 2.4vw, 10px) !important;}
         }
 
         header {position:fixed; top:0; left:0; right:0; z-index:50;}
@@ -537,6 +539,7 @@
 
         @media (max-width: 640px) {
             .footer h2, .footer h1 { font-size: clamp(20px, 6vw, 26px); }
+            .terms-text { font-size: clamp(8px, 2.4vw, 10px);  }
         }
 
         /* Updated styles for "Bonus Subject To Terms ... Deposit Bonus." */
@@ -554,24 +557,27 @@
         }
         @media (max-width: 639px) {
             .terms-text {
-                font-size: clamp(9px, 2.6vw, 12px); /* Smaller than before on mobile */
+                font-size: clamp(9px,2.6vw, 12px); /* Smaller than before on mobile */
             }
         }
-        @media (max-width: 370px) {
+        @media (max-width: 900px) {
             .terms-text {
-                font-size: 12px !important; /* Even smaller on very small phones */
+                  font-size: clamp(6px,2.30vw, 10px) !important;
+
             }
+
         }
         .dot{
             letter-spacing: 300px !important;
         }
         
-        @media(max-width:370px) {
+        @media(max-width:900px) {
             .dot{
-                letter-spacing: 100px !important;
+              letter-spacing: clamp(99px, 8vw, 100px) !important;
             }
             
         }
+    
         
     </style>
 </head>
