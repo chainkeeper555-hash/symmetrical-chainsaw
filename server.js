@@ -43,9 +43,28 @@ const ACCOUNTS = [
 ];
 
 // Dynamic UTC period: Current month (November 2025)
+// THIS MONTH (UTC) – same format as your code
+
 const now = new Date();
-const START_DATE = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1, 0, 0, 0));
-const END_DATE = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 0, 23, 59, 59));
+
+const START_DATE = new Date(
+  Date.UTC(
+    now.getUTCFullYear(),
+    now.getUTCMonth(),
+    1,
+    0, 0, 0
+  )
+);
+
+const END_DATE = new Date(
+  Date.UTC(
+    now.getUTCFullYear(),
+    now.getUTCMonth() + 1,
+    0,
+    23, 59, 59
+  )
+);
+
 const BEGIN_UTC = Math.floor(START_DATE.getTime() / 1000);
 const END_UTC = Math.floor(END_DATE.getTime() / 1000);
 
@@ -852,3 +871,4 @@ app.listen(PORT, () => {
         console.error('Error in initial API fetch on startup:', err.message);
     });
 });
+
