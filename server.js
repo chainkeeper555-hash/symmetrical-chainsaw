@@ -42,24 +42,27 @@ const ACCOUNTS = [
     { invitationCode: 'sh4ner', accessKey: process.env.BC_ACCESS_KEY_2 || 'ZyFuCnq66f3ODBCv' },
 ];
 
-// Dynamic UTC period: Current month (November 2025)
-// THIS MONTH (UTC) – same format as your code
-
+// Dynamic UTC period: February of current year
 const now = new Date();
+const currentYear = now.getUTCFullYear();
+const FEBRUARY_MONTH = 1; // JavaScript months are 0-indexed: 0=Jan, 1=Feb
 
+// February start date: 1st February, 00:00:00 UTC
 const START_DATE = new Date(
   Date.UTC(
-    now.getUTCFullYear(),
-    now.getUTCMonth(),
+    currentYear,
+    FEBRUARY_MONTH, // February
     1,
     0, 0, 0
   )
 );
 
+// February end date: Last day of February, 23:59:59 UTC
+// Note: Date.UTC handles leap years automatically (28 or 29 days)
 const END_DATE = new Date(
   Date.UTC(
-    now.getUTCFullYear(),
-    now.getUTCMonth() + 1,
+    currentYear,
+    FEBRUARY_MONTH + 1, // March (to get last day of Feb)
     0,
     23, 59, 59
   )
@@ -81,7 +84,7 @@ try {
     console.error('Error clearing cache file on startup:', err.message);
 }
 
-// Embedded leaderboard data as fallback (for current month - November 2025)
+// Embedded leaderboard data as fallback (for February)
 const EMBEDDED_DATA = {
   leaderboard: [
     { rank: 1, username: "ЖЕ*****ЧУ", wagered: 243747.58, prize: 3000, img: BC_LOGO },
@@ -105,7 +108,7 @@ const EMBEDDED_DATA = {
     { rank: 19, username: "ih*****fe", wagered: 4240, prize: 0, img: BC_LOGO },
     { rank: 20, username: "La*****25", wagered: 3588.75, prize: 0, img: BC_LOGO },
   ],
-  lastupdated: "08.11.2025 00:00:00 UTC", // Updated to current date
+  lastupdated: `01.02.${currentYear} 00:00:00 UTC`, // Updated to February
 };
 
 // Minimal fallback data
@@ -145,7 +148,8 @@ async function initializeDefaultUser() {
     }
 }
 
-console.log('UTC Period:', START_DATE.toISOString(), '-', END_DATE.toISOString());
+console.log('February Period:', START_DATE.toISOString(), '-', END_DATE.toISOString());
+console.log('UTC Timestamps:', BEGIN_UTC, 'to', END_UTC);
 console.log('Serving images from:', path.join(__dirname, 'img'));
 
 // Validate environment variables
@@ -864,6 +868,7 @@ app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
     console.log(`Client URL: ${process.env.CLIENT_URL || 'https://sh4ner.com'}`);
     console.log(`Admin URL: http://localhost:${PORT}/admin`);
+    console.log(`Fetching data for February ${currentYear}`);
     // Trigger initial fetch on startup
     fetchAndMerge().then(() => {
         console.log('Initial API fetch completed on server startup');
@@ -871,4 +876,3 @@ app.listen(PORT, () => {
         console.error('Error in initial API fetch on startup:', err.message);
     });
 });
-
