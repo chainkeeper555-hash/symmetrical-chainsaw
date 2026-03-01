@@ -98,7 +98,7 @@
 
                 <div class="winner-grid" data-aos="fade-up"></div>
                 <div class="countdown-card" data-aos="fade-up">
-                    <h4 class="text-lg sm:text-xl font-bold text-[#00E0FF] mb-3 sm:mb-4">Time Remaining</h4>
+                    <h4 class="text-lg sm:text-xl font-bold text-[#00E0FF] mb-3 sm:mb-4">Time Remaining in March</h4>
                     <div class="countdown-grid">
                         <div class="countdown-box">
                             <p id="countdown-days" class="text-xl sm:text-2xl font-bold text-white mb-1"></p>
@@ -313,24 +313,24 @@
                     tbody.appendChild(tr);
                 });
 
-                // UPDATED: Countdown logic for February
-                function getEndOfFebruaryUTC() {
+                // UPDATED: Countdown logic for March 2026
+                function getEndOfMarchUTC() {
                     const now = new Date();
                     const currentYear = now.getUTCFullYear();
-                    // February is month 1 (0-indexed)
-                    return new Date(Date.UTC(currentYear, 2, 0, 23, 59, 59, 999)); // Last day of February
+                    // March is month 2 (0-indexed)
+                    return new Date(Date.UTC(currentYear, 3, 0, 23, 59, 59, 999)); // Last day of March
                 }
 
                 function updateCountdown() {
-                    const endDate = getEndOfFebruaryUTC();
+                    const endDate = getEndOfMarchUTC();
                     const now = new Date().getTime();
                     const distance = endDate.getTime() - now;
 
                     if (distance < 0) {
-                        // February has ended - set to next February
+                        // March has ended - set to next March
                         const nextYear = new Date().getUTCFullYear() + 1;
-                        const nextFebEnd = new Date(Date.UTC(nextYear, 2, 0, 23, 59, 59, 999));
-                        const nextDistance = nextFebEnd.getTime() - now;
+                        const nextMarchEnd = new Date(Date.UTC(nextYear, 3, 0, 23, 59, 59, 999));
+                        const nextDistance = nextMarchEnd.getTime() - now;
                         
                         updateCountdownValues(nextDistance);
                         return;
@@ -351,22 +351,6 @@
                     document.getElementById('countdown-seconds').textContent = seconds.toString().padStart(2, '0');
                 }
 
-                // Also display current month for clarity
-                function displayCurrentMonth() {
-                    const now = new Date();
-                    const currentYear = now.getUTCFullYear();
-                    const monthNames = ["January", "February", "March", "April", "May", "June",
-                        "July", "August", "September", "October", "November", "December"];
-                    
-                    // Show February as the current month
-                    const monthElement = document.querySelector('h3.text-2xl');
-                    if (monthElement) {
-                        const originalText = monthElement.textContent;
-                        monthElement.textContent = `${originalText} - ${monthNames[1]} ${currentYear}`;
-                    }
-                }
-
-                displayCurrentMonth();
                 updateCountdown();
                 setInterval(updateCountdown, 1000);
 
