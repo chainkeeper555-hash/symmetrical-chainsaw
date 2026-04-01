@@ -42,34 +42,24 @@ const ACCOUNTS = [
     { invitationCode: 'sh4ner', accessKey: process.env.BC_ACCESS_KEY_2 || 'ZyFuCnq66f3ODBCv' },
 ];
 
-// Dynamic monthly period: Current month
-const now = new Date();
-const currentYear = now.getUTCFullYear();
-const currentMonth = now.getUTCMonth(); // JavaScript months are 0-indexed: 0=Jan, 1=Feb, 2=Mar, etc.
+// Helper to get current month timestamps (UTC)
+function getCurrentMonthTimestamps() {
+    const now = new Date();
+    const currentYear = now.getUTCFullYear();
+    const currentMonth = now.getUTCMonth(); // 0-indexed
 
-// Start date: 1st day of current month, 00:00:00 UTC
-const START_DATE = new Date(
-  Date.UTC(
-    currentYear,
-    currentMonth, // Current month
-    1,
-    0, 0, 0
-  )
-);
+    const startDate = new Date(Date.UTC(currentYear, currentMonth, 1, 0, 0, 0));
+    const endDate = new Date(Date.UTC(currentYear, currentMonth + 1, 0, 23, 59, 59));
 
-// End date: Last day of current month, 23:59:59 UTC
-// By going to the next month and then back to day 0, we get the last day of current month
-const END_DATE = new Date(
-  Date.UTC(
-    currentYear,
-    currentMonth + 1, // Next month
-    0,
-    23, 59, 59
-  )
-);
-
-const BEGIN_UTC = Math.floor(START_DATE.getTime() / 1000);
-const END_UTC = Math.floor(END_DATE.getTime() / 1000);
+    return {
+        beginUTC: Math.floor(startDate.getTime() / 1000),
+        endUTC: Math.floor(endDate.getTime() / 1000),
+        startDate,
+        endDate,
+        monthName: startDate.toLocaleString('default', { month: 'long' }),
+        year: currentYear,
+    };
+}
 
 // Flag to force API fetch on first call after server restart
 let forceFetchOnStartup = true;
@@ -85,6 +75,8 @@ try {
 }
 
 // Embedded leaderboard data as fallback (for current month)
+// Note: This fallback is static but will only be used if API fails.
+// We'll still display it but with correct month info.
 const EMBEDDED_DATA = {
   leaderboard: [
     { rank: 1, username: "ЖЕ*****ЧУ", wagered: 243747.58, prize: 3000, img: BC_LOGO },
@@ -108,7 +100,7 @@ const EMBEDDED_DATA = {
     { rank: 19, username: "ih*****fe", wagered: 4240, prize: 0, img: BC_LOGO },
     { rank: 20, username: "La*****25", wagered: 3588.75, prize: 0, img: BC_LOGO },
   ],
-  lastupdated: `01.${String(currentMonth + 1).padStart(2, '0')}.${currentYear} 00:00:00 UTC`,
+  lastupdated: `01.${String(new Date().getUTCMonth() + 1).padStart(2, '0')}.${new Date().getUTCFullYear()} 00:00:00 UTC`,
 };
 
 // Minimal fallback data
@@ -148,8 +140,10 @@ async function initializeDefaultUser() {
     }
 }
 
-console.log('Current Month Period:', START_DATE.toISOString(), '-', END_DATE.toISOString());
-console.log('UTC Timestamps:', BEGIN_UTC, 'to', END_UTC);
+// Log current month info at startup (dynamic)
+const { startDate, endDate, monthName, year } = getCurrentMonthTimestamps();
+console.log('Current Month Period:', startDate.toISOString(), '-', endDate.toISOString());
+console.log('UTC Timestamps:', getCurrentMonthTimestamps().beginUTC, 'to', getCurrentMonthTimestamps().endUTC);
 console.log('Serving images from:', path.join(__dirname, 'img'));
 
 // Validate environment variables
@@ -491,11 +485,12 @@ app.post('/api/clear-cache', authenticateToken, async (req, res) => {
 // BC.Game API Health Check Endpoint
 app.get('/api/bc-health', authenticateToken, async (req, res) => {
     try {
+        const { beginUTC, endUTC } = getCurrentMonthTimestamps();
         const payload = {
             invitationCode: ACCOUNTS[0].invitationCode,
             accessKey: ACCOUNTS[0].accessKey,
-            beginTimestamp: BEGIN_UTC,
-            endTimestamp: END_UTC
+            beginTimestamp: beginUTC,
+            endTimestamp: endUTC
         };
         console.log('Testing BC.Game API with payload:', JSON.stringify(payload, null, 2));
         const response = await fetch(BC_API_URL, {
@@ -644,14 +639,15 @@ async function fetchWithRetry(url, options, retries = 5, delay = 2000) {
     }
 }
 
-// Fetch BC.Game data
+// Fetch BC.Game data using current month timestamps
 async function fetchBCGame(account) {
     try {
+        const { beginUTC, endUTC } = getCurrentMonthTimestamps();
         const payload = {
             invitationCode: account.invitationCode,
             accessKey: account.accessKey,
-            beginTimestamp: BEGIN_UTC,
-            endTimestamp: END_UTC,
+            beginTimestamp: beginUTC,
+            endTimestamp: endUTC,
         };
         console.log(`Fetching BC.Game data for ${account.invitationCode} with payload:`, JSON.stringify(payload, null, 2));
         const res = await fetchWithRetry(BC_API_URL, {
@@ -865,10 +861,11 @@ mongoose.connect(process.env.MONGO_URI, {
 
 // Start the server
 app.listen(PORT, () => {
+    const { monthName, year } = getCurrentMonthTimestamps();
     console.log(`Server running on http://localhost:${PORT}`);
     console.log(`Client URL: ${process.env.CLIENT_URL || 'https://sh4ner.com'}`);
     console.log(`Admin URL: http://localhost:${PORT}/admin`);
-    console.log(`Fetching data for ${new Date(START_DATE).toLocaleString('default', { month: 'long' })} ${currentYear}`);
+    console.log(`Fetching data for ${monthName} ${year}`);
     // Trigger initial fetch on startup
     fetchAndMerge().then(() => {
         console.log('Initial API fetch completed on server startup');
